@@ -1,0 +1,63 @@
+/* 마감 캘린더 */
+.calbox{padding:16px 14px 10px;border:1px solid #EEF0EE;border-radius:20px;background:#fff}
+.calhead{display:flex;align-items:center;justify-content:space-between;padding:0 4px 10px}
+.calhead h2{margin:0;font-size:17px;font-weight:600;letter-spacing:-.4px}
+.calnav{display:flex;gap:2px}
+.calnav button{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#4B5650}
+.calnav button:hover{filter:none;background:#F3F6F4}
+.calnav .icon{width:18px;height:18px}
+.calweek,.calgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.calweek span{padding:4px 0 8px;text-align:center;font-size:12px;color:#8A928D}
+.calgrid{row-gap:2px}
+.calcell{position:relative;height:44px;display:grid;place-items:center;font-size:15px;color:var(--pm-ink);font-variant-numeric:tabular-nums}
+.calcell span{width:36px;height:36px;display:grid;place-items:center;border-radius:12px;transition:background-color .15s}
+.calcell:hover{filter:none}
+.calcell:hover span{background:#F3F6F4}
+.calcell.past{color:#A3ABA6}
+.calcell.sel span{box-shadow:inset 0 0 0 1.5px var(--pm-key);color:var(--pm-key);font-weight:600}
+.calcell.today span{background:var(--pm-key)!important;color:#fff;font-weight:700;box-shadow:none}
+.caldot{position:absolute;bottom:1px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--pm-key)}
+.calcell:focus-visible{outline:none}
+.calcell:focus-visible span{outline:2px solid var(--pm-key);outline-offset:1px}
+.callist{display:grid;gap:8px}
+.calrow{display:flex;align-items:center;gap:14px;width:100%;padding:12px 14px 12px 12px;border:1px solid #EEF0EE;border-radius:18px;background:#fff;text-align:left;color:var(--pm-ink)}
+.calrow:hover{filter:none;border-color:#DDE3DF}
+.calthumb{flex:none;width:56px;height:56px;border-radius:12px;overflow:hidden;background:#EEF2EF}
+.calthumb>img,.calthumb>svg{width:100%;height:100%;object-fit:cover;display:block}
+.caltext{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.caltext b{font-size:15px;font-weight:600;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.caltext small{display:flex;align-items:center;gap:4px;font-size:12.5px;color:#8A928D;white-space:nowrap;overflow:hidden}
+.caltext small .icon{flex:none;width:14px;height:14px}
+.calbadge{flex:none;padding:5px 10px;border-radius:999px;background:var(--pm-key-soft,#E3F6EC);color:var(--pm-key);font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.calbadge.soon{background:var(--pm-key);color:#fff}
+.calempty{margin:0;font-size:13.5px;color:var(--pm-sub)}
+
+/* 계획 탭에서 날짜별로 저장한 코스를 다시 찾습니다. */
+.cal-courses{margin-bottom:28px}
+.cal-courses .sectionhead{margin-bottom:12px}
+.cal-courses .sectionhead .textbtn{display:inline-flex;align-items:center;gap:4px;color:var(--pm-key);font-size:13px;font-weight:700}
+.cal-courses .sectionhead .icon{width:15px;height:15px}
+.cal-course-count{font-size:14px;color:var(--pm-key);font-weight:700}
+.cal-course-carousel{display:flex;gap:11px;overflow-x:auto;overflow-y:hidden;padding:2px 4px 12px 1px;scroll-snap-type:x mandatory;scroll-padding-inline:1px;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.cal-course-carousel::-webkit-scrollbar{display:none}
+.cal-course-card{position:relative;min-width:0;display:grid;gap:3px;padding:15px 44px 15px 16px;border:1px solid #e4eae5;border-radius:17px;background:#fff;text-align:left;box-shadow:0 2px 10px #1435260a}
+.cal-course-carousel .cal-course-card{flex:0 0 clamp(230px,74%,330px);scroll-snap-align:start}
+.cal-course-card:hover,.cal-course-card:focus-visible{border-color:var(--pm-key);background:#f7fcf9;outline:none}
+.cal-course-date{color:var(--pm-key);font-size:12px;font-weight:700}
+.cal-course-title{color:var(--pm-ink);font-size:16px;font-weight:700;line-height:1.4}
+.cal-course-meta{color:var(--pm-sub);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-course-arrow{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--pm-key)}
+.cal-course-arrow .icon{width:18px;height:18px}
+.cal-course-empty{margin:0;padding:18px;border:1px dashed #cbdcd0;border-radius:17px;background:#f7faf7;color:var(--pm-sub);font-size:13px;line-height:1.5}
+.cal-course-example{display:inline-block;margin-left:5px;padding:2px 5px;border-radius:5px;background:#eaf5ed;color:#386d4c;font-size:10px;font-weight:700}
+.cal-course-all{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;min-height:40px;margin-top:2px;border:1px solid #d9e9dd;border-radius:12px;background:#f6fbf7;color:var(--pm-key);font-size:13px;font-weight:750}
+.cal-course-all .icon{width:16px;height:16px}
+.all-courses-page{max-width:850px;margin:auto;padding-bottom:75px}
+.all-courses-head{display:flex;align-items:end;justify-content:space-between;gap:14px;margin:18px 0 20px}
+.all-courses-head .eyebrow{color:var(--pm-key);font-size:12px;font-weight:750}
+.all-courses-head h1{margin:5px 0 0;font-size:29px}
+.all-courses-head h1 span{color:var(--pm-key);font-size:18px}
+.all-courses-head .tonal{display:flex;align-items:center;gap:5px;min-height:38px;padding:0 12px;font-size:12px;white-space:nowrap}
+.all-courses-head .icon{width:16px;height:16px}
+.all-courses-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.all-courses-list .cal-course-card{width:100%;min-height:108px}
