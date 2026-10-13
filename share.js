@@ -67,10 +67,10 @@ function sdLayer(){
       </div>
       <div class="sd-oslist"><span>복사 ${icon('copy')}</span><span>새로운 빠른 메모에 추가 ${icon('note')}</span></div>
     </div>`;
-  if (p === 'save') return `<div class="sd-dim light" data-sd="savedone" aria-label="닫고 저장"></div>${saveSheet()}`;
+  if (p === 'save') return `<div class="sd-dim light" data-sd="savedone" aria-label="닫고 저장"></div>${shareSaveSheet()}`;
   return '';
 }
-function saveSheet(){
+function shareSaveSheet(){
   const x = sd.item, t = typeOf(x.type);
   const cols = collectionNames().map(name => {
     const first = items.find(i => inCollection(i,name) && i !== x), on = inCollection(x,name);
