@@ -4,8 +4,7 @@
 
 /* ---------- 하단 메뉴에 캘린더 추가 ---------- */
 NAV.splice(3, 0, ['calendar', 'calendar', '캘린더']);
-pageName.calendar = '계획';
-pageName.courses = '내 코스';
+pageName.calendar = '캘린더';
 
 /* ---------- 마감이 적힌 콘텐츠만 캘린더에 ---------- */
 // 전시 기간 · 지원 마감처럼 원본 콘텐츠에 마감이 적혀 있는 것만 표시해요.
@@ -49,26 +48,6 @@ function calRow(x){
   </button>`;
 }
 
-function calSavedCourses(){
-  return Object.entries(coursePlans)
-    .filter(([date,plan])=>courseValidDate(date)&&plan&&typeof plan==='object'&&(String(plan.title||'').trim()||String(plan.note||'').trim()||Array.isArray(plan.ids)&&plan.ids.length))
-    .sort(([a],[b])=>b.localeCompare(a));
-}
-function calCourseCard([date,plan]){
-  const stops=Array.isArray(plan.ids)?plan.ids.map(id=>items.find(x=>x.id===id)).filter(Boolean):[];
-  return `<button class="cal-course-card" data-course-view="${date}" aria-label="${esc(courseDateLabel(date))} ${esc(String(plan.title||'').trim()||'하루 코스')} 보기"><span class="cal-course-date">${esc(courseDateLabel(date))}${plan.example?' <span class="cal-course-example">예시</span>':''}</span><span class="cal-course-title">${esc(String(plan.title||'').trim()||'하루 코스')}</span><span class="cal-course-meta">${stops.length}곳${stops.length?` · ${esc(stops.slice(0,2).map(x=>x.title).join(' → '))}${stops.length>2?' 외':''}`:''}</span><span class="cal-course-arrow">${icon('arrow')}</span></button>`;
-}
-function calCourseSection(){
-  const saved=calSavedCourses();
-  return `<section class="cal-courses" aria-label="내 코스"><div class="sectionhead"><h2>내 코스 <span class="cal-course-count">${saved.length}</span></h2><button class="textbtn" data-page="course">코스 계획하기 ${icon('arrow')}</button></div>
-    ${saved.length?`<div class="cal-course-carousel" aria-label="내 코스 가로 목록">${saved.map(calCourseCard).join('')}</div>${saved.length>2?`<button class="cal-course-all" data-page="courses">모든 코스 보기 ${icon('arrow')}</button>`:''}`:'<p class="cal-course-empty">아직 저장한 코스가 없어요. 날짜와 장소를 골라 첫 코스를 만들어 보세요.</p>'}</section>`;
-}
-
-pages.courses = function(){
-  const saved=calSavedCourses();
-  return `<div class="all-courses-page"><button class="back" data-page="calendar">${icon('back')} 계획으로 돌아가기</button><div class="all-courses-head"><div><span class="eyebrow">내가 계획한 하루</span><h1>내 코스 <span>${saved.length}</span></h1></div><button class="tonal" data-page="course">${icon('plus')} 새 코스</button></div>${saved.length?`<div class="all-courses-list">${saved.map(calCourseCard).join('')}</div>`:'<p class="cal-course-empty">아직 저장한 코스가 없어요. 새 코스를 계획해 보세요.</p>'}</div>`;
-};
-
 pages.calendar = function(){
   const y = calMonth.getFullYear(), m = calMonth.getMonth();
   const first = new Date(y, m, 1).getDay(), last = new Date(y, m + 1, 0).getDate();
@@ -84,9 +63,7 @@ pages.calendar = function(){
   const [sy, sm, sd] = calSel.split('-').map(Number);
   const selList = dueByDay[calSel] || [];
   const soon = calDueList().filter(x => calDue(x) >= calToday).slice(0, 5);
-  return head('계획', '', false) + `
-    ${calCourseSection()}
-    <div class="sectionhead"><h2>마감 캘린더</h2></div>
+  return head('마감 캘린더', '', false) + `
     <section class="calbox">
       <div class="calhead">
         <h2>${y}년 ${m + 1}월</h2>

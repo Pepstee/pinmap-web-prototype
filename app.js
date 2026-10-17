@@ -42,19 +42,7 @@ const COLLECTIONS = [
   ['나의 작은 공간','home','집을 조금 더 나답게'],
   ['일상에 영감','spark','요리부터 기록까지']
 ];
-const itemCollections = x => [...new Set([x.collection,...(Array.isArray(x.collections)?x.collections:[])].filter(n=>typeof n==='string'&&n.trim()))];
-const inCollection = (x,name) => itemCollections(x).includes(name);
-const addItemCollection = (x,name) => {
-  if(inCollection(x,name))return false;
-  if(!x.collection)x.collection=name;
-  else x.collections=[...(Array.isArray(x.collections)?x.collections:[]),name];
-  return true;
-};
-const removeItemCollection = (x,name) => {
-  if(x.collection===name){const extras=Array.isArray(x.collections)?x.collections:[];x.collection=extras[0]||'';x.collections=extras.slice(1);}
-  else x.collections=(Array.isArray(x.collections)?x.collections:[]).filter(n=>n!==name);
-};
-const collectionNames = () => [...new Set([...COLLECTIONS.map(c => c[0]), ...items.flatMap(itemCollections)])];
+const collectionNames = () => [...new Set([...COLLECTIONS.map(c => c[0]), ...items.map(x => x.collection).filter(Boolean)])];
 
 // 예시 데이터 · 실제 SNS 계정과 연결되지 않습니다.
 let items = [
@@ -71,7 +59,6 @@ let items = [
   {id:11,title:'원룸 수납 정리 아이디어',type:'생활 정보',category:'수납',source:'Instagram',ago:'3주 전',desc:'좁은 방을 넓게 쓰는 선반 배치.',memo:'이사 가면 참고하기.',art:'tips',collection:'일상에 영감',saves:142,aiClassified:true}
 ];
 let page='home', filter='전체', query='', detailId=null, selectedPin=1, collection=null, locationAllowed=false, toastTimer;
-let mapMenuOpen=false, mapPickMode=false, mapSheetState='closed', mapSearchQuery='', courseReturnPage='map';
 // 마이 > 프로필 · 설정 (pinmap.js가 브라우저에 저장합니다)
 let settings = {nickname:'서연', area:'성수동', notiDeadline:true, notiNearby:true, notiReminder:false, aiDefault:true, mapApp:'naver', readNoti:[], push:false, locPerm:'none', places:['성수동','청파동'], recentPlaces:['한남동','연남동','잠실3동']};
 const LOC_PERM = {none:'허용 안 함', using:'앱을 사용하는 동안', always:'항상 허용'};
@@ -112,14 +99,14 @@ function card(x){const info=infoLine(x);return `<button class="card" data-detail
 function gcard(x){const ratio=[0.82,1.12,0.95,1.28][x.id%4];const info=infoLine(x);return `<button class="gcard" data-detail="${x.id}"><div class="gart" style="aspect-ratio:${ratio}">${art(x.art)}${badge(x)}</div><div class="gbody"><h3>${esc(x.title)}</h3>${info?`<p class="infoline">${esc(info)}</p>`:''}<p class="hint">${esc(x.ago)} 저장</p></div></button>`}
 
 /* ---------- 공통 레이아웃 ---------- */
-const NAV = [['home','home','홈'],['map','map','지도'],['library','bookmark','저장목록'],['my','user','마이']];
-const pageName = {home:'홈',map:'지도',library:'저장목록',my:'마이'};
-function nav(){return NAV.map(([p,i,l])=>{const active=page===p||(page==='courses'&&p==='calendar')||(page==='course'&&p===(courseReturnPage==='calendar'||courseReturnPage==='courses'?'calendar':'map'));return `<button class="navitem ${active&&!detailId?'active':''}" data-page="${p}" aria-label="${esc(l)}" title="${esc(l)}" ${active?'aria-current="page"':''}><span class="navicon">${icon(i)}</span></button>`}).join('')}
+const NAV = [['home','home','홈'],['map','map','지도'],['library','bookmark','저장함'],['my','user','마이']];
+const pageName = {home:'홈',map:'지도',library:'저장함',my:'마이'};
+function nav(){return NAV.map(([p,i,l])=>`<button class="navitem ${page===p&&!detailId?'active':''}" data-page="${p}" ${page===p?'aria-current="page"':''}><span class="navicon">${icon(i)}</span><span>${l}</span></button>`).join('')}
 // 페이지 제목 (서브 문구는 표시하지 않아요)
-function head(title,sub,save=true){return `<div class="heading"><div><h1>${title}</h1></div></div>`}
+function head(title,sub,save=true){return `<div class="heading"><div><h1>${title}</h1></div>${save?`<button class="filled" data-action="save" aria-label="새로 저장">${icon('plus')}<span>새로 저장</span></button>`:''}</div>`}
 let locbar = () => `<button class="locbar" data-action="location"><span aria-hidden="true">📍</span><b>${esc((settings.places||['성수동'])[0])}</b><span class="hint">${settings.locPerm!=='none'?'현재 위치 · 예시':'예시 위치 · 위치 권한 체험'}</span></button>`;
 function chips(){return `<div class="chips" role="group" aria-label="콘텐츠 유형 필터">${categories.map(c=>`<button class="chip ${filter===c?'active':''}" data-filter="${c}" aria-pressed="${filter===c}">${filter===c?icon('check'):(c==='전체'?'':typeOf(c).emoji+' ')}${c}</button>`).join('')}</div>`}
-function filtered(){const q=query.toLowerCase();return items.filter(x=>(filter==='전체'||x.type===filter)&&(!collection||inCollection(x,collection))&&(!q||[x.title,x.desc,x.type,x.category,...itemCollections(x),x.memo].join(' ').toLowerCase().includes(q)))}
+function filtered(){const q=query.toLowerCase();return items.filter(x=>(filter==='전체'||x.type===filter)&&(!collection||x.collection===collection)&&(!q||[x.title,x.desc,x.type,x.category,x.collection,x.memo].join(' ').toLowerCase().includes(q)))}
 const galleryMode = () => !collection && filter!=='전체' && !typeOf(filter).place;
 
 /* ---------- 화면 ---------- */
@@ -127,49 +114,20 @@ pages.home = function(){return locbar()+head('저장한 취향이, 오늘의 일
 
 pages.library = function(){
   const sub = collection?'하나의 계획으로 연결되는 다양한 취향.':`지금까지 담아둔 ${items.length}개의 콘텐츠를 한곳에서.`;
-  return head(esc(collection)||'저장목록',sub)+`${collection?`<button class="back" data-page="library">${icon('back')} 전체 저장목록</button>`:''}<label class="search">${icon('search')}<input id="search" aria-label="저장 콘텐츠 검색" placeholder="제목, 키워드, 저장한 이유로 찾기" value="${esc(query)}"><button class="iconbtn" data-action="clear" aria-label="검색 지우기">${icon('close')}</button></label>${collection?'':`<div class="colstrip" aria-label="내 컬렉션">${collectionNames().map(n=>`<button class="colpill" data-collection="${esc(n)}">📁 ${esc(n)} <span>${items.filter(x=>inCollection(x,n)).length}</span></button>`).join('')}</div>`}${chips()}<div class="sectionhead"><span id="resultcount" class="muted">${filtered().length}개의 콘텐츠</span><span class="hint">${galleryMode()?'갤러리 보기 · ':''}최근 저장순</span></div><div id="results" class="${galleryMode()?'gallery':'grid'}">${resultCards()}</div>`;
+  return head(esc(collection)||'내 저장함',sub)+`${collection?`<button class="back" data-page="library">${icon('back')} 전체 저장함</button>`:''}<label class="search">${icon('search')}<input id="search" aria-label="저장 콘텐츠 검색" placeholder="제목, 키워드, 저장한 이유로 찾기" value="${esc(query)}"><button class="iconbtn" data-action="clear" aria-label="검색 지우기">${icon('close')}</button></label>${collection?'':`<div class="colstrip" aria-label="내 모음">${collectionNames().map(n=>`<button class="colpill" data-collection="${esc(n)}">📁 ${esc(n)} <span>${items.filter(x=>x.collection===n).length}</span></button>`).join('')}</div>`}${chips()}<div class="sectionhead"><span id="resultcount" class="muted">${filtered().length}개의 콘텐츠</span><span class="hint">${galleryMode()?'갤러리 보기 · ':''}최근 저장순</span></div><div id="results" class="${galleryMode()?'gallery':'grid'}">${resultCards()}</div>`;
 };
 function resultCards(){const list=filtered();return list.map(galleryMode()?gcard:card).join('')||`<div class="empty">${icon('search')}<h3>아직 찾는 콘텐츠가 없어요</h3><p class="muted">다른 키워드나 유형으로 다시 찾아보세요.</p><button class="tonal" data-action="resetfilter">전체 콘텐츠 보기</button></div>`}
 
-const SAMPLE_MAP_POINTS = {
-  1:{title:'햇살이 머무는 성수 카페',coords:[37.5446,127.0557],label:'성수역 주변'},
-  4:{title:'초록 사이, 주말의 전시',coords:[37.5433,127.0520],label:'성수동 전시 공간 주변'},
-  6:{title:'서울숲에서 잠깐 쉬어가기',coords:[37.5445,127.0374],label:'서울숲'},
-  8:{title:'골목 안 작은 브런치 식당',coords:[37.5472,127.0474],label:'뚝섬역 주변'},
-  9:{title:'바다 앞 작은 숙소',coords:[37.7519,128.8761],label:'강릉 해변 주변'}
-};
-function mapCoordinates(x){
-  if(Array.isArray(x.coords)&&x.coords.length===2&&x.coords.every(Number.isFinite))return x.coords;
-  const sample=SAMPLE_MAP_POINTS[x.id];
-  return sample&&sample.title===x.title?sample.coords:null;
-}
-const mapPlaceLabel = x => x.placeLabel||SAMPLE_MAP_POINTS[x.id]?.label||x.address||'장소 후보';
-const readyPlaces = () => items.filter(x=>isPlace(x)&&x.address&&!x.pending&&mapCoordinates(x));
+const readyPlaces = () => items.filter(x=>isPlace(x)&&x.address&&!x.pending);
 const distanceOf = x => /도보/.test(x.distance||'') ? Number(String(x.distance).replace(/\D/g,''))||99 : 999;
 pages.map = function(){
-  const ready=readyPlaces();
-  const savedPlaces=items.filter(isPlace);
-  const x=ready.find(p=>p.id===selectedPin);
-  return `<div class="map-screen" aria-label="저장한 장소 지도">
-    <div class="mapwrap real-map-wrap"><div id="real-map" role="application" aria-label="저장한 장소가 표시된 실제 지도"></div><p id="map-fallback" hidden>지도를 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.</p></div>
-    ${!mapPickMode?`<div class="map-search"><label for="map-search-input" class="sr-only">저장한 장소 검색</label>${icon('search')}<input id="map-search-input" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="저장한 장소 검색" value="${esc(mapSearchQuery)}" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="map-search-results"><span class="map-search-count">${savedPlaces.length}곳</span></div><div id="map-search-results" class="map-search-results" role="listbox" aria-label="저장한 장소 검색 결과" hidden></div>`:''}
-    ${mapPickMode?`<p class="map-pick-hint">지도에서 추가할 장소의 위치를 눌러주세요</p>`:''}
-    ${!mapPickMode&&mapSheetState!=='closed'&&x?mapPlaceSheet(x):''}
-    ${!mapPickMode&&!ready.length?`<p class="map-empty-hint">아직 지도에 표시할 장소가 없어요. 오른쪽 아래 +를 눌러 추가해 보세요.</p>`:''}
-  </div>`;
+  const ready=readyPlaces().sort((a,b)=>distanceOf(a)-distanceOf(b)), near=ready.filter(x=>distanceOf(x)<999), pending=items.filter(x=>isPlace(x)&&(!x.address||x.pending));
+  const x=near.find(p=>p.id===selectedPin)||near[0];
+  const pins=near.slice(0,4).map((p,i)=>`<button class="pin ${x&&p.id===x.id?'selected':''}" style="left:${[46,65,19,30][i]}%;top:${[33,53,42,62][i]}%" data-pin="${p.id}" aria-label="${esc(p.title)} 선택">${typeOf(p.type).emoji} ${esc(p.category)}</button>`).join('');
+  return locbar()+head('저장한 곳, 지금 가까이에.','내 주변에 저장한 장소를 지도에서 찾아요.')+`<div class="mapwrap"><svg class="mapdrawing" viewBox="0 0 850 540" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="850" height="540" fill="#E7EADC"/><path d="M0 480 850 420v120H0" fill="#C0D9E0"/><path d="m100 50 220 25 30 175-250 20z" fill="#C4D7B7"/><g stroke="#F9F9EF" stroke-width="22" fill="none"><path d="M-40 300 900 90 M20 400 900 230 M320-20 530 500 M600-20 760 460 M120-20 230 480"/></g><g stroke="#CDD1C1" stroke-width="2" fill="none"><path d="M-40 300 900 90 M20 400 900 230 M320-20 530 500 M600-20 760 460"/></g><g fill="#D6D9CC"><rect x="390" y="45" width="120" height="70" rx="8" transform="rotate(-14 390 45)"/><rect x="435" y="290" width="85" height="62" rx="8" transform="rotate(-14 435 290)"/><rect x="550" y="165" width="60" height="61" rx="7"/><rect x="630" y="290" width="90" height="60" rx="8"/></g><g font-size="14" fill="#707B66"><text x="150" y="170">서울숲</text><text x="565" y="84">성수동</text><text x="345" y="285">서울숲길</text><text x="640" y="445">한강</text></g><circle cx="410" cy="260" r="30" fill="#648EAA22"/><circle cx="410" cy="260" r="9" fill="#507FA6" stroke="white" stroke-width="4"/></svg><span class="maplabel">예시 지도 · 실제 거리와 다를 수 있어요</span>${pins}${x?`<div class="mapcard"><div><span class="hint">${esc(x.distance||'성수동')} · ${esc(x.category)}</span><h3>${esc(x.title)}</h3><p class="muted">${esc(x.memo)}</p></div><button class="filled" data-detail="${x.id}">상세 보기</button></div>`:''}<button class="iconbtn location" data-action="location" aria-label="위치 권한 체험">${icon('target')}</button></div><div class="sectionhead"><h2>지도에 담긴 내 장소</h2><span class="hint">${ready.length}곳 · 가까운 순</span></div><div class="grid">${ready.map(card).join('')}</div>`+(pending.length?`<div class="sectionhead"><h2>장소 확인 필요 · ${pending.length}개</h2></div><p class="hint">AI가 위치를 확정하지 못한 콘텐츠예요. 주소를 확인하면 지도에 표시돼요.</p><div class="grid">${pending.map(card).join('')}</div>`:'');
 };
 
-function mapPlaceSheet(x){
-  return `<section class="map-place-sheet peek" aria-label="${esc(x.title)} 장소 정보">
-    <button class="map-sheet-handle" data-map-sheet-toggle aria-label="저장 콘텐츠 상세 화면으로 펼치기"><span></span></button>
-    <div class="map-sheet-top"><span class="map-sheet-kicker">${esc(x.type)} · 저장한 장소</span><button class="map-sheet-close" data-map-sheet-close aria-label="장소 정보 닫기">${icon('close')}</button></div>
-    <div class="map-sheet-body"><div class="map-sheet-hero"><div class="map-sheet-photo">${libThumb(x)}</div><div><h2>${esc(x.title)}</h2><p>${esc(mapPlaceLabel(x))}</p></div></div>
-      <p class="map-sheet-summary">${esc(x.desc||'저장한 장소 정보')}</p>
-    </div>
-  </section>`;
-}
-
-function collectionCard(name){const meta=COLLECTIONS.find(c=>c[0]===name)||[name,'folder','내가 만든 컬렉션'];const list=items.filter(x=>inCollection(x,name));const due=list.find(x=>x.deadline);return `<button class="collection" data-collection="${esc(name)}">${icon(meta[1])}<div><h3>${esc(name)}</h3><p>${esc(meta[2])}</p><span class="hint">${list.length}개의 콘텐츠${due?` · ${esc(due.deadline)} 일정 포함`:''}</span></div></button>`}
+function collectionCard(name){const meta=COLLECTIONS.find(c=>c[0]===name)||[name,'folder','내가 만든 모음'];const list=items.filter(x=>x.collection===name);const due=list.find(x=>x.deadline);return `<button class="collection" data-collection="${esc(name)}">${icon(meta[1])}<div><h3>${esc(name)}</h3><p>${esc(meta[2])}</p><span class="hint">${list.length}개의 콘텐츠${due?` · ${esc(due.deadline)} 일정 포함`:''}</span></div></button>`}
 function detail(){
   const x=items.find(x=>x.id===detailId);
   if(!x){detailId=null;return pages[page]();}
@@ -188,18 +146,11 @@ function detail(){
   return `<div class="detail"><button class="back" data-action="back">${icon('back')} 돌아가기</button><div class="art">${art(x.art)}${badge(x)}</div><div class="detailmeta"><span>${esc(x.source)}에서 저장 · ${esc(x.ago)}</span><span class="classlabel">${x.aiClassified?'✨ AI 분류':'직접 분류'} · ${t.emoji} ${esc(x.type)}</span></div><h1>${esc(x.title)}</h1><p class="muted">${esc(x.desc)}</p><span class="tag">${esc(x.collection||'미분류')}</span>${info}<div class="infobox"><div class="inline">${icon('bookmark')}<h3>이래서 저장했어요</h3></div><p>${esc(x.memo||'아직 메모가 없어요.')}</p><button class="textbtn" data-action="edit">${t.place?'장소·분류·메모 수정':'분류·메모 수정'}</button></div>${original}<div class="actions">${x.deleted?'':`<button class="filled" data-action="original">${icon('external')} 원본 콘텐츠 보기</button>`}${mapLink}</div><p class="hint">원본 콘텐츠는 저장한 SNS에서 확인해요. 핀맵은 썸네일과 요약만 보여줘요. (예시 콘텐츠)</p></div>`;
 }
 
-function mapControls(){
-  return mapMenuOpen?`<div class="map-action-fab" role="group" aria-label="새 작업"><button class="map-action-close" data-action="mapmenu" aria-label="메뉴 닫기">${icon('close')}</button><button data-action="save">${icon('bookmark')} 새 콘텐츠 추가</button><button data-page="course">${icon('calendar')} 코스 계획 추가</button></div>`:`<button class="globalfab" data-action="mapmenu" aria-label="${mapPickMode?'장소 추가 취소':'새 작업 열기'}" aria-expanded="false">${icon(mapPickMode?'close':'plus')}</button>`;
-}
-
 function render(){
-  if(typeof destroyRealMap==='function')destroyRealMap();
   const content=detailId?detail():pages[page]();
-  $('#app').innerHTML=`<div class="layout"><aside class="rail"><a href="#" class="brand" data-page="home"><b class="brandmark">${icon('bookmark')}</b><span>핀맵</span></a><button class="filled" data-action="save">${icon('plus')}<span>새로 저장</span></button><nav aria-label="주 메뉴">${nav()}</nav><div class="railfoot">저장을 다시, 일상으로.<button data-action="intro">사용 방법 알아보기</button><span>Prototype 03</span></div></aside><main class="main"><header class="topbar"><span class="breadcrumb">핀맵 / ${detailId?'콘텐츠 상세':pageName[page]}</span>${page==='my'&&!detailId?'<h1 class="toptitle">마이</h1>':`<a href="#" class="brand mobilebrand" data-page="home"><b class="brandmark">${icon('bookmark')}</b>핀맵</a>`}<div class="topactions">${(n=>`<button class="bellbtn" data-action="noti" aria-label="알림${n?` ${n}개 안 읽음`:''}">${icon('bell')}${n?`<span class="belldot">${n}</span>`:''}</button>`)(unreadCount())}</div></header>${content}<footer class="footer"><span>핀맵 · 저장을 다시, 일상으로.</span><span>예시 데이터로 체험하는 프로토타입</span></footer></main>${!detailId?(page==='library'&&libSelectionMode?libSelectionControls():mapControls()):''}<nav class="bottomnav" aria-label="하단 메뉴">${nav()}</nav></div>`;
-  if(page==='map'&&!detailId&&typeof initRealMap==='function'){initRealMap();if(mapSearchQuery&&typeof updateMapSearchResults==='function')updateMapSearchResults();}
-  if(page==='course'&&!detailId&&typeof initCourseMap==='function')initCourseMap();
+  $('#app').innerHTML=`<div class="layout"><aside class="rail"><a href="#" class="brand" data-page="home"><b class="brandmark">${icon('bookmark')}</b><span>핀맵</span></a><button class="filled" data-action="save">${icon('plus')}<span>새로 저장</span></button><nav aria-label="주 메뉴">${nav()}</nav><div class="railfoot">저장을 다시, 일상으로.<button data-action="intro">사용 방법 알아보기</button><span>Prototype 03</span></div></aside><main class="main"><header class="topbar"><span class="breadcrumb">핀맵 / ${detailId?'콘텐츠 상세':pageName[page]}</span>${page==='my'&&!detailId?'<h1 class="toptitle">마이</h1>':`<a href="#" class="brand mobilebrand" data-page="home"><b class="brandmark">${icon('bookmark')}</b>핀맵</a>`}<div class="topactions">${page==='home'&&!detailId?`<button class="bellbtn searchbtn" data-action="homesearch" aria-label="저장한 콘텐츠 검색">${icon('search')}</button>`:''}${(n=>`<button class="bellbtn" data-action="noti" aria-label="알림${n?` ${n}개 안 읽음`:''}">${icon('bell')}${n?`<span class="belldot">${n}</span>`:''}</button>`)(unreadCount())}</div></header>${content}<footer class="footer"><span>핀맵 · 저장을 다시, 일상으로.</span><span>예시 데이터로 체험하는 프로토타입</span></footer></main><nav class="bottomnav" aria-label="하단 메뉴">${nav()}</nav></div>`;
 }
-function go(p){if(p!=='library'&&typeof resetLibrarySelection==='function')resetLibrarySelection();if(p==='course'&&page!=='course')courseReturnPage=page;mapMenuOpen=false;if(p!=='map'){mapPickMode=false;mapSheetState='closed';mapSearchQuery='';}page=p;detailId=null;collection=null;filter='전체';query='';render();window.scrollTo(0,0)}
+function go(p){page=p;detailId=null;collection=null;filter='전체';query='';render();window.scrollTo(0,0)}
 function openDetail(id){detailId=id;render();window.scrollTo(0,0)}
 function toast(t){$('#snackbar').textContent=t;$('#snackbar').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#snackbar').classList.remove('show'),3200)}
 function modal(title,body){const d=$('#sheet');d.innerHTML=`<div class="handle"></div><div class="dialoghead"><h2>${title}</h2><button class="iconbtn" data-action="close" aria-label="닫기">${icon('close')}</button></div>${body}`;if(!d.open)d.showModal()}
@@ -217,16 +168,15 @@ function guessType(text){
 }
 
 /* ---------- 대화상자 ---------- */
-function saveDialog(){modal('새 콘텐츠 추가',`<button class="sharecta" data-action="snsdemo"><span class="bigemoji" aria-hidden="true">📲</span><div><b>SNS에서 공유로 저장하기</b><small>SNS 게시물에서 공유 → 핀맵을 누르는 저장 과정을 체험해요</small></div>${icon('arrow')}</button><div class="divider"><span>또는 링크 붙여넣기</span></div><form id="saveform"><label class="field"><span>콘텐츠 링크</span><input type="url" name="url" placeholder="https://" required></label><button type="button" class="textbtn" data-action="sample">예시 링크로 채우기 ${icon('arrow')}</button><label class="field"><span>제목</span><input name="title" placeholder="다시 찾기 쉬운 이름" required maxlength="80"></label><label class="field"><span>카테고리</span><select name="type"><option value="ai" ${settings.aiDefault?'selected':''}>✨ 자동 분류 체험</option>${TYPES.map(t=>`<option value="${t.id}" ${!settings.aiDefault&&t.id==='기타'?'selected':''}>${t.emoji} ${t.id}</option>`).join('')}</select></label><label class="field"><span>컬렉션 · 선택</span><select name="collection"><option value="">나중에 정리</option>${collectionNames().map(c=>`<option>${esc(c)}</option>`).join('')}</select></label><label class="field"><span>저장한 이유 · 선택</span><textarea name="memo" rows="2" maxlength="300" placeholder="어떤 순간에 다시 보고 싶나요?"></textarea></label><p class="hint">이 브라우저에 저장돼요. 지금은 제목과 링크의 단어로 분류하는 체험 기능이며 게시물 본문 자동 변환은 연결 전이에요.</p><p class="error" id="saveerror"></p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">${icon('bookmark')} 저장하기</button></div></form>`)}
-function editDialog(){const x=items.find(x=>x.id===detailId);modal('저장 정보 수정',`<form id="editform"><label class="field"><span>카테고리</span><select name="type">${TYPES.map(t=>`<option value="${t.id}" ${t.id===x.type?'selected':''}>${t.emoji} ${t.id}</option>`).join('')}</select></label><label class="field"><span>제목 / 장소명</span><input name="title" value="${esc(x.title)}" required maxlength="80"></label><label class="field"><span>주소 · 맛집·카페, 전시·팝업, 여행에만 사용</span><input name="address" value="${esc(x.address||'')}" maxlength="200" placeholder="원본에서 확인한 주소"></label><label class="field"><span>내 메모</span><textarea name="memo" maxlength="300">${esc(x.memo||'')}</textarea></label><label class="field"><span>컬렉션</span><input name="collection" list="collectionlist" value="${esc(x.collection||'')}" maxlength="80" placeholder="나중에 정리"><datalist id="collectionlist">${collectionNames().map(c=>`<option value="${esc(c)}">`).join('')}</datalist></label><p class="hint">직접 바꾼 카테고리는 ‘직접 분류’로 표시돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">수정 내용 저장</button></div></form>`)}
+function saveDialog(){modal('새로 저장',`<button class="sharecta" data-action="snsdemo"><span class="bigemoji" aria-hidden="true">📲</span><div><b>SNS에서 공유로 저장하기</b><small>SNS 게시물에서 공유 → 핀맵을 누르는 저장 과정을 체험해요</small></div>${icon('arrow')}</button><div class="divider"><span>또는 링크 붙여넣기</span></div><form id="saveform"><label class="field"><span>콘텐츠 링크</span><input type="url" name="url" placeholder="https://" required></label><button type="button" class="textbtn" data-action="sample">예시 링크로 채우기 ${icon('arrow')}</button><label class="field"><span>제목</span><input name="title" placeholder="다시 찾기 쉬운 이름" required maxlength="80"></label><label class="field"><span>카테고리</span><select name="type"><option value="ai" ${settings.aiDefault?'selected':''}>✨ AI 자동 분류</option>${TYPES.map(t=>`<option value="${t.id}" ${!settings.aiDefault&&t.id==='기타'?'selected':''}>${t.emoji} ${t.id}</option>`).join('')}</select></label><label class="field"><span>모음 · 선택</span><select name="collection"><option value="">나중에 정리</option>${collectionNames().map(c=>`<option>${esc(c)}</option>`).join('')}</select></label><label class="field"><span>저장한 이유 · 선택</span><textarea name="memo" rows="2" maxlength="300" placeholder="어떤 순간에 다시 보고 싶나요?"></textarea></label><p class="hint">이 브라우저에 저장돼요. AI 분류는 프로토타입용 간단한 규칙이에요.</p><p class="error" id="saveerror"></p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">${icon('bookmark')} 저장하기</button></div></form>`)}
+function editDialog(){const x=items.find(x=>x.id===detailId);modal('저장 정보 수정',`<form id="editform"><label class="field"><span>카테고리</span><select name="type">${TYPES.map(t=>`<option value="${t.id}" ${t.id===x.type?'selected':''}>${t.emoji} ${t.id}</option>`).join('')}</select></label><label class="field"><span>제목 / 장소명</span><input name="title" value="${esc(x.title)}" required maxlength="80"></label><label class="field"><span>주소 · 맛집·카페, 전시·팝업, 여행에만 사용</span><input name="address" value="${esc(x.address||'')}" maxlength="200" placeholder="원본에서 확인한 주소"></label><label class="field"><span>내 메모</span><textarea name="memo" maxlength="300">${esc(x.memo||'')}</textarea></label><label class="field"><span>모음</span><input name="collection" list="collectionlist" value="${esc(x.collection||'')}" maxlength="80" placeholder="나중에 정리"><datalist id="collectionlist">${collectionNames().map(c=>`<option value="${esc(c)}">`).join('')}</datalist></label><p class="hint">직접 바꾼 카테고리는 ‘직접 분류’로 표시돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">수정 내용 저장</button></div></form>`)}
 function intro(){modal('핀맵',`<p class="muted">저장한 콘텐츠를 필요한 순간 다시 꺼내보세요.</p><div class="dialogactions"><button class="filled" data-action="close">확인</button></div>`)}
 // 위치 권한 (프로토타입: 실제 위치는 요청하지 않고 성수동 예시 위치를 사용)
 function locationDialog(){modal('위치 권한',`<p>현재 위치 주변에 저장한 장소를 찾을 때 사용해요.</p><div class="permopts" role="radiogroup" aria-label="위치 권한">${Object.entries(LOC_PERM).map(([k,v])=>`<button role="radio" aria-checked="${settings.locPerm===k}" class="permopt ${settings.locPerm===k?'on':''}" data-locperm="${k}"><b>${v}</b><small>${{none:'예시 위치(성수동)로만 체험해요',using:'앱을 켜 두었을 때 주변 장소를 보여줘요',always:'앱을 켜지 않아도 근처 저장 콘텐츠를 알려드려요'}[k]}</small></button>`).join('')}</div><p class="hint">프로토타입에서는 실제 위치를 요청하지 않아요.</p>`)}
 
 /* ---------- 동작 ---------- */
 const actions = {
-  save: () => {if(mapMenuOpen){mapMenuOpen=false;render();}saveDialog();}, intro: () => intro(), close: () => $('#sheet').close(),
-  mapmenu: () => { if(mapPickMode)mapPickMode=false;else mapMenuOpen=!mapMenuOpen; if(mapMenuOpen)mapSheetState='closed'; render(); },
+  save: saveDialog, intro: () => intro(), close: () => $('#sheet').close(),
   back: () => { detailId=null; render(); },
   clear: () => { query=''; render(); $('#search')?.focus(); },
   resetfilter: () => { query=''; filter='전체'; render(); },
@@ -262,16 +212,14 @@ document.addEventListener('submit',e=>{
     const x={id:Date.now(),title,type,category:shortType(type),source:sample?'YouTube':u.hostname.replace(/^www\./,''),ago:'방금',desc:'새롭게 담아둔 나의 취향',memo:f.memo.value,art:typeOf(type).art,collection:f.collection.value,url:u.href,sample,aiClassified:ai};
     if(typeOf(type).place)x.pending=true;
     items.unshift(x);afterChange();$('#sheet').close();page='library';openDetail(x.id);
-    toast(ai?`저장했어요. 제목과 링크를 바탕으로 ‘${type}’으로 분류했어요.`:'저장했어요. 필요할 때 다시 꺼내보세요.');
+    toast(ai?`저장했어요. AI가 ‘${type}’로 분류했어요.`:'저장했어요. 필요할 때 다시 꺼내보세요.');
   } else if(e.target.id==='editform'){
     e.preventDefault();const data=new FormData(e.target),x=items.find(x=>x.id===detailId);
     const type=String(data.get('type'));
     if(type!==x.type){x.aiClassified=false;x.category=shortType(type);x.art=x.art||typeOf(type).art;}
     x.type=type;
-    for(const k of ['title','address','memo']) x[k]=String(data.get(k)||'').trim();
-    const nextCollection=String(data.get('collection')||'').trim();
-    if(nextCollection!==x.collection){x.collection=nextCollection;x.collections=nextCollection?(Array.isArray(x.collections)?x.collections:[]).filter(n=>n!==nextCollection):[];}
-    x.pending=isPlace(x)&&(!x.address||!mapCoordinates(x)); if(x.address)x.mapQuery=x.mapQuery||x.address;
+    for(const k of ['title','address','memo','collection']) x[k]=String(data.get(k)||'').trim();
+    x.pending=isPlace(x)&&!x.address; if(x.address)x.mapQuery=x.mapQuery||x.address;
     $('#sheet').close();render();toast('저장 정보를 수정했어요.');afterChange();
   }
 });

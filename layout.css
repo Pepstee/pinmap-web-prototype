@@ -1,6 +1,6 @@
 /* 공통 레이아웃 · 모든 화면의 여백과 제목 위치를 맞춰요 (마지막에 불러와요)
-   양옆 여백 20 · 위 여백 16 · 제목→다음 요소 20 · 섹션 사이 28 · 섹션 제목→내용 12 */
-:root{--gutter:20px;--top:16px;--gap-title:20px;--gap-section:28px;--md-sys-color-surface:#FFFFFF}
+   상태 표시줄(시간 · 배터리 · 와이파이) 50 · 양옆 여백 20 · 위 여백 상태 표시줄 + 14 · 제목→다음 요소 20 · 섹션 사이 28 · 섹션 제목→내용 12 */
+:root{--gutter:20px;--status:50px;--top:calc(var(--status) + 14px);--gap-title:20px;--gap-section:28px;--md-sys-color-surface:#FFFFFF}
 
 /* 흰 배경 (모든 화면 · 온보딩 · 대화상자) */
 body{background:#fff}
@@ -41,20 +41,10 @@ body{background:#fff}
 .gallery{columns:2;column-gap:12px}
 .gallery .libcard{break-inside:avoid;margin-bottom:12px}
 
-/* 모든 탭에서 같은 위치의 새로 저장 버튼 */
-.globalfab,.deletefab{position:fixed;right:max(20px,calc((100vw - 480px)/2 + 20px));bottom:calc(92px + env(safe-area-inset-bottom));z-index:4;width:56px;height:56px;min-height:0;padding:0;border-radius:50%;display:grid;place-items:center;background:rgba(247,255,250,.97);color:var(--pm-deep);border:1px solid #fff;-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);box-shadow:0 7px 24px #12352630,inset 0 1px 0 #fff}
-.globalfab .icon,.deletefab .icon{width:26px;height:26px;stroke-width:2.2}
-.deletefab{background:#d53939;color:#fff;border-color:#fff;box-shadow:0 8px 25px #8b1f1f55,inset 0 1px 0 #ffffff80}
-.deletefab .icon{stroke:#fff}
-.deletefab:disabled{opacity:.52;cursor:default}
-.deletefab-count{position:absolute;right:-4px;top:-6px;min-width:22px;height:22px;padding:0 5px;border-radius:11px;display:grid;place-items:center;background:#fff;color:#bf2929;font-size:11px;font-weight:800;border:2px solid #d53939}
-.lib-selection-actions{position:fixed;right:max(20px,calc((100vw - 480px)/2 + 20px));bottom:calc(92px + env(safe-area-inset-bottom));z-index:4;display:flex;align-items:end;gap:10px}
-.lib-selection-actions .collectionfab,.lib-selection-actions .deletefab{position:relative;right:auto;bottom:auto;width:64px;height:64px;min-height:0;padding:7px 3px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:20px;border:1px solid #fff;box-shadow:0 7px 24px #12352630;font-size:10px;font-weight:750}
-.lib-selection-actions .collectionfab{background:#e7f7ecf5;color:#17623f;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
-.lib-selection-actions .deletefab{background:#d53939;color:#fff}
-.lib-selection-actions .icon{width:24px;height:24px;stroke-width:2.1}
-.lib-selection-actions .collectionfab:disabled,.lib-selection-actions .deletefab:disabled{opacity:.5;cursor:default}
-.lib-selection-actions button:focus-visible{outline:3px solid #16855a;outline-offset:3px}
+/* 새로 저장 버튼: 모든 화면에서 하단 메뉴 위 가운데, + 아이콘만 */
+.heading>.filled,.libfab{position:fixed;left:50%;right:auto;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:4;width:56px;height:56px;min-height:0;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--pm-mint-strong);color:var(--pm-deep);box-shadow:0 6px 18px #11111126}
+.heading>.filled span,.libfab span{display:none!important}
+.heading>.filled .icon,.libfab .icon{width:26px;height:26px;stroke-width:2.2}
 
 /* 온보딩 · 대화상자 · 상세도 같은 양옆 여백 */
 .ob-screen{padding-left:var(--gutter);padding-right:var(--gutter)}
@@ -67,15 +57,15 @@ body{background:#fff}
 .eshead,.esbody,.esfoot{padding-left:var(--gutter);padding-right:var(--gutter)}
 
 /* 하단 메뉴: 떠 있는 글래스 캡슐 · 아이콘만 (모든 화면 공통) */
-.bottomnav{position:fixed!important;left:50%!important;right:auto!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:calc(min(100%,480px) - 2 * var(--gutter))!important;height:64px!important;padding:6px!important;display:flex!important;gap:4px;border-radius:32px;border:1px solid #ffffffb3!important;background:#ffffff8c!important;-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);box-shadow:0 10px 30px #1435261f,inset 0 1px 0 #ffffffcc;z-index:5}
-.bottomnav .navitem{flex:1;min-width:0;height:100%!important;padding:0!important;display:grid!important;place-items:center;border-radius:26px!important;background:none!important;color:#2B3530}
+.bottomnav{position:fixed!important;left:50%!important;right:auto!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:calc(min(100%,480px) - 2 * var(--gutter))!important;height:64px!important;padding:6px!important;display:flex!important;gap:4px;border-radius:32px;border:1px solid #ffffffb3!important;background:#ffffff8c!important;-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);box-shadow:0 10px 30px #1111111f,inset 0 1px 0 #ffffffcc;z-index:5}
+.bottomnav .navitem{flex:1;min-width:0;height:100%!important;padding:0!important;display:grid!important;place-items:center;border-radius:26px!important;background:none!important;color:#313131}
 .bottomnav .navitem>span:not(.navicon){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .bottomnav .navitem .navicon{width:100%!important;height:100%!important;display:grid;place-items:center;border-radius:26px!important;padding:0!important;background:none!important;transition:background-color .2s}
 .bottomnav .navitem svg{width:24px!important;height:24px!important;stroke-width:1.8}
-.bottomnav .navitem.active .navicon{background:linear-gradient(160deg,#E4F8EE 0%,#C9EEDB 100%)!important;box-shadow:inset 0 1px 0 #ffffffb3}
-.bottomnav .navitem.active{color:var(--pm-key,#16855A)}
+.bottomnav .navitem.active .navicon{background:linear-gradient(160deg,#F6F6F6 0%,#E6E6E6 100%)!important;box-shadow:inset 0 1px 0 #ffffffb3}
+.bottomnav .navitem.active{color:var(--pm-key,#111111)}
 .bottomnav .navitem.active svg{stroke-width:2.3}
-.bottomnav .navitem:focus-visible{outline:3px solid var(--pm-key,#16855A);outline-offset:-3px}
+.bottomnav .navitem:focus-visible{outline:3px solid var(--pm-key,#111111);outline-offset:-3px}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.bottomnav{background:#fffffff0!important}}
 
 /* 스크롤 표시 (모든 화면 · 팝업 공통): 기본 스크롤바는 모두 숨겨 여백이 밀리지 않게 하고, 스크롤하는 동안만 얇은 회색 바를 보여줘요 */
@@ -90,3 +80,7 @@ body:has(.dt) .bottomnav{display:none!important}
 
 /* 화면 맨 아래 안내 문구(바닥글) 숨김 */
 .main>.footer{display:none!important}
+
+/* 상태 표시줄 자리: 스크롤해도 내용이 시간 · 배터리 아이콘과 겹치지 않게 (온보딩 · 상세 사진은 제외) */
+body:not(.onboarding-open):not(:has(.dt))::before{content:"";position:fixed;inset:0 0 auto;height:var(--status);background:var(--t-bg,#F4F4F5);z-index:30;pointer-events:none}
+.ob-screen{padding-top:calc(var(--status) + 4px)}

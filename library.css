@@ -1,11 +1,11 @@
 /* 저장함 화면 리디자인 (Figma 시안) · 색은 아래 변수에서 한 번에 바꿀 수 있어요 */
 :root{
-  --pm-ink:#14231B;        /* 제목 글자 */
-  --pm-sub:#6E7872;        /* 보조 글자 */
-  --pm-deep:#123526;       /* 선택된 칩 · 북마크 */
-  --pm-mint:#D6F3E5;       /* 카테고리 태그 · 개수 배지 · 하단 메뉴 선택 */
-  --pm-mint-strong:#C3EDD8;/* 저장하기 버튼 */
-  --pm-mint-ink:#1D6B47;   /* 민트 위 글자 */
+  --pm-ink:#1E1E1E;        /* 제목 글자 */
+  --pm-sub:#747474;        /* 보조 글자 */
+  --pm-deep:#111111;       /* 선택된 칩 · 북마크 */
+  --pm-mint:#EEEEEE;       /* 카테고리 태그 · 개수 배지 · 하단 메뉴 선택 */
+  --pm-mint-strong:#E3E3E3;/* 저장하기 버튼 */
+  --pm-mint-ink:#111111;   /* 민트 위 글자 */
   --pm-line:#E4EAE6;       /* 테두리 */
   --pm-card:#FFFFFF;
 }
@@ -19,36 +19,34 @@
 
 /* 검색 */
 .libsearch{display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 18px;margin-bottom:12px;border:1px solid var(--pm-line);border-radius:27px;background:var(--pm-card)}
-.libsearch>.icon{color:#4B5650}
+.libsearch>.icon{color:#525252}
 .libsearch input{flex:1;min-width:0;border:0;outline:0;background:none;font-size:16px;color:inherit}
-.libsearch input::placeholder{color:#A3ABA6}
-.libsearch:focus-within{border-color:var(--pm-deep);box-shadow:0 0 0 3px #12352614}
+.libsearch input::placeholder{color:#A8A8A8}
+.libsearch:focus-within{border-color:var(--pm-deep);box-shadow:0 0 0 3px #11111114}
 .libsearch .iconbtn{width:42px;height:42px;color:var(--pm-sub)}
 .libsearch .iconbtn[hidden]{display:none}
 
 /* 카테고리 칩 */
 .libchips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--gutter));padding:2px var(--gutter) 4px}
 .libchips::-webkit-scrollbar{display:none}
-.libchip{flex:none;min-height:40px;padding:0 16px;border-radius:20px;border:1px solid var(--pm-line);background:var(--pm-card);font-size:15px;color:#3E4943;white-space:nowrap}
+.libchip{flex:none;min-height:40px;padding:0 16px;border-radius:20px;border:1px solid var(--pm-line);background:var(--pm-card);font-size:15px;color:#454545;white-space:nowrap}
 .libchip.on{background:var(--pm-deep);border-color:var(--pm-deep);color:#fff;font-weight:700}
 
 /* 내 모음 바로가기 */
 .libcols{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:8px calc(-1 * var(--gutter)) 0;padding:0 var(--gutter)}
 .libcols::-webkit-scrollbar{display:none}
-.libcol{flex:none;display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 12px;border-radius:16px;background:#F3F6F4;font-size:13px;color:#4B5650;white-space:nowrap}
+.libcol{flex:none;display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 12px;border-radius:16px;background:#F3F6F4;font-size:13px;color:#525252;white-space:nowrap}
 .libcol .icon{width:15px;height:15px}
 .libcol span{color:var(--pm-mint-ink);font-weight:700}
 
 /* 목록 머리 */
 .libsection{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:var(--gap-section) 0 12px}
-.libsection h2{display:flex;align-items:center;gap:8px;letter-spacing:-.6px;white-space:nowrap;font-size:16px}
+.libsection h2{display:flex;align-items:center;gap:8px;letter-spacing:-.6px}
 .libcount{min-width:30px;padding:2px 10px;border-radius:14px;background:var(--pm-mint);color:var(--pm-mint-ink);font-size:14px;font-weight:700;text-align:center;letter-spacing:0}
 .libsort{position:relative;display:inline-flex;align-items:center;color:var(--pm-sub);font-size:14px}
 .libsort select{appearance:none;-webkit-appearance:none;border:0;background:none;padding:8px 20px 8px 4px;font:inherit;color:inherit;cursor:pointer}
 .libsort select:focus-visible{outline:2px solid var(--pm-deep);border-radius:8px}
 .libsort .icon{position:absolute;right:0;width:16px;height:16px;pointer-events:none}
-.libtools{display:flex;align-items:center;gap:4px;flex:none}
-.lib-select-toggle{min-height:36px;padding:0 12px;border:1px solid var(--pm-line);border-radius:18px;font-size:13px;font-weight:700;color:var(--pm-deep);background:#fff}
 
 /* 카드 목록 */
 .libgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -58,15 +56,10 @@
 .libcard{display:flex;flex-direction:column;width:100%;min-width:0;padding:6px 6px 10px;border:1px solid #EEF0EE;border-radius:18px;background:#fff;text-align:left;transition:transform .15s}
 .libcard{cursor:pointer}
 .libcard:hover{filter:none;transform:translateY(-2px)}
-.libcard:focus-visible{outline:3px solid var(--pm-key,#16855A);outline-offset:2px}
-.libpage.selecting .libcard{touch-action:none;user-select:none;-webkit-user-select:none}
-.libcard.selected,.libcard.sweep-preview{border-color:#16855a;box-shadow:0 0 0 2px #baf0d4}
-.libcheck{position:absolute;right:8px;top:8px;width:28px;height:28px;display:grid;place-items:center;border:2px solid #fff;border-radius:50%;background:#ffffffd9;box-shadow:0 1px 5px #0003;color:#fff}
-.selected .libcheck{background:#16855a}
-.libcheck .icon{width:17px;height:17px;stroke-width:3}
+.libcard:focus-visible{outline:3px solid var(--pm-key,#111111);outline-offset:2px}
 .libmark{border:0;padding:0;cursor:pointer;transition:transform .15s,background-color .15s}
 .libmark:hover{filter:none;transform:scale(1.08)}
-.libmark:focus-visible{outline:2px solid var(--pm-key,#16855A);outline-offset:2px}
+.libmark:focus-visible{outline:2px solid var(--pm-key,#111111);outline-offset:2px}
 .libart{position:relative;width:100%;max-width:100%;border-radius:13px;overflow:hidden;background:#EEF2EF}
 .libart svg{width:100%;height:100%;display:block}
 .libmark{position:absolute;top:7px;right:7px;width:28px;height:28px;border-radius:50%;background:#fff;display:grid;place-items:center;color:var(--pm-deep);box-shadow:0 1px 4px #0000001a}
@@ -74,37 +67,18 @@
 .libbody{flex:1;display:flex;flex-direction:column;padding:12px 6px 0;min-width:0}
 .libart img{width:100%;height:100%;object-fit:cover;display:block}
 .libtags{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto;padding-top:10px}
-.libpill{padding:4px 10px;border-radius:999px;border:1px solid #E3E7E4;background:#fff;color:var(--pm-key,#16855A);font-size:10px;font-weight:500;letter-spacing:0;line-height:1.4}
-.libpill.due{color:#C2410C}
+.libpill{padding:4px 10px;border-radius:999px;border:1px solid #E3E7E4;background:#fff;color:var(--pm-key,#111111);font-size:10px;font-weight:500;letter-spacing:0;line-height:1.4}
+.libpill.due{color:#626262}
 .libbody h3{margin:0 0 4px;font-size:15px;font-weight:600;letter-spacing:-.3px;line-height:1.35;color:var(--pm-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.libsub{margin:0;font-size:12.5px;color:#8A928D;letter-spacing:-.1px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.libsub{margin:0;font-size:12.5px;color:#8F8F8F;letter-spacing:-.1px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .libsep{display:inline-block;width:1px;height:9px;margin:0 7px;background:#D3D8D5;vertical-align:0}
-.libmeta{display:flex;align-items:center;gap:4px;margin:7px 0 0;font-size:12.5px;color:#8A928D;letter-spacing:-.1px}
-.libmeta .icon{flex:none;width:15px;height:15px;color:#7C857F}
+.libmeta{display:flex;align-items:center;gap:4px;margin:7px 0 0;font-size:12.5px;color:#8F8F8F;letter-spacing:-.1px}
+.libmeta .icon{flex:none;width:15px;height:15px;color:#828282}
 .libmeta span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-.libmeta.warn{color:#B4682A}.libmeta.warn .icon{color:#B4682A}
+.libmeta.warn{color:#111111}.libmeta.warn .icon{color:#111111}
 /* 위치 아이콘은 속이 찬 핀 */
 .libmeta.m-pin .icon path{fill:currentColor;fill-rule:evenodd;stroke:none}
 
 @media(max-width:370px){.libhead h1{font-size:28px}.libbody h3{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.libcard{transition:none}}
-
-/* 선택한 콘텐츠를 기존 또는 새 컬렉션에 추가하는 시트 */
-.colsheet-hint{margin:0;color:var(--pm-sub);font-size:13px}
-.colsheet-list{display:grid;gap:8px}
-.colsheet-list button{width:100%;min-height:58px;display:flex;align-items:center;gap:11px;padding:9px 12px;border:1px solid var(--pm-line);border-radius:14px;background:#fff;text-align:left}
-.colsheet-list button:hover,.colsheet-list button:focus-visible{border-color:var(--pm-key);background:#f5fcf8;outline:none}
-.colsheet-list button>.icon:first-child{width:20px;height:20px;color:var(--pm-key)}
-.colsheet-list button>.icon:last-child{width:16px;height:16px;color:var(--pm-key)}
-.colsheet-list button span{min-width:0;flex:1;display:grid;gap:3px}
-.colsheet-list button b{font-size:14px}
-.colsheet-list button small{color:var(--pm-sub);font-size:11px}
-.colsheet-new{display:grid;gap:9px;padding-top:17px;border-top:1px solid var(--pm-line)}
-.colsheet-new label{font-size:14px;font-weight:750}
-.colsheet-new>div{display:flex;gap:8px}
-.colsheet-new input{flex:1;min-width:0;height:46px;padding:0 12px;border:1px solid var(--pm-line);border-radius:11px;font:inherit}
-.colsheet-new input:focus{outline:2px solid var(--pm-key);outline-offset:1px}
-.colsheet-new button{flex:none;min-width:94px;padding:0 11px;border-radius:11px;background:var(--pm-deep);color:#fff;font-size:12px;font-weight:750}
-.colsheet-error{margin:0;color:#b93434;font-size:12px}
-.colsheet-error[hidden]{display:none}

@@ -36,55 +36,66 @@ detail = function(){
   const src = x.source || 'SNS';
   const [subIcon, subText] = dtSubline(x, ready);
 
-  // 가운데 동작 줄: 길찾기 · 원본 보기 · 수정
-  const acts = [];
-  if (ready) acts.push(`<a class="dtact" href="${mapHref}" target="_blank" rel="noopener noreferrer">${icon('send')}길찾기</a>`);
-  if (t.place && !ready) acts.push(`<button class="dtact" data-action="edit">${icon('pin')}장소 입력</button>`);
-  if (!x.deleted) acts.push(`<button class="dtact" data-action="original">${icon('external')}원본 보기</button>`);
-  acts.push(`<button class="dtact" data-action="edit">${icon('pen')}수정</button>`);
-
   // 유형별 정보
   let info = '';
   if (x.period) info += `<section class="dtsec"><h2>운영 기간</h2><div class="dtrow">${icon('calendar')}<span>${esc(x.period)}</span>${x.deadline ? `<b class="dtdue">마감 ${esc(x.deadline)}</b>` : ''}</div></section>`;
+  const facts = [[t.place ? 'pin' : 'bookmark', x.category || shortType(x.type)], x.distance && ready ? ['walk', x.distance] : null, ['clock', `${x.ago} 저장`]].filter(Boolean);
+  const factRow = `<div class="dtfacts">${facts.map(([ic, v]) => `<span>${icon(ic)}${esc(v)}</span>`).join('')}</div>`;
   if (t.place) info += ready
-    ? `<section class="dtsec"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><a class="dtmap" href="${mapHref}" target="_blank" rel="noopener noreferrer" aria-label="${esc(app.name)}에서 위치 보기">${dtMap}<span class="dtmaptag">예시 지도</span></a><div class="dtrow">${icon('pin')}<span>${esc(x.address)}</span></div>${x.distance ? `<p class="dthint">${esc(x.distance)} · 방문 전 원본에서 정보를 확인하세요.</p>` : ''}</section>`
-    : `<section class="dtsec"><h2>장소 정보</h2><div class="dtwarn"><b>장소 확인 필요</b><p>AI가 위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></section>`;
+    ? `<section class="dtsec"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2>${distanceOf(x) < 999
+      ? `<button type="button" class="dtmap" data-action="dtgomap" aria-label="핀맵 지도에서 위치 보기">${dtMap}<span class="dtmaptag">예시 지도</span><span class="dtmapgo">지도에서 보기${icon('arrow')}</span></button>`
+      : `<a class="dtmap" href="${mapHref}" target="_blank" rel="noopener noreferrer" aria-label="${esc(app.name)}에서 위치 보기">${dtMap}<span class="dtmaptag">예시 지도</span><span class="dtmapgo">${esc(app.name)}에서 보기${icon('external')}</span></a>`}${factRow}</section>`
+    : `<section class="dtsec"><h2>장소 정보</h2><div class="dtwarn"><b>장소 확인 필요</b><p>위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></section>`;
   if (x.type === '쇼핑') info += `<section class="dtsec"><h2>구매 정보</h2><div class="dtrow">${icon('bookmark')}<span>${esc(x.price || '가격 정보 없음')}</span></div><p class="dthint">${esc(x.shop || '판매처 정보 없음')} · 가격과 재고는 원본에서 다시 확인하세요.</p></section>`;
   if (x.type === '레시피') info += `<section class="dtsec"><h2>간단 정보</h2><div class="dtrow">${icon('clock')}<span>${esc(x.recipe || '정보 없음')}</span></div><p class="dthint">자세한 조리법은 원본 콘텐츠에서 확인해요.</p></section>`;
   if (x.deleted) info += `<section class="dtsec"><h2>원본 콘텐츠</h2><div class="dtgone"><b>삭제된 게시물입니다.</b><p>원본을 열 수 없지만 ${t.place ? '장소 정보와 ' : ''}내 메모는 그대로 남아 있어요.</p></div></section>`;
 
-  // 아래 고정 버튼: 장소면 길찾기, 아니면 원본 보기
-  const primary = ready
-    ? `<a class="dtprimary" href="${mapHref}" target="_blank" rel="noopener noreferrer">${icon('send')}길찾기</a>`
-    : !x.deleted ? `<button class="dtprimary" data-action="original">${icon('external')}원본 보기</button>`
-    : `<button class="dtprimary" data-action="edit">${icon('pen')}정보 수정</button>`;
+  // 아래 고정 버튼: 길찾기 · 원본 보기 (장소가 아니면 원본 보기만)
+  const bottom = [];
+  if (ready) bottom.push(`<a class="dtghost" href="${mapHref}" target="_blank" rel="noopener noreferrer">${icon('send')}길찾기</a>`);
+  else if (t.place) bottom.push(`<button class="dtghost" data-action="edit">${icon('pin')}장소 입력</button>`);
+  if (!x.deleted) bottom.push(`<button class="dtprimary" data-action="original">${icon('image')}원본 보기</button>`);
+  else if (!ready) bottom.push(`<button class="dtprimary" data-action="edit">${icon('pen')}정보 수정</button>`);
+  if (bottom.length === 1) bottom[0] = bottom[0].replace('class="dtghost"', 'class="dtprimary"');
 
   return `<article class="dt">
     <div class="dthero">${libThumb(x)}<div class="dtshade" aria-hidden="true"></div>
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
-        <div class="dttopr"><button class="dtbtn" data-action="dtshare" aria-label="공유">${icon('nodes')}</button><button class="dtbtn" data-action="edit" aria-label="저장 정보 수정">${icon('more')}</button></div></div>
-      <div class="dtsrc"><span class="dtavatar" aria-hidden="true">${dtLogo(src) ? `<img src="${dtLogo(src)}" alt="">` : esc([...src.replace(/^SNS · /,'')][0].toUpperCase())}</span><div><b>${esc(src)}</b><small>${esc(x.ago)} 저장</small></div></div>
+        <div class="dttopr">
+          <button class="dtbtn" data-action="dtshare" aria-label="공유">${icon('share')}</button>
+          <button class="dtbtn" data-action="edit" aria-label="수정">${icon('pen')}</button>
+          <button class="dtbtn" data-unsave="${x.id}" aria-label="삭제">${icon('trash')}</button>
+        </div></div>
+      <div class="dtsrc"><div><b>${esc(src)}</b><small>${esc(x.ago)} 저장</small></div></div>
     </div>
     <div class="dtsheet">
       <div class="dthead">
         <div class="dtheadtext">
           <p class="dtcat"><span class="libpill">${esc(x.category || shortType(x.type))}</span></p>
           <h1>${esc(x.title)}</h1>
-          <p class="dtsub ${isPlace(x) && !ready ? 'warn' : ''}">${subIcon}<span>${esc(subText)}</span></p>
+          <p class="dtsub ${isPlace(x) && !ready ? 'warn' : ''}">${subIcon}<span>${esc(subText)}</span>${ready ? `<button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button>` : ''}</p>
         </div>
         <button class="dtfav ${x.favorite ? 'on' : ''}" data-action="fav" aria-pressed="${!!x.favorite}" aria-label="즐겨찾기">${icon('star')}</button>
       </div>
-      <div class="dtacts">${acts.join('<i class="dtdiv" aria-hidden="true"></i>')}</div>
-      <section class="dtsec"><h2>저장한 메모</h2><p class="dtmemo">${esc(x.memo || '아직 메모가 없어요.')}</p>${x.desc ? `<p class="dthint">원본 요약 · ${esc(x.desc)}</p>` : ''}</section>
+      ${x.desc ? `<section class="dtsum"><h2>${icon('spark')}요약</h2><p>${esc(x.desc)}</p></section>` : ''}
+      <section class="dtsec"><h2>저장한 메모</h2><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨보세요.')}</span>${icon('chevron')}</button></section>
       ${info}
-      <section class="dtsec"><h2>컬렉션</h2>${itemCollections(x).length ? itemCollections(x).map(name=>`<button class="dtcol" data-collection="${esc(name)}">${icon('folder')}${esc(name)}${icon('arrow')}</button>`).join('') : `<button class="dtcol" data-action="edit">${icon('folder')}미분류 · 컬렉션 정하기${icon('arrow')}</button>`}</section>
       <p class="dthint dtfoot">원본 콘텐츠는 저장한 SNS에서 확인해요. 핀맵은 썸네일과 요약만 보여줘요. (예시 콘텐츠)</p>
     </div>
-    <div class="dtbar"><button class="dtghost" data-page="home">${icon('home')}홈으로</button>${primary}</div>
+    <div class="dtbar ${bottom.length === 1 ? 'one' : ''}">${bottom.join('')}</div>
   </article>`;
 };
 
-actions.dtshare = () => toast('프로토타입에서는 공유 기능을 제공하지 않아요.');
+// 공유: 휴대폰 공유 메뉴 → 안 되면 제목 · 주소 · 링크를 복사
+actions.dtshare = async () => {
+  const x = items.find(i => i.id === detailId); if (!x) return;
+  const text = [x.title, x.address && !x.pending ? x.address : '', x.url || ''].filter(Boolean).join('\n');
+  try { if (navigator.share) { await navigator.share({title: x.title, text}); return; } } catch (e) { if (e?.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text); toast('공유할 내용을 복사했어요.'); }
+  catch { toast('이 브라우저에서는 공유할 수 없어요.'); }
+};
+paths.trash = 'M4 7h16 M10 11v6 M14 11v6 M6 7l1 13h10l1-13 M9 7V4h6v3';
+paths.walk = 'M13 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0 M9 21l2-6 2 2v4 M8 11l2-3 3 1 2 3 2 1 M11 15l1-5';
 
 // 즐겨찾기 (별표) · 브라우저에 함께 저장돼요
 actions.fav = () => {
@@ -116,10 +127,10 @@ function editSheet(){
       <label class="esfield">${label('note','메모')}
         <span class="esinput area"><textarea name="memo" id="es-memo" rows="3" maxlength="200" placeholder="어떤 순간에 다시 보고 싶나요?">${esc(x.memo||'')}</textarea><small class="escount" data-for="es-memo"></small></span>
       </label>
-      <div class="esfield">${label('folder','컬렉션')}
+      <div class="esfield">${label('folder','모음')}
         <input type="hidden" name="collection" id="es-col" value="${esc(x.collection||'')}">
-        <div class="eschips">${colChip('', '미분류')}${cols.map(c => colChip(c, c)).join('')}${custom ? colChip(x.collection, x.collection) : ''}<button type="button" class="eschip add" data-esnew>${icon('plus')}새 컬렉션</button></div>
-        <input class="esnewcol" id="es-newcol" maxlength="30" placeholder="새 컬렉션 이름 (예: 10월 데이트)" hidden>
+        <div class="eschips">${colChip('', '미분류')}${cols.map(c => colChip(c, c)).join('')}${custom ? colChip(x.collection, x.collection) : ''}<button type="button" class="eschip add" data-esnew>${icon('plus')}새 모음</button></div>
+        <input class="esnewcol" id="es-newcol" maxlength="30" placeholder="새 모음 이름 (예: 10월 데이트)" hidden>
       </div>
       <p class="eshint">카테고리를 직접 바꾸면 ‘직접 분류’로 표시돼요.</p>
     </div>
@@ -164,7 +175,7 @@ function saveSheet(){
   const label = (ic, text, extra='') => `<div class="eslabel">${icon(ic)}<span>${text}</span>${extra}</div>`;
   const colChip = (name, text) => `<button type="button" class="eschip ${name===''?'on':''}" data-escol="${esc(name)}" aria-pressed="${name===''}">${esc(text)}</button>`;
   modal('', `<form id="saveform" class="esform" novalidate>
-    <div class="eshead"><span class="esicon" aria-hidden="true">${icon('plus')}</span><div><h2>새 콘텐츠 추가</h2><p>장소·영상·상품 등 저장하고 싶은 콘텐츠 링크를 추가해요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
+    <div class="eshead"><span class="esicon" aria-hidden="true">${icon('plus')}</span><div><h2>새로 저장</h2><p>SNS 링크를 붙여넣으면 바로 저장돼요.</p></div><button type="button" class="esclose" data-action="close" aria-label="닫기">${icon('close')}</button></div>
     <div class="esbody">
       <button type="button" class="esshare" data-action="snsdemo"><span class="esshareicon" aria-hidden="true">${icon('share')}</span><div><b>SNS에서 공유로 저장하기</b><small>게시물에서 공유 → 핀맵, 저장 과정을 체험해요</small></div>${icon('arrow')}</button>
       <div class="esdivider"><span>또는 링크로 저장</span></div>
@@ -175,17 +186,17 @@ function saveSheet(){
         <span class="esinput"><input name="title" id="es-title" placeholder="다시 찾기 쉬운 이름" required maxlength="50"><small class="escount" data-for="es-title"></small></span>
       </label>
       <label class="esfield">${label('grid','카테고리')}
-        <span class="esselect"><span class="esemoji" aria-hidden="true">${settings.aiDefault ? '✨' : typeOf('기타').emoji}</span><select name="type" id="es-type"><option value="ai" ${settings.aiDefault?'selected':''}>자동 분류 체험</option>${TYPES.map(t => `<option value="${t.id}" ${!settings.aiDefault&&t.id==='기타'?'selected':''}>${t.id}</option>`).join('')}</select>${icon('chevron')}</span>
+        <span class="esselect"><span class="esemoji" aria-hidden="true">${settings.aiDefault ? '✨' : typeOf('기타').emoji}</span><select name="type" id="es-type"><option value="ai" ${settings.aiDefault?'selected':''}>AI 자동 분류</option>${TYPES.map(t => `<option value="${t.id}" ${!settings.aiDefault&&t.id==='기타'?'selected':''}>${t.id}</option>`).join('')}</select>${icon('chevron')}</span>
       </label>
-      <div class="esfield">${label('folder','컬렉션', '<small class="esopt">선택</small>')}
+      <div class="esfield">${label('folder','모음', '<small class="esopt">선택</small>')}
         <input type="hidden" name="collection" id="es-col" value="">
-        <div class="eschips">${colChip('', '나중에 정리')}${collectionNames().map(c => colChip(c, c)).join('')}<button type="button" class="eschip add" data-esnew>${icon('plus')}새 컬렉션</button></div>
-        <input class="esnewcol" id="es-newcol" maxlength="30" placeholder="새 컬렉션 이름 (예: 10월 데이트)" hidden>
+        <div class="eschips">${colChip('', '나중에 정리')}${collectionNames().map(c => colChip(c, c)).join('')}<button type="button" class="eschip add" data-esnew>${icon('plus')}새 모음</button></div>
+        <input class="esnewcol" id="es-newcol" maxlength="30" placeholder="새 모음 이름 (예: 10월 데이트)" hidden>
       </div>
       <label class="esfield">${label('note','저장한 이유', '<small class="esopt">선택</small>')}
         <span class="esinput area"><textarea name="memo" id="es-memo" rows="2" maxlength="200" placeholder="어떤 순간에 다시 보고 싶나요?"></textarea><small class="escount" data-for="es-memo"></small></span>
       </label>
-      <p class="eshint">이 브라우저에 저장돼요. 지금은 입력한 제목과 링크로 간단히 분류하며, 게시물 본문 자동 변환은 연결 전이에요.</p>
+      <p class="eshint">이 브라우저에 저장돼요. AI 분류는 프로토타입용 간단한 규칙이에요.</p>
       <p class="eserror" id="saveerror" role="alert"></p>
     </div>
     <div class="esfoot"><button type="button" class="escancel" data-action="close">취소</button><button class="essubmit" type="submit">저장하기</button></div>
@@ -193,7 +204,7 @@ function saveSheet(){
   $('#sheet').classList.add('editsheet');
   esCounts();
 }
-actions.save = () => {if(mapMenuOpen){mapMenuOpen=false;render();}saveSheet();};
+actions.save = saveSheet;
 // 예시 링크로 채우기: 기존 동작 후 화면(글자 수 · 카테고리 · 모음 칩)도 맞춰요
 const fillSample = actions.sample;
 actions.sample = () => {
@@ -211,3 +222,28 @@ document.addEventListener('submit', e => {
   if (!f.elements.namedItem('title').value.trim()) { e.preventDefault(); e.stopImmediatePropagation(); err.textContent = '제목을 입력해 주세요.'; f.elements.namedItem('title').focus(); }
 }, true);
 paths.link = paths.link || 'M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1 M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1';
+
+// 상세에서 사진 아래까지 스크롤하면 상태 표시줄 띠를 켜요
+addEventListener('scroll', () => {
+  const hero = document.querySelector('.dthero');
+  document.body.classList.toggle('dtscrolled', !!hero && hero.getBoundingClientRect().bottom < 120);
+}, {passive: true});
+
+// 주소 복사 (클립보드 → 안 되면 선택 복사)
+async function dtCopy(text){
+  try { await navigator.clipboard.writeText(text); return true; } catch {}
+  try {
+    const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0'; document.body.append(ta); ta.select();
+    const ok = document.execCommand('copy'); ta.remove(); return ok;
+  } catch { return false; }
+}
+actions.dtcopyaddr = async () => {
+  const x = items.find(i => i.id === detailId); if (!x?.address) return;
+  toast(await dtCopy(x.address) ? '주소를 복사했어요.' : `주소: ${x.address}`);
+};
+// 지도 누르면 핀맵 지도 탭으로 이동해 이 장소를 선택해요
+actions.dtgomap = () => {
+  const x = items.find(i => i.id === detailId); if (!x) return;
+  selectedPin = x.id; go('map');
+};

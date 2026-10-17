@@ -67,15 +67,15 @@ function sdLayer(){
       </div>
       <div class="sd-oslist"><span>복사 ${icon('copy')}</span><span>새로운 빠른 메모에 추가 ${icon('note')}</span></div>
     </div>`;
-  if (p === 'save') return `<div class="sd-dim light" data-sd="savedone" aria-label="닫고 저장"></div>${shareSaveSheet()}`;
+  if (p === 'save') return `<div class="sd-dim light" data-sd="savedone" aria-label="닫고 저장"></div>${saveSheet()}`;
   return '';
 }
-function shareSaveSheet(){
+function saveSheet(){
   const x = sd.item, t = typeOf(x.type);
   const cols = collectionNames().map(name => {
-    const first = items.find(i => inCollection(i,name) && i !== x), on = inCollection(x,name);
-    const count = items.filter(i => inCollection(i,name)).length;
-    return `<div class="pm-col"><div class="pm-colthumb">${art(first?first.art:'book')}</div><div class="pm-colname"><b>${esc(name)}</b><small>${count}개</small></div><button class="pm-colbtn ${on?'on':''}" data-sd-col="${esc(name)}" aria-pressed="${on}" aria-label="${esc(name)} 컬렉션에 ${on?'저장됨':'저장'}">${icon(on?'check':'plus')}</button></div>`;
+    const first = items.find(i => i.collection === name && i !== x), on = x.collection === name;
+    const count = items.filter(i => i.collection === name).length;
+    return `<div class="pm-col"><div class="pm-colthumb">${art(first?first.art:'book')}</div><div class="pm-colname"><b>${esc(name)}</b><small>${count}개</small></div><button class="pm-colbtn ${on?'on':''}" data-sd-col="${esc(name)}" aria-pressed="${on}" aria-label="${esc(name)} 모음에 ${on?'저장됨':'저장'}">${icon(on?'check':'plus')}</button></div>`;
   }).join('');
   return `<div class="pm-sheet" role="dialog" aria-label="핀맵에 저장">
     <div class="sd-handle"></div>
@@ -92,8 +92,8 @@ function shareSaveSheet(){
       <button class="pm-chip ai ${sd.aiOn?'on':''}" data-sd-type="ai" aria-pressed="${sd.aiOn}">✨ AI 자동 분류</button>
       ${TYPES.map(c => `<button class="pm-chip ${!sd.aiOn&&x.type===c.id?'on':''}" data-sd-type="${c.id}" aria-pressed="${!sd.aiOn&&x.type===c.id}">${c.emoji} ${c.id}</button>`).join('')}
     </div>
-    <div class="pm-label">컬렉션 <small>선택</small><button class="pm-new" data-sd="newcol">${icon('plus')} 새 컬렉션</button></div>
-    ${sd.newCol?`<form class="pm-newform" id="pm-newform"><input name="name" maxlength="30" placeholder="컬렉션 이름 (예: 10월 데이트)" aria-label="새 컬렉션 이름" required><button class="pm-newsubmit">만들기</button></form>`:''}
+    <div class="pm-label">모음 <small>선택</small><button class="pm-new" data-sd="newcol">${icon('plus')} 새 모음</button></div>
+    ${sd.newCol?`<form class="pm-newform" id="pm-newform"><input name="name" maxlength="30" placeholder="모음 이름 (예: 10월 데이트)" aria-label="새 모음 이름" required><button class="pm-newsubmit">만들기</button></form>`:''}
     <div class="pm-cols">${cols}</div>
     <button class="pm-done" data-sd="savedone">완료</button>
     <p class="pm-hint">바깥을 눌러도 지금 상태로 저장돼요.</p>
@@ -149,7 +149,7 @@ function sdFinish(){
   clearTimeout(sd.closeTimer);
   const x = sd.item; afterChange();
   sd.step = 'post'; sd.newCol = false;
-  const what = x.collection ? `‘${esc(x.collection)}’ 컬렉션에 저장됨` : (x.aiClassified ? `✨ ${esc(x.type)}로 저장됨` : `${typeOf(x.type).emoji} ${esc(x.type)}로 저장됨`);
+  const what = x.collection ? `‘${esc(x.collection)}’ 모음에 저장됨` : (x.aiClassified ? `✨ ${esc(x.type)}로 저장됨` : `${typeOf(x.type).emoji} ${esc(x.type)}로 저장됨`);
   sd.banner = {text:`<b>핀맵</b> · ${what}`};
   drawShareDemo();
   clearTimeout(sd.bannerTimer);
@@ -169,15 +169,15 @@ document.addEventListener('click', e => {
   const col = e.target.closest('[data-sd-col]');
   if (col) {
     const name = col.dataset.sdCol;
-    if (inCollection(sd.item,name)) { removeItemCollection(sd.item,name); afterChange(); drawShareDemo(); return; }
+    if (sd.item.collection === name) { sd.item.collection = ''; afterChange(); drawShareDemo(); return; }
     // case2: 모음을 직접 고르면 체크 표시 후 시트가 내려갑니다.
-    addItemCollection(sd.item,name); afterChange(); drawShareDemo();
+    sd.item.collection = name; afterChange(); drawShareDemo();
     sd.closeTimer = setTimeout(sdFinish, 450);
     return;
   }
   const b = e.target.closest('[data-sd]'); if (!b) return;
   const v = b.dataset.sd;
-  if (v === 'exit') { const saved = sdSaved(); closeShareDemo(); render(); if (saved) toast('저장한 콘텐츠는 홈과 저장목록에서 볼 수 있어요.'); }
+  if (v === 'exit') { const saved = sdSaved(); closeShareDemo(); render(); if (saved) toast('저장한 콘텐츠는 홈과 컬렉션에서 볼 수 있어요.'); }
   else if (v === 'share') { sd.step = 'snsSheet'; sd.banner = null; drawShareDemo(); }
   else if (v === 'os') { sd.step = 'osSheet'; drawShareDemo(); }
   else if (v === 'pinmap') { sdCreateItem(); sd.step = 'save'; drawShareDemo(); }
@@ -196,7 +196,7 @@ document.addEventListener('submit', e => {
   if (e.target.id !== 'pm-newform') return;
   e.preventDefault();
   const name = e.target.elements.name.value.trim(); if (!name) return;
-  addItemCollection(sd.item,name); sd.newCol = false; afterChange(); drawShareDemo();
+  sd.item.collection = name; sd.newCol = false; afterChange(); drawShareDemo();
   sd.closeTimer = setTimeout(sdFinish, 450);
 });
 document.addEventListener('keydown', e => {

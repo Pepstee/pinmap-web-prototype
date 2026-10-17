@@ -13,7 +13,7 @@ const interestOptions = [
   {id:'later',  emoji:'🔖', label:'그냥 나중에 보려고 저장해요', short:'나중에 보기'}
 ];
 const interestIds = interestOptions.map(x => x.id);
-const MAX_INTERESTS = 3; // 관심사 키워드는 최대 3개
+const MAX_INTERESTS = Infinity; // 관심사 키워드 개수 제한 없음
 const interestOf = id => interestOptions.find(x => x.id === id);
 let preferences = [], onboardStep = 0, onboardDone = false, onboardDraft = [], onboardTimer = null;
 
@@ -68,9 +68,9 @@ const homeSections = {
   }),
   plan: () => ({
     title:'계획에 바로 쓰는 콘텐츠', sub:'마감이 있는 일정과 주말·여행 후보',
-    more:'data-collection="이번 주말 성수"', moreLabel:'컬렉션',
+    more:'data-collection="이번 주말 성수"', moreLabel:'모음',
     hero:{title:'주말엔 저장해둔 성수로', desc:'카페부터 전시까지, 모아둔 후보로 하루를 계획해요.', btn:'모아둔 콘텐츠 보기', attr:'data-collection="이번 주말 성수"'},
-    list: items.filter(x => !x.pending && (inCollection(x,'이번 주말 성수') || x.type==='여행' || x.deadline)).sort((a,b) => (b.deadline?1:0)-(a.deadline?1:0))
+    list: items.filter(x => !x.pending && (x.collection==='이번 주말 성수' || x.type==='여행' || x.deadline)).sort((a,b) => (b.deadline?1:0)-(a.deadline?1:0))
   }),
   shop: () => ({
     title:'사고 싶었던 것', sub:'장바구니 대신 저장해둔 상품',
@@ -92,14 +92,14 @@ const homeSections = {
   }),
   idea: () => ({
     title:'영감이 필요할 때', sub:'레시피부터 생활 정보까지, 일상의 아이디어',
-    more:'data-collection="일상에 영감"', moreLabel:'컬렉션', gallery:true,
-    hero:{title:'막힐 때 보는 영감 컬렉션', desc:'저장해둔 아이디어로 새로운 하루를 시작해요.', btn:'영감 컬렉션 보기', attr:'data-collection="일상에 영감"'},
-    list: items.filter(x => inCollection(x,'일상에 영감') || x.type==='생활 정보')
+    more:'data-collection="일상에 영감"', moreLabel:'모음', gallery:true,
+    hero:{title:'막힐 때 보는 영감 모음', desc:'저장해둔 아이디어로 새로운 하루를 시작해요.', btn:'영감 모음 보기', attr:'data-collection="일상에 영감"'},
+    list: items.filter(x => x.collection==='일상에 영감' || x.type==='생활 정보')
   }),
   later: () => ({
     title:'다시 꺼내볼 때가 됐어요', sub:'저장한 지 오래된 콘텐츠부터',
-    more:'data-page="library"', moreLabel:'저장목록',
-    hero:{title:'잊고 있던 저장 꺼내기', desc:'오래전에 담아둔 콘텐츠를 모았어요.', btn:'저장목록 보기', attr:'data-page="library"'},
+    more:'data-page="library"', moreLabel:'컬렉션',
+    hero:{title:'잊고 있던 저장 꺼내기', desc:'오래전에 담아둔 콘텐츠를 모았어요.', btn:'컬렉션 보기', attr:'data-page="library"'},
     list: [...items].reverse()
   })
 };
@@ -157,17 +157,8 @@ const photo = (kind, cls='') => `<div class="ob-tile photo ${cls}">${art(kind)}<
 const loader = text => `<div class="ob-loader" role="status"><div class="ob-bar"><i></i></div><p>${text}</p></div>`;
 function onboardScreen() {
   const s = onboardStep;
-  if (s === 0) return `
-    <h1 class="ob-title" tabindex="-1">저장한 콘텐츠,<br>이제 <em>다시 찾기 쉽게.</em></h1>
-    <p class="ob-desc">흩어진 저장 콘텐츠를 한곳에 모으고,<br>AI가 필요한 순간 다시 꺼내드립니다.</p>
-    <div class="ob-art" aria-hidden="true">
-      <div class="ob-ring"></div><div class="ob-ring r2"></div>
-      ${photo('exhibit','t1')}${photo('park','t2')}${photo('lamp','t3')}${photo('food','t4')}
-      <div class="ob-tile emoji t5">📸</div><div class="ob-tile emoji t6">▶️</div><div class="ob-tile emoji t7">📍</div>
-      <span class="ob-spark s1">✦</span><span class="ob-spark s2">✦</span>
-      <div class="ob-center">${icon('bookmark')}</div>
-    </div>
-    ${loader('나의 저장 콘텐츠를 모으고 있어요…')}`;
+  // 첫 화면: 로고만 심플하게 (화면을 누르면 바로 다음 단계)
+  if (s === 0) return `<button class="ob-splash" data-ob="next" aria-label="핀맵 시작"><img src="img/logo-splash.png" alt="PINMAP"></button>`;
   if (s === 1) return `
     <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를<br><em>발견</em>했다면?</h1>
     <p class="ob-desc">Instagram 등에서<br><b>공유 → [핀맵]</b>을 선택하세요.</p>
@@ -185,43 +176,39 @@ function onboardScreen() {
     <div class="ob-actions"><button class="filled ob-next" data-ob="next">다음</button></div>`;
   if (s === 2) return `
     <h1 class="ob-title" tabindex="-1">저장한 콘텐츠를<br><em>주로 언제 다시 찾아보나요?</em></h1>
-    <p class="ob-desc">선택하신 내용에 맞춰<br>더 적합한 콘텐츠를 추천해드려요. (최대 3개 선택)</p>
+    <p class="ob-desc">선택하신 내용에 맞춰<br>더 적합한 콘텐츠를 추천해드려요. (복수 선택 가능)</p>
     <div class="ob-options" role="group" aria-label="관심사 · 활용 목적">
-      ${interestOptions.map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${o.emoji}</span><span class="ob-label">${o.label}</span><span class="ob-check" aria-hidden="true">${icon('check')}</span></button>`; }).join('')}
+      ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${o.emoji}</span><span class="ob-label">${o.label}</span><span class="ob-check" aria-hidden="true">${icon('check')}</span></button>`; }).join('')}
     </div>
     <div class="ob-actions"><p class="ob-need" ${onboardDraft.length?'hidden':''}>하나 이상 선택해 주세요.</p><button class="filled ob-next" data-ob="next" ${onboardDraft.length?'':'disabled'}>다음</button></div>`;
-  const picked = (onboardDraft.length ? onboardDraft : interestIds).slice(0,6);
-  return `
-    <h1 class="ob-title" tabindex="-1">이제<br>필요한 순간,<br><em>다시 찾아드릴게요.</em></h1>
-    <p class="ob-desc">저장한 콘텐츠를 내 주변, 일정, 상황에 맞게<br>AI가 알아서 다시 꺼내드립니다.</p>
-    <div class="ob-art orbit" aria-hidden="true">
-      <div class="ob-ring"></div><div class="ob-ring r2"></div>
-      ${picked.map((id,i) => { const a = (i/picked.length)*Math.PI*2 - Math.PI/2; return `<div class="ob-tile emoji" style="left:${50+40*Math.cos(a)}%;top:${50+36*Math.sin(a)}%;animation-delay:${i*.3}s">${interestOf(id).emoji}</div>`; }).join('')}
-      <span class="ob-spark s1">✦</span><span class="ob-spark s2">✦</span>
-      <div class="ob-center">${icon('bookmark')}</div>
-    </div>
-    ${loader('나에게 딱 맞는 콘텐츠를 준비하고 있어요…')}`;
+  // 마지막 화면: 문구 없이, 저장 카드에서 핀맵으로 점이 하나씩 채워지며 이어지는 애니메이션
+  return `<div class="ob-send" role="img" aria-label="나에게 맞는 홈을 준비하고 있어요">
+    <span class="obs-card">${icon('bookmark')}</span>
+    <span class="obs-dots">${'<i></i>'.repeat(6)}</span>
+    <span class="obs-pin"><img src="img/logo-pin.png" alt=""></span>
+  </div>`;
 }
 function drawOnboarding() {
   clearTimeout(onboardTimer);
   const el = $('#onboarding');
   if (!el) return;
-  el.innerHTML = `<div class="ob-screen step${onboardStep+1}">
+  const bare = onboardStep === 0 || onboardStep === 3; // 첫 · 마지막 화면은 위쪽 단계 표시 없이
+  el.innerHTML = `<div class="ob-screen step${onboardStep+1}${bare ? ' bare' : ''}">
     <div class="ob-top">
-      <div class="ob-topleft">${onboardStep===1||onboardStep===2?`<button class="ob-back" data-ob="back" aria-label="이전">${icon('back')}</button>`:''}<span class="ob-count" aria-label="${onboardStep+1}단계, 전체 4단계"><b>${onboardStep+1}</b> / 4</span></div>
+      <div class="ob-topleft">${onboardStep===1||onboardStep===2?`<button class="ob-back" data-ob="back" aria-label="이전">${icon('back')}</button>`:''}<span class="ob-count" aria-label="${onboardStep}단계, 전체 2단계"><b>${onboardStep}</b> / 2</span></div>
       ${onboardStep<3?'<button class="ob-skip" data-ob="skip">건너뛰기</button>':''}
     </div>
     ${onboardScreen()}
   </div>`;
   el.scrollTop = 0;
   el.querySelector('.ob-title')?.focus?.();
-  if (onboardStep === 0) onboardTimer = setTimeout(() => { onboardStep = 1; drawOnboarding(); }, 2800);
-  if (onboardStep === 3) onboardTimer = setTimeout(finishOnboarding, 2800);
+  if (onboardStep === 0) onboardTimer = setTimeout(() => { onboardStep = 1; drawOnboarding(); }, 1400);
+  if (onboardStep === 3) onboardTimer = setTimeout(finishOnboarding, 2600);
 }
 let onboardFull = false; // 처음부터 본 온보딩일 때만 끝나고 튜토리얼을 보여줘요
 function openOnboarding(step = 0) {
   onboardFull = step === 0;
-  onboardDraft = [...preferences];
+  onboardDraft = onboardFull ? [] : [...preferences];
   onboardStep = step;
   if ($('#sheet').open) $('#sheet').close();
   let el = $('#onboarding');
@@ -280,7 +267,7 @@ document.addEventListener('click',e=>{
 });
 render();
 // 페이지를 열 때마다 온보딩부터 보여줍니다. (이전에 고른 관심사는 3단계에 미리 선택돼 있어요)
-openDemoLogin();
+openOnboarding(0);
 
 // 추천 카드 넘길 때 아래 점 표시 갱신
 document.addEventListener('scroll', e => {

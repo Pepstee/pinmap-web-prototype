@@ -3,9 +3,11 @@
 
 /* ---------- 알림 ---------- */
 // 설정에서 켠 알림만 만들어요. 시간과 내용은 예시입니다.
+const dueNum = x => Number(String(x.deadline || '').replace(/\D/g, '')); // 'D-3' → 3 (calendar.js보다 먼저 쓰일 수 있어 따로 둬요)
 function notifications(){
   const list = [];
-  if (settings.notiDeadline) items.filter(x => x.deadline).forEach(x => list.push({
+  // 홈 띠배너의 마감 임박 콘텐츠는 알림 목록에도 항상 보여줘요 (설정은 휴대폰 푸시 알림에만 적용)
+  items.filter(x => x.deadline).sort((a,b) => dueNum(a) - dueNum(b)).forEach(x => list.push({
     id:'due-'+x.id, emoji:'⏰', title:`마감 ${x.deadline} · ${x.title}`,
     body:`${x.period ? x.period.replace(' · 예시 기간','')+' 운영 · ' : ''}끝나기 전에 다녀오세요.`, time:'오늘 오전 9:00', detail:x.id
   }));
@@ -43,19 +45,18 @@ pages.my = function(){
   const notiOn = ['notiNearby','notiDeadline','notiReminder'].filter(k => settings[k]).length;
   return `
   <button class="mprofile" data-action="profile" aria-label="프로필 편집">
-    <span class="pavatar" aria-hidden="true">${esc([...settings.nickname][0] || '핀')}</span>
+    ${avatarHtml()}
     <span class="mpinfo"><b>${esc(settings.nickname)}</b><small>프로필 편집</small></span>${icon('chevron')}
   </button>
-  <div class="mstats">
-    <button data-page="library"><b>${items.length}</b><span>저장</span></button>
-    <button data-page="map"><b>${places}</b><span>장소</span></button>
-    <button data-page="library"><b>${cols.length}</b><span>컬렉션</span></button>
-  </div>
   <button class="sharepromo" data-action="snsdemo"><span aria-hidden="true">📲</span><div><b>SNS에서 바로 저장해보기</b><small>게시물에서 공유 → 핀맵, 저장 과정을 체험해요</small></div>${icon('arrow')}</button>
 
   <section class="mgroup"><h2>나의 핀맵</h2>
     ${myRow('placesheet','📍','내 동네', esc(myPlaces().join(' · ')))}
     ${myRow('interests','💡','관심사 · 활용 목적', esc(prefText))}
+  </section>
+  <section class="mgroup"><h2>계정 설정</h2>
+    ${myRow('accounts','🔗','SNS 계정 연동', `${myAccounts().length}개 연결됨`)}
+    ${syncBtn()}
   </section>
   <section class="mgroup"><h2>설정</h2>
     ${myRow('notisheet','🔔','알림 설정', settings.push ? `푸시 켜짐 · ${notiOn}개` : '푸시 꺼짐')}
@@ -111,7 +112,7 @@ Object.assign(actions, {
   profile: () => { modal('프로필 편집', `<form id="profileform"><label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label><p class="hint">동네는 ‘내 동네’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`); $('#sheet').classList.add('bottomsheet'); },
   resetask: () => modal('저장 데이터 초기화', `<p>이 브라우저에 저장한 콘텐츠, 관심사, 설정이 모두 지워지고 예시 상태로 돌아가요.</p><div class="dialogactions"><button class="textbtn" data-action="close">취소</button><button class="filled danger" data-action="resetdata">초기화</button></div>`),
   resetdata: () => { try { [STORAGE, ...LEGACY_KEYS].forEach(k => localStorage.removeItem(k)); } catch {} location.reload(); },
-  logout: () => { go('home'); openDemoLogin(); }
+  logout: () => toast('프로토타입에서는 로그아웃 기능을 제공하지 않아요.')
 });
 
 document.addEventListener('click', e => {
