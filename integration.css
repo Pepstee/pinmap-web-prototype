@@ -1,7 +1,7 @@
 /* Shared glass controls; teammate collection/detail content remains unchanged. */
 :root{--pm-glass:rgba(255,255,255,.62);--pm-glass-border:rgba(255,255,255,.88);--pm-glass-shadow:0 8px 28px #20202022,inset 0 1px 0 #ffffffe6}
 .bottomnav .pm-nav-main,.bottomnav .pm-nav-add,
-.live-map button:not(.navitem),.live-map .leaflet-control-zoom a,.live-map .lm-search{
+.live-map button:not(.navitem):where(:not(.libgo)),.live-map .leaflet-control-zoom a,.live-map .lm-search{
  background:var(--pm-glass)!important;border:1px solid var(--pm-glass-border)!important;box-shadow:var(--pm-glass-shadow)!important;
  -webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8)
 }
@@ -157,7 +157,7 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 .layout .main:has(>.topbar .toptitle){padding-top:36px!important}
 
 /* Map search header: solid white through the bottom of the search field. */
-.live-map::before{content:'';position:absolute;inset:0 0 auto;height:100px;background:#fff;z-index:400;pointer-events:none}
+.live-map::before{display:none}
 .live-map .lm-search{top:28px;left:20px;right:20px;background:#f5f5f5!important;border:1px solid #ededed!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none}
 .live-map .lm-search-results,.live-map .lm-status{top:106px}
 .live-map .lm-search-results{right:20px}
@@ -193,3 +193,28 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 .course-saved-stops{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;color:#888;margin-top:7px}
 .course-list-empty{text-align:center;padding:50px 10px;color:#888;font-size:13px;line-height:1.8}
 .coursepage button:focus-visible{outline:2px solid #444;outline-offset:3px}
+
+/* Reuse the collection title/search component, including its 44/16/50px rhythm. */
+.live-map .lm-header{position:absolute;inset:0 0 auto;z-index:401;padding:var(--top) var(--gutter) 16px;background:#fff}
+.live-map .lm-header .cf-fhead{position:relative;padding-right:120px}
+.live-map .lm-header .libsearch{margin-bottom:0}
+.live-map .lm-header input{font-family:inherit}
+.live-map .lm-header .libgo{border:0;flex:none;width:28px;height:28px;padding:0;border-radius:50%;display:grid;place-items:center;color:#17191b;background:rgba(255,255,255,.62);box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
+.live-map .lm-header .libgo svg{width:20px;height:20px}
+.live-map .lm-course-link{position:absolute;top:2px;right:0;left:auto;bottom:auto;transform:none;min-height:40px;height:40px;padding:0 13px;border-radius:21px;gap:6px;font-size:13px;font-weight:700;z-index:auto}
+.live-map .lm-course-link svg{width:16px;height:16px}
+.live-map .lm-search-results,.live-map .lm-status{top:calc(var(--top) + 122px)}
+/* A separate six-dot grip makes the existing reorder interaction visible. */
+.course-row{gap:10px}
+.course-drag-handle{display:grid;place-items:center;align-self:center;flex:0 0 28px;width:28px;height:48px;border:0;border-radius:8px;padding:0;background:transparent;color:#999;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.course-drag-handle svg{width:16px;height:24px;fill:currentColor;stroke:none;pointer-events:none}
+.course-drag-handle:hover,.course-drag-handle:focus-visible{color:#444;background:#f2f2f2}
+.course-drag-handle:active{cursor:grabbing}
+
+/* Keep the map visible behind every bottom control. */
+.live-map .lm-bottom:before{display:none}
+.live-map .lm-bottom button,.live-map .lm-bottom .pm-nav-main,.live-map .lm-bottom .navicon{background:transparent!important;border-color:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+/* Editing controls must not shift the rows while a grip is being dragged. */
+.course-body{position:relative}
+.course-edit-bar{position:absolute;right:20px;top:-48px;margin:0;z-index:410}

@@ -30,8 +30,10 @@
   };
   function content() {
     return `<section class="live-map" aria-label="지도에서 장소 탐색"><div id="live-map-canvas"></div>
-      <form class="lm-search" id="lm-search" role="search">${icon('search')}<input name="q" aria-label="지도 장소 검색" placeholder="장소명 또는 주소 검색" value="${safe(searchQuery)}" autocomplete="off"><button type="submit" aria-label="검색">${icon('arrow')}</button></form>
-      <button class="lm-course-link" data-page="courses">${icon('calendar')} 코스 짜기</button>
+      <header class="lm-header cfpage">
+        <div class="libhead cf-fhead"><h1>지도페이지</h1><button class="lm-course-link" data-page="courses">${icon('calendar')} 코스 짜기</button></div>
+        <form class="libsearch" id="lm-search" role="search">${icon('search')}<input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="장소명 또는 주소 검색" value="${safe(searchQuery)}" autocomplete="off"><button type="submit" class="libgo" aria-label="검색">${icon('arrow')}</button></form>
+      </header>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
       <div class="lm-bottom"><div class="lm-area">${round('현재 위치로 이동','target')}</div>
@@ -69,7 +71,7 @@
     expandedKey=key;updateMarker(entry,true);
     const resultsPanel=$('#lm-search-results');if(resultsPanel)resultsPanel.hidden=true;
     // Leave enough room for the expanded card, search header, and bottom controls.
-    liveMap.panInside([place.lat,place.lng],{paddingTopLeft:[35,142],paddingBottomRight:[230,275],animate:false});
+    liveMap.panInside([place.lat,place.lng],{paddingTopLeft:[35,205],paddingBottomRight:[230,275],animate:false});
     entry.marker.getElement()?.focus({preventScroll:true});
   }
   function markers() {

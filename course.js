@@ -64,7 +64,7 @@
       <div class="course-body">
         ${course.days.length>1?`<div class="course-days" aria-label="코스 날짜">${course.days.map((_,index)=>`<button data-course-day="${index}" class="${selectedDay===index?'selected':''}" aria-pressed="${selectedDay===index}">${index+1}일차 <small>${dayDate(index)}</small></button>`).join('')}</div>`:''}
         <div class="course-edit-bar" ${editing?'':'hidden'}><button data-course-done ${editing?'':'hidden'}>완료</button></div>
-        ${stops.length?`<div class="course-timeline">${stops.map((stop,index)=>`<div class="course-row" data-course-id="${stop.id}"><span class="course-badge" style="background:${stopColor(index)}">${index+1}</span><article class="course-card" tabindex="0" aria-label="${esc(stop.place.title)} 일정 편집"><button class="course-remove" data-course-remove="${stop.id}" aria-label="${esc(stop.place.title)} 삭제" ${editing?'':'hidden'}>×</button><div class="course-card-head"><img src="${thumbnail(stop.place)}" alt=""><div><b>${esc(stop.place.title)}</b><small>${esc(stop.place.category||stop.place.type)} · ${esc(stop.place.address)}</small></div></div></article></div>`).join('')}</div>`:'<div class="course-empty">이 날의 코스가 비어 있어요.<br>저장한 장소를 추가해 보세요.</div>'}
+        ${stops.length?`<div class="course-timeline">${stops.map((stop,index)=>`<div class="course-row" data-course-id="${stop.id}"><span class="course-badge" style="background:${stopColor(index)}">${index+1}</span><article class="course-card" tabindex="0" aria-label="${esc(stop.place.title)} 일정 편집"><button class="course-remove" data-course-remove="${stop.id}" aria-label="${esc(stop.place.title)} 삭제" ${editing?'':'hidden'}>×</button><div class="course-card-head"><img src="${thumbnail(stop.place)}" alt=""><div><b>${esc(stop.place.title)}</b><small>${esc(stop.place.category||stop.place.type)} · ${esc(stop.place.address)}</small></div></div></article><button class="course-drag-handle" data-course-drag aria-label="${esc(stop.place.title)} 순서 변경" title="드래그로 순서 변경 · 방향키 위/아래로 이동"><svg viewBox="0 0 16 24" aria-hidden="true"><circle cx="5" cy="5" r="1.7"/><circle cx="11" cy="5" r="1.7"/><circle cx="5" cy="12" r="1.7"/><circle cx="11" cy="12" r="1.7"/><circle cx="5" cy="19" r="1.7"/><circle cx="11" cy="19" r="1.7"/></svg></button></div>`).join('')}</div>`:'<div class="course-empty">이 날의 코스가 비어 있어요.<br>저장한 장소를 추가해 보세요.</div>'}
         <button class="course-add-place" data-course-picker aria-label="장소 추가하기">${icon('plus')}</button>
         ${pickerOpen?`<section id="course-picker" class="course-picker"><div class="course-picker-heading"><h2>저장한 장소</h2><button data-course-picker aria-label="장소 목록 닫기">${icon('close')}</button></div>${available.length?available.map(item=>`<div class="course-option"><img src="${thumbnail(item)}" alt=""><div><b>${esc(item.title)}</b><small>${esc(item.category||item.type)}</small></div><button data-course-add="${item.id}" aria-label="${esc(item.title)} 추가">추가</button></div>`).join(''):'<p>이 날짜에 추가할 장소가 없습니다.</p>'}</section>`:''}
 
@@ -120,11 +120,12 @@
     document.body.classList.add('course-dragging');dragTick();
   }
   function startGesture(target,x,y,id){
-    if(page!=='course'||target.closest('button,input,a,select'))return;
-    const card=target.closest('.course-card');if(!card)return;
+    const handle=target.closest('[data-course-drag]');
+    if(page!=='course'||(!handle&&target.closest('button,input,a,select')))return;
+    const row=target.closest('.course-row');if(!row||(!handle&&!target.closest('.course-card')))return;
     endGesture(true);
-    gesture={row:card.closest('.course-row'),x,y,startX:x,startY:y,id,active:false};
-    if(editing)activateDrag();else holdTimer=setTimeout(activateDrag,450);
+    gesture={row,x,y,startX:x,startY:y,id,active:false};
+    if(editing||handle)activateDrag();else holdTimer=setTimeout(activateDrag,450);
   }
   function moveGesture(x,y,event){
     if(!gesture)return;
@@ -146,7 +147,7 @@
     }
     if(page==='course')renderInPlace();
   }
-  document.addEventListener('pointerdown',event=>{if(event.pointerType!=='touch'&&event.button===0){if(event.target.closest('.course-card')&&!event.target.closest('button,input,a,select'))event.preventDefault();startGesture(event.target,event.clientX,event.clientY,event.pointerId)}});
+  document.addEventListener('pointerdown',event=>{if(event.pointerType!=='touch'&&event.button===0){if(event.target.closest('[data-course-drag]')||(event.target.closest('.course-card')&&!event.target.closest('button,input,a,select')))event.preventDefault();startGesture(event.target,event.clientX,event.clientY,event.pointerId)}});
   document.addEventListener('pointermove',event=>{if(gesture?.id===event.pointerId)moveGesture(event.clientX,event.clientY,event)});
   document.addEventListener('pointerup',event=>{if(gesture?.id===event.pointerId){gesture.y=event.clientY;endGesture()}});
   document.addEventListener('pointercancel',()=>endGesture(true));
@@ -155,14 +156,16 @@
   document.addEventListener('touchend',()=>{if(gesture?.id==='touch')endGesture()});
   document.addEventListener('touchcancel',()=>endGesture(true));
   window.addEventListener('blur',()=>endGesture(true));
-  document.addEventListener('contextmenu',event=>{if(event.target.closest('.course-card'))event.preventDefault()});
+  document.addEventListener('contextmenu',event=>{if(event.target.closest('.course-card,[data-course-drag]'))event.preventDefault()});
   document.addEventListener('click',event=>{if(Date.now()<suppressClickUntil){event.preventDefault();event.stopImmediatePropagation()}},true);
   document.addEventListener('keydown',event=>{
-    const card=event.target.closest('.course-card');if(!card||event.target!==card)return;
+    const card=event.target.closest('.course-card,[data-course-drag]');if(!card||event.target!==card)return;
+    const handle=card.hasAttribute('data-course-drag');
     if(event.key==='Enter'||event.key===' '){event.preventDefault();enterEdit();}
-    if(editing&&['ArrowUp','ArrowDown'].includes(event.key)){
+    if((editing||handle)&&['ArrowUp','ArrowDown'].includes(event.key)){
+      enterEdit();
       event.preventDefault();const id=Number(card.closest('[data-course-id]').dataset.courseId),list=dayStops(),index=list.findIndex(stop=>stop.id===id),next=index+(event.key==='ArrowUp'?-1:1);
-      if(next>=0&&next<list.length){[list[index],list[next]]=[list[next],list[index]];refresh();document.querySelector(`[data-course-id="${id}"] .course-card`)?.focus()}
+      if(next>=0&&next<list.length){[list[index],list[next]]=[list[next],list[index]];refresh();document.querySelector(`[data-course-id="${id}"] ${handle?'[data-course-drag]':'.course-card'}`)?.focus()}
     }
     if(event.key==='Escape'){editing=false;render()}
   });
@@ -198,6 +201,7 @@
       try{localStorage.removeItem(draftKey)}catch{}
       go('courses');toast('코스를 저장했어요.');return;
     }
+    if(event.target.closest('[data-course-drag]')){enterEdit();return;}
     if(event.target.closest('[data-course-edit-title]')){
       const title=document.querySelector('[data-course-field="title"]');
       if(title){title.readOnly=false;title.focus();title.select()}
