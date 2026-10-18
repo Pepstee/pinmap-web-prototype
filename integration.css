@@ -122,12 +122,10 @@ body:has(.main .strip)::before{display:none!important}
 .course-header{padding:16px 20px 18px;background:#fff}
 .course-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .course-header-actions{display:flex;gap:10px}
-.course-header .course-close,.course-header .course-share,.course-header .course-friends{position:static;display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;background:transparent;box-shadow:none;color:#292929;cursor:pointer}
+.course-header .course-close,.course-header .course-share{position:static;display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;background:transparent;box-shadow:none;color:#292929;cursor:pointer}
 .course-header-actions svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .course-header .course-title-row{margin-bottom:0}
 .course-header .course-title-row>div input{font-size:22px}
-.course-companions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
-.course-companions span{padding:5px 10px;background:#f2f2f2;border-radius:14px;font-size:12px;color:#666}
 .course-map-wrap{height:200px}
 .course-card-head img{width:64px;height:64px;border-radius:10px}
 .course-body{padding-top:22px;padding-bottom:180px}
@@ -145,50 +143,53 @@ body:has(.main .strip)::before{display:none!important}
 .course-header .course-title-row>label input{margin-top:0}
 .course-timeline:before{display:none}
 .course-row:not(:last-child):before{content:'';position:absolute;left:2px;top:31px;bottom:-21px;width:2px;background:#dedede}
-.course-card-summary{display:flex;gap:6px;margin-top:12px;padding-top:11px;border-top:1px solid #e8e8e8;font-size:11px;line-height:1.4;color:#4b4b4b}
-.course-card-summary strong{flex:none;color:#555}
-.course-card-summary span{min-width:0;flex:1}
-/* Demo companions use three bundled profile photos; added names join this row. */
-.course-companions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0;padding:12px 20px 3px;background:#fff}
-.course-companions .course-friend{display:flex;align-items:center;gap:5px;padding:0;background:none}
-.course-companions .course-friend-photo{display:block;box-sizing:border-box;width:32px;height:32px;padding:0;border-radius:50%;background-color:transparent;background-image:url('img/course-friends-demo.png');background-size:300% 100%;border:2px solid #fff;box-shadow:0 1px 5px #0002}
-.course-companions .course-friend-name{padding:0;background:none;font-size:11px;color:#666}
 /* The dock avatar uses the same markup and saved photo as the My page. */
 .bottomnav .navitem .pm-nav-avatar{box-sizing:border-box;width:28px;height:28px;min-width:28px;border-radius:50%;font-size:12px;line-height:1;background:#111!important;color:#fff!important;overflow:hidden}
 .bottomnav .navitem .pm-nav-avatar img{width:100%;height:100%;object-fit:cover;display:block}
-/* Existing-friends picker for the course prototype. */
-.course-friends-sheet{padding:6px 0 8px;color:#222}
-.course-friends-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
-.course-friends-head h2{margin:0;font-size:20px;letter-spacing:-.5px}
-.course-friends-head p{margin:3px 0 0;color:#777;font-size:12px}
-.course-friends-head button{flex:none;width:28px;height:28px;border-radius:50%;background:#eee;color:#555;font-size:19px;line-height:1}
-.course-friends-search{width:100%;height:42px;padding:0 14px;border:1px solid #e5e5e5;border-radius:22px;background:#f6f6f6;font-size:13px;outline-color:#555}
-.course-friends-list{max-height:330px;margin:13px 0;overflow:auto}
-.course-friends-row{display:flex;align-items:center;gap:12px;min-height:57px;padding:8px 2px;border-bottom:1px solid #eee;cursor:pointer}
-.course-friends-row[hidden],.course-friends-empty[hidden]{display:none}
-.course-friends-row .course-friend-photo{flex:none;box-sizing:border-box;width:38px;height:38px;border:2px solid white;border-radius:50%;background-image:url('img/course-friends-demo.png');background-size:300% 100%;box-shadow:0 1px 5px #0002}
-.course-friends-name{flex:1;font-size:14px;font-weight:650}
-.course-friends-invited{color:#969696;font-size:11px}
-.course-friends-row input[type=checkbox]{appearance:none;flex:none;width:22px;height:22px;margin:0;border:1.5px solid #bbb;border-radius:50%;background:#fff;cursor:pointer}
-.course-friends-row input[type=checkbox]:checked{border-color:#333;background:#333;box-shadow:inset 0 0 0 5px #333}
-.course-friends-row input[type=checkbox]:checked:after{content:'✓';display:block;color:#fff;text-align:center;font-size:14px;line-height:19px}
-.course-friends-row input[type=checkbox]:disabled{border-color:#ddd;background:#eee;cursor:default}
-.course-friends-empty{padding:18px;text-align:center;color:#888;font-size:12px}
-.course-friends-actions{display:flex;gap:9px;margin-top:18px}
-.course-friends-actions button{flex:1;min-height:45px;border-radius:22px;background:#eee;color:#333;font-size:13px;font-weight:700}
-.course-friends-actions [data-friend-invite]{flex:1.7;background:#222;color:#fff}
-.course-friends-actions [data-friend-invite]:disabled{background:#d6d6d6;color:#888;cursor:default}
-
-/* Keep the map title and search together while halving their top spacing. */
-.live-map .lm-search{top:88px;left:20px;right:20px}
-.live-map .lm-search-results,.live-map .lm-status{top:146px}
+/* Course action spacing. */
 .live-map .lm-course-link{bottom:187px}
 
-/* Match the search row's side margins and the other pages' title typeface. */
-.live-map .lm-region-title{position:absolute;z-index:401;top:37px;left:20px;max-width:calc(100% - 40px);margin:0;padding:0;border:0;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:var(--pm-ink);font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;font-size:24px;font-weight:600;line-height:1.35;letter-spacing:-.6px;text-shadow:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 
 /* Align page headings with the map title; the visible home banner retains its own space. */
 :root{--top:28px}
 body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:none!important}
 .layout .main:not(:has(.strip)):has(.placebar){padding-top:34px!important}
 .layout .main:has(>.topbar .toptitle){padding-top:36px!important}
+
+/* Map search header: solid white through the bottom of the search field. */
+.live-map::before{content:'';position:absolute;inset:0 0 auto;height:100px;background:#fff;z-index:400;pointer-events:none}
+.live-map .lm-search{top:28px;left:20px;right:20px;background:#f5f5f5!important;border:1px solid #ededed!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none}
+.live-map .lm-search-results,.live-map .lm-status{top:106px}
+.live-map .lm-search-results{right:20px}
+.lm-expanded-pin{position:relative;display:flex;align-items:center;gap:10px;width:240px;height:88px;padding:12px 24px 12px 8px;border:2px solid #fff;border-radius:19px;background:#fff;box-shadow:0 5px 20px #14251e38;cursor:pointer;text-align:left;animation:pin-expand .16s ease-out;transform-origin:23px center}
+.lm-pin-symbol{flex:none;width:28px;font-size:25px;text-align:center}
+.lm-pin-copy{min-width:0;flex:1;display:grid;gap:3px}
+.lm-pin-copy b{font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#222}
+.lm-pin-copy small{font-size:10px;color:#777}
+.lm-pin-copy>span{font-size:10px;line-height:1.4;color:#555;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lm-pin-collapse{position:absolute;right:9px;top:8px;color:#888;font-size:16px;line-height:1}
+@keyframes pin-expand{from{opacity:.7;transform:scaleX(.75)}to{opacity:1;transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){.lm-expanded-pin{animation:none}}
+/* Compact stops: align both badges and connecting lines with card centers. */
+.course-row{align-items:center}
+.course-badge{margin-top:0}
+.course-row:not(:last-child):before{top:50%;bottom:calc(-50% - 14px)}
+.course-card{padding:10px 12px}
+.course-card-head img{width:56px;height:56px}
+.course-header .course-save{align-self:center;min-height:40px;padding:8px 17px;border:0;border-radius:21px;background:#222;color:#fff;font-size:13px;font-weight:700;cursor:pointer}
+.course-list-page h1{font-size:24px;letter-spacing:-.6px;margin:0 0 8px;font-weight:700}
+.course-list-page .course-header>p{font-size:13px;color:#777;line-height:1.5;margin:0}
+.course-list-body{padding:6px 20px 120px}
+.course-new{width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:15px;background:#222;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.course-new svg,.course-resume svg,.course-saved-card>svg,.course-saved-placeholder svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;flex:none}
+.course-resume{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:14px;border:1px solid #e8e8e8;border-radius:14px;background:#f7f7f7;color:#555;font-size:12px;text-align:left;cursor:pointer}
+.course-list-heading{margin:28px 0 12px;font-size:13px;font-weight:650;color:#666}
+.course-saved-card{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:12px;padding:14px;border:1px solid #e8e8e8;border-radius:17px;background:#fff;color:#222;text-align:left;cursor:pointer}
+.course-saved-card>img,.course-saved-placeholder{flex:none;width:58px;height:58px;border-radius:11px;object-fit:cover;background:#f1f1f1}
+.course-saved-placeholder{display:grid;place-items:center}
+.course-saved-card>span:not(.course-saved-placeholder){min-width:0;flex:1}
+.course-saved-card b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px}
+.course-saved-card small{display:block;margin-top:5px;font-size:11px;color:#777}
+.course-saved-stops{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;color:#888;margin-top:7px}
+.course-list-empty{text-align:center;padding:50px 10px;color:#888;font-size:13px;line-height:1.8}
+.coursepage button:focus-visible{outline:2px solid #444;outline-offset:3px}
