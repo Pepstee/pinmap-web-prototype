@@ -24,6 +24,7 @@
   };
   let courses=[],course={id:newId(),title:'새 코스',date:today,days:[[]]},draft=null;
   let pickerOpen=false,courseMap=null,editing=false;
+  const thumbnailMaps=[];
   try {
     const stored=localStorage.getItem(storageKey);
     if(stored!==null){const values=JSON.parse(stored);if(Array.isArray(values))courses=values.map(normalize).filter(Boolean);}
@@ -49,7 +50,8 @@
       <div class="course-list-body">
         <button class="course-new" data-course-new>${icon('plus')} 새 코스 만들기</button>
         <div class="course-list-heading">코스 ${courses.length}개</div>
-        ${courses.length?courses.map(saved=>{const places=saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean);return `<button class="course-saved-card" data-course-open="${esc(saved.id)}">${places[0]?`<img src="${thumbnail(places[0])}" alt="">`:`<span class="course-saved-placeholder">${icon('map')}</span>`}<span><b>${esc(saved.title)}</b><small>${esc(saved.date)} · 장소 ${places.length}곳</small><span class="course-saved-stops">${places.map(place=>esc(place.title)).join(' → ')||'장소를 추가해 주세요'}</span></span>${icon('arrow')}</button>`}).join(''):'<div class="course-list-empty">아직 저장한 코스가 없어요.<br>저장한 장소로 첫 코스를 만들어 보세요.</div>'}
+        ${courses.length?courses.map(saved=>{const places=saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean);return `<button class="course-saved-card" data-course-open="${esc(saved.id)}">${places.some(place=>coordinates(place))?`<span class="course-saved-map" data-course-map="${esc(saved.id)}" role="img" aria-label="${esc(saved.title)} 장소 순서 지도" inert></span>`:`<span class="course-saved-placeholder">${icon('map')}</span>`}<span><b>${esc(saved.title)}</b><small>${esc(saved.date)} · 장소 ${places.length}곳</small><span class="course-saved-stops">${places.map(place=>esc(place.title)).join(' → ')||'장소를 추가해 주세요'}</span></span>${icon('arrow')}</button>`}).join(''):'<div class="course-list-empty">아직 저장한 코스가 없어요.<br>저장한 장소로 첫 코스를 만들어 보세요.</div>'}
+        ${courses.length?'<p class="course-map-credit">지도 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>':''}
       </div></section>`;
   };
   pages.course=function(){
@@ -70,6 +72,26 @@
 
       </div>
     </section>`;
+  };
+  window.unmountCourseThumbnails=()=>{thumbnailMaps.splice(0).forEach(map=>map.remove())};
+  window.mountCourseThumbnails=()=>{
+    window.unmountCourseThumbnails();
+    if(!window.L)return;
+    document.querySelectorAll('[data-course-map]').forEach(element=>{
+      const saved=courses.find(value=>value.id===element.dataset.courseMap);if(!saved)return;
+      const stops=saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean);
+      const points=stops.map((place,index)=>({point:coordinates(place),index})).filter(stop=>stop.point);
+      if(!points.length)return;
+      const map=L.map(element,{zoomControl:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,boxZoom:false,dragging:false,keyboard:false,zoomAnimation:false,fadeAnimation:false}).setView(points[0].point,15);
+      thumbnailMaps.push(map);
+      if(points.length>1){
+        map.fitBounds(points.map(stop=>stop.point),{padding:[17,17],maxZoom:16});
+        L.polyline(points.map(stop=>stop.point),{color:'#555',weight:2,opacity:.85,interactive:false}).addTo(map);
+      }
+      points.forEach(({point,index})=>L.marker(point,{interactive:false,keyboard:false,icon:L.divIcon({className:'course-thumbnail-marker',html:`<i style="background:${stopColor(index)}">${index+1}</i>`,iconSize:[19,19],iconAnchor:[9.5,9.5]})}).addTo(map));
+      window.attachPinmapBasemap(map);
+      map.attributionControl.remove();
+    });
   };
   window.unmountCourseMap=()=>{if(courseMap){courseMap.remove();courseMap=null}};
   window.mountCourseMap=()=>{

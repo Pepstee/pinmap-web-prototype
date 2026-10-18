@@ -98,11 +98,12 @@
     searchController?.abort();
     expandedKey=null;markerEntries.clear();
     window.unmountCourseMap?.();
+    window.unmountCourseThumbnails?.();
     if (liveMap) { liveMap.remove(); liveMap=null; locationMarker=null; }
     const isMap = page === 'map' && !detailId;
     document.body.classList.toggle('live-map-page',isMap);
     if (isMap) { $('#app').innerHTML=content(); mount(); if(searchResults) showResults(); }
-    else { originalRender(); if(page==='course' && !detailId) window.mountCourseMap?.(); }
+    else { originalRender(); if(page==='course' && !detailId) window.mountCourseMap?.(); if(page==='courses' && !detailId) window.mountCourseThumbnails?.(); }
   };
   function drawLocation() {
     if(!liveMap)return;

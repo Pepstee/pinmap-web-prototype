@@ -223,3 +223,9 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 .lm-pin-photo-placeholder{display:grid;place-items:center;font-size:28px;background:var(--t-soft,#EFEFF1)}
 .lm-expanded-pin .lm-pin-copy{padding:0;gap:3px}
 .lm-pin-collapse{display:grid;place-items:center;width:16px;height:16px;right:6px;top:7px;background:transparent;color:#888;font-size:16px;box-shadow:none}
+
+/* Saved-course previews show the route and its ordered stops. */
+.course-saved-card>.course-saved-map{display:block;position:relative;flex:0 0 112px!important;width:112px;height:88px;border-radius:11px;overflow:hidden;pointer-events:none;background:#e9e9e9}
+.course-thumbnail-marker i{display:grid;place-items:center;width:19px;height:19px;border:1.5px solid #fff;border-radius:50%;font-family:inherit;font-size:11px;font-weight:700;line-height:1;font-style:normal;color:#fff;box-shadow:0 1px 4px #0004}
+.course-map-credit{margin:4px 0 0;text-align:right;font-size:9px;color:#888}
+.course-map-credit a{color:inherit}
