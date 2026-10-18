@@ -189,7 +189,7 @@ function drawOnboarding() {
   const bare = onboardStep === 0; // 첫 화면은 위쪽 단계 표시 없이
   el.innerHTML = `<div class="ob-screen step${onboardStep+1}${bare ? ' bare' : ''}">
     <div class="ob-top">
-      <div class="ob-topleft">${onboardStep===1||onboardStep===2?`<button class="ob-back" data-ob="back" aria-label="이전">${icon('back')}</button>`:''}<span class="ob-count" aria-label="${onboardStep}단계, 전체 2단계"><b>${onboardStep}</b> / 2</span></div>
+      <div class="ob-topleft">${onboardStep===2?`<button class="ob-back" data-ob="back" aria-label="이전">${icon('back')}</button>`:''}<span class="ob-count" aria-label="${onboardStep}단계, 전체 2단계"><b>${onboardStep}</b> / 2</span></div>
       ${'<button class="ob-skip" data-ob="skip">건너뛰기</button>'}
     </div>
     ${onboardScreen()}

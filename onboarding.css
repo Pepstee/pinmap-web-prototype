@@ -192,3 +192,17 @@ body.onboarding-open{overflow:hidden}
 #onboarding .step2 .ob-flow{margin-top:36px!important}
 #onboarding .step3 .ob-options{margin-top:36px!important}
 #onboarding .step3 .ob-options{gap:14px!important}
+
+/* 2 · 3번째 화면: 배경 그라데이션(흐린 원) 없이 단색 배경 · 카드는 흰색 */
+#onboarding .ob-screen.step2::before,#onboarding .ob-screen.step2::after,
+#onboarding .ob-screen.step3::before,#onboarding .ob-screen.step3::after{display:none!important;content:none!important}
+#onboarding .ob-screen.step2,#onboarding .ob-screen.step3{background:#F4F4F5!important}
+#onboarding .ob-actions{background:none!important}
+.step2 .ob-flowcard{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid #ECECEE!important;box-shadow:none!important}
+.step2 .ob-mock{background:#F6F6F7!important;border:0!important}
+.step3 .ob-option{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid #ECECEE!important;box-shadow:none!important}
+.step3 .ob-option.on{background:#E4E4E7!important;border-color:#E4E4E7!important}
+.step3 .ob-option .ob-label{letter-spacing:-.4px}
+.step3 .ob-option{padding-left:14px!important;padding-right:10px!important}
+/* 첫 화면: 검정 배경 시작 이미지 */
+#onboarding .ob-screen.step1,#onboarding:has(.step1){background:#000!important}
