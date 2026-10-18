@@ -22,7 +22,17 @@
 .cfpage .libchip.on{background:var(--t-ink);color:#fff}
 
 /* ---------- 폴더 그리드 ---------- */
-.cf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:20px;row-gap:28px;margin-top:24px;padding:0 2px}
+.cf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px;row-gap:28px;margin-top:24px;padding:0 14px}
+/* 새 폴더 추가 타일: 폴더 박스와 같은 크기의 점선 상자 */
+.cf-add{align-self:start}
+.cf-add .cf-addbox{position:relative;display:block;aspect-ratio:100/64;margin-top:16%;padding:12px 14px;overflow:hidden;border:1.5px dashed #BDBDC2;border-radius:20px;background:rgba(255,255,255,.5);transition:transform .2s ease,border-color .2s}
+.cf-addtext{display:grid;gap:2px}
+.cf-addtext b{font-size:17px;font-weight:700;letter-spacing:-.4px;color:var(--t-ink)}
+.cf-addtext small{font-size:13px;color:#9A9AA0}
+.cf-addplus{position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--t-ink);color:#fff;box-shadow:0 6px 14px rgba(0,0,0,.18)}
+.cf-addplus .icon{width:18px;height:18px;stroke-width:2.2}
+@media(hover:hover){.cf-add:hover .cf-addbox{transform:translateY(-2px);border-color:var(--t-ink)}}
+.cf-add:active .cf-addbox{transform:scale(.98)}
 .cf-folder{display:block;width:100%;min-width:0;padding:0;border-radius:20px;background:none;text-align:left;color:var(--t-ink)}
 /* button:hover의 brightness 필터는 앞판 블러를 깨뜨려서 꺼요 */
 .cf-folder:hover{filter:none}
@@ -98,7 +108,7 @@
 
 
 @media(max-width:360px){
-  .cf-grid{column-gap:12px}
+  .cf-grid{column-gap:16px;padding:0 6px}
   .cf-icon{width:34px;height:34px}.cf-icon .icon{width:18px;height:18px}
   .cf-title{font-size:16px}.cf-count{font-size:14px}
 }
@@ -205,3 +215,134 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 .cf-delfolder:hover{filter:none;background:rgba(0,0,0,.05);color:#C2261B}
 /* 담기 목록: 검색해도 시트 높이가 바뀌지 않게 고정 */
 .cf-pick{height:min(46dvh,400px);max-height:none;align-content:start}
+
+/* ---------- 폴더 v2: 아이콘 없이 · 흰 테두리 사진이 양옆으로 퍼짐 · 이름 가운데 + 개수 알약 ---------- */
+.cf-photo{width:44%;aspect-ratio:1/1;border:3px solid #fff;border-radius:9px;box-shadow:0 1px 2px rgba(0,0,0,.08),0 6px 14px rgba(0,0,0,.12)}
+.cf-slot0{left:28%;top:-4%;transform:rotate(-1deg)}
+.cf-slot1{left:-4%;top:8%;transform:rotate(-10deg)}
+.cf-slot2{left:60%;top:7%;transform:rotate(9deg)}
+/* 앞판: 더 하얀 반투명 유리 */
+.cf-front{background:linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(248,248,250,.78) 45%,rgba(240,240,243,.9) 100%);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4)}
+/* 앞판 아래쪽 얇은 홈 두 줄 */
+.cf-lip{position:absolute;left:7%;right:7%;bottom:9%;z-index:7;height:5px;border-top:1px solid rgba(0,0,0,.06);border-bottom:1px solid rgba(255,255,255,.9);pointer-events:none}
+.cf-lip::after{content:'';position:absolute;left:0;right:0;top:3px;border-top:1px solid rgba(0,0,0,.05)}
+.cf-back{filter:drop-shadow(0 1px 2px rgba(0,0,0,.05)) drop-shadow(0 14px 24px rgba(0,0,0,.10))}
+/* 이름 가운데 · 개수는 회색 알약 */
+.cf-meta{flex-direction:column;align-items:center;gap:6px;margin:12px 0 0;text-align:center}
+.cf-title{max-width:100%;font-size:16.5px;font-weight:600}
+.cf-count{padding:2px 10px;border-radius:999px;background:#E9E9EC;font-size:12.5px;font-weight:500;color:#8A8A8E;line-height:1.6}
+
+/* ---------- v3: 폴더 폭 줄임 · 사진은 폴더 안쪽 · 개수는 이름 옆 · 작은 필터 칩 ---------- */
+.cf-grid{padding:0 24px;column-gap:32px}
+.cf-slot0{left:28%;top:-4%;transform:rotate(-1deg)}
+.cf-slot1{left:4%;top:8%;transform:rotate(-7deg)}
+.cf-slot2{left:52%;top:7%;transform:rotate(6deg)}
+.cf-meta{flex-direction:row;justify-content:center;align-items:baseline;gap:5px}
+.cf-count{padding:0;border-radius:0;background:none;font-size:14.5px;font-weight:500;color:#9A9AA0;line-height:1.3}
+.cfpage .libchip{display:inline-flex;align-items:center;gap:4px;min-height:32px;height:32px;padding:0 12px;font-size:13px;font-weight:500}
+.cfpage .libchip.on{font-weight:600}
+.cfpage .libchip svg.icon{width:15px;height:15px;stroke-width:1.9}
+.cf-addtext small{font-size:12px}
+.cf-addplus{width:28px;height:28px;right:9px;bottom:9px}
+.cf-addplus .icon{width:16px;height:16px}
+
+/* ---------- v4: 폴더 세로로 키움 · 적당한 여백 · 이름은 폴더 앞판 안 왼쪽 아래 ---------- */
+.cf-grid{padding:0 6px;column-gap:16px;row-gap:20px}
+.cf-shell{aspect-ratio:100/94}
+.cf-add .cf-addbox{aspect-ratio:100/75.2;margin-top:18.8%}
+.cf-photo{width:46%}
+.cf-slot0{left:27%;top:-2%}
+.cf-slot1{left:4%;top:9%}
+.cf-slot2{left:50%;top:8%}
+.cf-meta{position:absolute;left:10%;right:8%;bottom:10%;z-index:7;justify-content:flex-start;align-items:baseline;gap:5px;margin:0;text-align:left}
+.cf-title{font-size:15px;font-weight:600;letter-spacing:-.3px;color:var(--t-ink)}
+.cf-count{font-size:13px;color:#8A8A8E}
+@media(max-width:360px){.cf-grid{column-gap:12px;padding:0 2px}.cf-title{font-size:14px}.cf-count{font-size:12.5px}}
+
+/* ---------- v5: 줄 간격 넓힘 · 사진 작게 · 새 폴더도 같은 유리 폴더 모양 ---------- */
+.cf-grid{row-gap:34px}
+.cf-photo{width:40%}
+.cf-slot0{left:30%;top:0}
+.cf-slot1{left:7%;top:10%}
+.cf-slot2{left:53%;top:9%}
+.cf-add{align-self:auto}
+.cf-add .cf-backshape{background:#ECECEF}
+.cf-add .cf-front{background:linear-gradient(180deg,rgba(255,255,255,.6) 0%,rgba(250,250,252,.82) 100%)}
+.cf-add .cf-addplus{position:absolute;left:50%;top:64%;right:auto;bottom:auto;z-index:7;width:40px;height:40px;transform:translate(-50%,-50%);border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--t-ink);box-shadow:0 1px 2px rgba(0,0,0,.06),0 6px 14px rgba(0,0,0,.08)}
+.cf-add .cf-addplus .icon{width:20px;height:20px;stroke-width:2}
+.cf-add .cf-title{color:#6B6B70}
+@media(hover:hover){.cf-add:hover .cf-addplus{background:var(--t-ink);color:#fff}}
+.cf-add .cf-addplus{top:57%;width:36px;height:36px}.cf-add .cf-addplus .icon{width:18px;height:18px}
+.cf-add .cf-addplus{left:auto;top:auto;right:8%;bottom:7%;transform:none;width:34px;height:34px}
+/* v6: 사진 조금 아래로 · 폴더 간격 넓힘 */
+.cf-grid{column-gap:22px;row-gap:40px;padding:0 4px}
+.cf-slot0{top:7%}
+.cf-slot1{top:16%}
+.cf-slot2{top:15%}
+
+/* ---------- 폴더 안 콘텐츠 v2: 1단 · 높이 2/3 · 사진 위 그라데이션 + 흰 글씨 ---------- */
+.cf-items{gap:12px}
+.cf-item{position:relative;border-radius:20px;background:#222;box-shadow:0 1px 2px rgba(0,0,0,.06),0 8px 20px rgba(0,0,0,.10)}
+.cf-itemimg{aspect-ratio:2.6/1}
+.cf-itemimg::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.28) 55%,rgba(0,0,0,.72) 100%)}
+.cf-itemimg .libmark{z-index:2}
+.cf-itembody{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:0 16px 13px;gap:10px;pointer-events:none}
+.cf-itemtext h3{color:#fff;font-size:16px;text-shadow:0 1px 6px rgba(0,0,0,.25)}
+.cf-itemdesc{margin-top:1px;color:rgba(255,255,255,.82);font-size:13px}
+.cf-itemmeta{margin-top:5px;color:rgba(255,255,255,.75);font-size:12px}
+.cf-itemmeta .icon{color:rgba(255,255,255,.85)}
+.cf-itemmeta i{color:rgba(255,255,255,.45)}
+.cf-itemmeta.warn{color:#fff}
+.cf-check{border-color:rgba(255,255,255,.85);background:rgba(0,0,0,.15)}
+.cf-item.on .cf-check{background:#fff;border-color:#fff;color:var(--t-ink)}
+.cf-itemimg::after{background:linear-gradient(180deg,rgba(0,0,0,0) 20%,rgba(0,0,0,.35) 50%,rgba(0,0,0,.8) 100%)}
+/* v3: 조금 더 높게 · 제목/설명 위계 강화 */
+.cf-itemimg{aspect-ratio:2.35/1}
+.cf-itembody{padding:0 16px 14px}
+.cf-itemtext h3{font-size:18.5px;font-weight:700;letter-spacing:-.5px;line-height:1.3}
+.cf-itemdesc{margin-top:4px;font-size:12.5px;font-weight:400;color:rgba(255,255,255,.68)}
+.cf-itemmeta{margin-top:8px;font-size:11.5px;color:rgba(255,255,255,.6)}
+/* v7: 폴더 세로 조금 더 · 뒤판 낮춤 */
+.cf-shell{aspect-ratio:100/102}
+.cf-back{top:27%}
+.cf-add .cf-addbox{aspect-ratio:100/74.5;margin-top:27.5%}
+.cf-slot0{top:12%}
+.cf-slot1{top:20%}
+.cf-slot2{top:19%}
+/* 새 폴더 · 담기 시트: 뒤 화면 블러 없이 살짝 어둡게만 */
+#sheet.cfsheet::backdrop{background:rgba(17,17,17,.32);-webkit-backdrop-filter:none;backdrop-filter:none}
+#sheet.cfsheet{background:#fff!important;-webkit-backdrop-filter:none;backdrop-filter:none}
+/* 새 폴더 창: 키보드에 가리지 않게 화면 위쪽 가운데 카드로 */
+#sheet.cfcenter{margin:16dvh auto auto;width:calc(100% - 32px);max-width:400px;max-height:none;padding:22px 20px 18px;border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,.18);animation:cfPop .22s cubic-bezier(.2,.8,.2,1)}
+#sheet.cfcenter .handle,#sheet.cfcenter .sd-handle{display:none}
+#sheet.cfcenter .dialoghead{margin-bottom:6px}
+#sheet.cfcenter .field{margin:14px 0 8px}
+#sheet.cfcenter .dialogactions{margin-top:16px}
+@keyframes cfPop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){#sheet.cfcenter{animation:none}}
+#sheet.cfcenter .error:empty{display:none}
+/* 빈 화면 (검색 결과 없음 · 담긴 콘텐츠 없음): 폴더 앞판 같은 반투명 유리 카드 */
+.cf-list>.empty{position:relative;overflow:hidden;isolation:isolate;padding:40px 24px 32px;border-radius:24px;border:1px solid rgba(255,255,255,.85);background:linear-gradient(180deg,rgba(255,255,255,.72) 0%,rgba(248,248,250,.55) 100%);-webkit-backdrop-filter:blur(16px) saturate(1.5);backdrop-filter:blur(16px) saturate(1.5);box-shadow:0 1px 2px rgba(0,0,0,.04),0 14px 30px rgba(0,0,0,.08),inset 0 1px 0 #fff}
+.cf-list>.empty>.icon{width:52px;height:52px;padding:14px;border-radius:50%;background:#fff;color:var(--t-ink);stroke-width:1.8;box-shadow:0 1px 2px rgba(0,0,0,.06),0 6px 14px rgba(0,0,0,.08)}
+.cf-list>.empty h3{margin-top:14px;font-size:17px;letter-spacing:-.4px}
+.cf-list>.empty p{margin:6px 0 18px;font-size:14px}
+.cf-list>.empty .tonal{min-height:42px;padding:0 20px;background:var(--t-ink);color:#fff;box-shadow:0 6px 14px rgba(0,0,0,.14)}
+/* 빈 화면을 폴더처럼: 뒤판(탭 포함)이 유리 앞판 뒤로 비쳐요 */
+.cf-list:has(>.empty){position:relative;isolation:isolate;padding-top:22px}
+.cf-list:has(>.empty)::before,.cf-list:has(>.empty)::after{content:'';position:absolute;z-index:-1;background:#E3E3E6}
+.cf-list:has(>.empty)::before{left:0;right:0;top:12px;height:150px;border-radius:22px;box-shadow:0 10px 24px rgba(0,0,0,.06)}
+.cf-list:has(>.empty)::after{left:0;top:0;width:38%;height:30px;border-radius:16px 22px 0 0}
+.cf-list>.empty{background:linear-gradient(180deg,rgba(255,255,255,.5) 0%,rgba(250,250,251,.72) 40%,rgba(246,246,248,.86) 100%)}
+.cf-list:has(>.empty){margin-top:18px}.cf-list:has(>.empty)::before{border-top-left-radius:0}
+/* 저장함 검색창: 지도 검색창과 같은 모양 (반투명 흰 유리 · 높이 50 · 오른쪽 → 원 버튼) */
+.cfpage .libsearch{height:50px;gap:10px;padding:0 11px 0 14px;border-radius:24px;border:1px solid rgba(255,255,255,.88);background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(28px) saturate(1.8);backdrop-filter:blur(28px) saturate(1.8);box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
+.cfpage .libsearch>.icon{width:20px;height:20px;color:#17191B;stroke-width:1.8}
+.cfpage .libsearch input{font-size:13px;color:#292929}
+.cfpage .libsearch input::placeholder{color:#8A8A8E}
+.cfpage .libsearch .iconbtn{width:28px;height:28px}
+.cfpage .libsearch .iconbtn .icon{width:16px;height:16px;color:#8A8A8E}
+.libgo{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.62);color:#17191B;box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
+.libgo .icon{width:20px;height:20px;stroke-width:1.8}
+.libgo:hover{filter:none;background:#fff}
+.cfpage .libsearch:focus-within{border-color:rgba(255,255,255,.88);box-shadow:0 0 0 1.5px var(--t-ink),0 8px 28px rgba(32,32,32,.133)}
+.cf-add .cf-addplus,.cf-add:hover .cf-addplus{background:var(--t-ink);color:#fff;box-shadow:0 6px 14px rgba(0,0,0,.18)}

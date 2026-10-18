@@ -4,7 +4,7 @@ const paths = {
   home:'M3 10 12 3l9 7v10H3z M9 20v-7h6v7', bookmark:'M6 3h12v18l-6-4-6 4z',
   map:'m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2z M9 3v16 M15 5v16', folder:'M3 7V4h7l3 3h8v13H3z',
   plus:'M12 5v14 M5 12h14', search:'M21 21l-5-5 M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0',
-  arrow:'M5 12h14 M13 6l6 6-6 6', back:'M19 12H5 M11 6l-6 6 6 6', close:'m6 6 12 12 M18 6 6 18',
+  arrow:'M5 12h14 M13 6l6 6-6 6', back:'M15 5l-7 7 7 7', close:'m6 6 12 12 M18 6 6 18',
   pin:'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0 M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
   coffee:'M4 4h12v10a5 5 0 0 1-10 0V4 M16 5h2a3 3 0 0 1 0 6h-2 M3 21h16', check:'m5 12 4 4L20 5',
   external:'M14 3h7v7 M21 3 10 14 M11 3H3v18h18v-8', spark:'m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3z',

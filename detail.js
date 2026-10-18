@@ -66,16 +66,17 @@ detail = function(){
           <button class="dtbtn" data-action="edit" aria-label="수정">${icon('pen')}</button>
           <button class="dtbtn" data-unsave="${x.id}" aria-label="삭제">${icon('trash')}</button>
         </div></div>
-      <div class="dtsrc"><div><b>${esc(src)}</b><small>${esc(x.ago)} 저장</small></div></div>
+      <div class="dtsrc dthtitle">
+        <span class="dthpill">${esc(x.category || shortType(x.type))}</span>
+        <h1>${esc(x.title)}</h1>
+        <small>${esc(src)} · ${esc(x.ago)} 저장</small>
+      </div>
     </div>
     <div class="dtsheet">
       <div class="dthead">
         <div class="dtheadtext">
-          <p class="dtcat"><span class="libpill">${esc(x.category || shortType(x.type))}</span></p>
-          <h1>${esc(x.title)}</h1>
           <p class="dtsub ${isPlace(x) && !ready ? 'warn' : ''}">${subIcon}<span>${esc(subText)}</span>${ready ? `<button type="button" class="dtcopy" data-action="dtcopyaddr" aria-label="주소 복사" title="주소 복사">${icon('copy')}</button>` : ''}</p>
         </div>
-        <button class="dtfav ${x.favorite ? 'on' : ''}" data-action="fav" aria-pressed="${!!x.favorite}" aria-label="즐겨찾기">${icon('star')}</button>
       </div>
       ${x.desc ? `<section class="dtsum"><h2>${icon('spark')}요약</h2><p>${esc(x.desc)}</p></section>` : ''}
       <section class="dtsec"><h2>저장한 메모</h2><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨보세요.')}</span>${icon('chevron')}</button></section>

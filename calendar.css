@@ -31,3 +31,108 @@
 .calbadge{flex:none;padding:5px 10px;border-radius:999px;background:var(--pm-key-soft,#F4F4F4);color:var(--pm-key);font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
 .calbadge.soon{background:var(--pm-key);color:#fff}
 .calempty{margin:0;font-size:13.5px;color:var(--pm-sub)}
+
+/* ---------- 마감 캘린더 v2: 흰 카드 · 검정 원 · 남은 기간 띠 · 위계 정리 ---------- */
+.calbox{padding:22px 16px 14px;border:0;border-radius:28px;background:#fff;box-shadow:var(--t-shadow)}
+.calhead{padding:0 6px 16px}
+.calhead h2{display:flex;flex-direction:column;font-size:26px;font-weight:700;letter-spacing:-.8px;line-height:1.15}
+.calhead h2 small{font-size:13px;font-weight:500;letter-spacing:0;color:var(--t-sub);margin-bottom:2px}
+.calnav{gap:6px}
+.calnav button{width:36px;height:36px;background:var(--t-soft);color:var(--t-ink)}
+.calnav button:hover{background:#E4E4E7}
+.calweek span{padding:0 0 10px;font-size:12px;font-weight:500;color:#A1A1A6}
+.calweek span:first-child{color:#C2261B;opacity:.7}
+.calgrid{row-gap:6px}
+.calcell{height:44px;font-size:15px;font-weight:500;color:var(--t-ink)}
+.calcell span{position:relative;z-index:1;width:40px;height:40px;border-radius:50%}
+.calcell:hover span{background:var(--t-soft)}
+/* 지난 날짜: 연한 회색 + 취소선 */
+.calcell.past{color:#C4C4C8;font-weight:400}
+.calcell.past span{text-decoration:line-through;text-decoration-thickness:1px}
+/* 마감이 있는 날: 굵게 + 점 */
+.calcell.hasdue{font-weight:700}
+.caldot{bottom:2px;z-index:2;width:4px;height:4px;margin-left:-2px;background:var(--t-ink)}
+/* 오늘 → 고른 날짜 띠 */
+.calcell.range::before{content:'';position:absolute;inset:2px 0;background:var(--t-soft)}
+.calcell.rstart::before{left:2px;border-radius:20px 0 0 20px}
+.calcell.rend::before{right:2px;border-radius:0 20px 20px 0}
+.calcell.rstart.rend::before{border-radius:20px}
+/* 오늘 · 고른 날: 검정 원 */
+.calcell.sel span,.calcell.today span{background:var(--t-ink)!important;color:#fff!important;font-weight:700;box-shadow:none}
+.calcell.today:not(.sel) span{background:#fff!important;color:var(--t-ink)!important;box-shadow:inset 0 0 0 1.5px var(--t-ink)!important}
+.calcell.sel .caldot,.calcell.today.sel .caldot{background:#fff;bottom:7px}
+
+/* 섹션 제목: 크고 굵게 · 개수는 회색 */
+.calsec{margin:30px 0 12px}
+.calsec h2{font-size:19px;font-weight:700;letter-spacing:-.5px}
+.calsec h2 span{margin-left:6px;font-weight:500;color:#A1A1A6}
+/* 목록: 흰 카드 · 그림자 · 화면 밖으로 넘치지 않게 */
+.callist{grid-template-columns:minmax(0,1fr);gap:10px}
+.calrow{min-width:0;gap:14px;padding:12px 14px 12px 12px;border:0;border-radius:22px;background:#fff;box-shadow:var(--t-shadow)}
+.calrow:hover{transform:translateY(-1px)}
+.calthumb{width:58px;height:58px;border-radius:14px;background:var(--t-soft)}
+.caltext{gap:5px}
+.caltext b{font-size:15.5px;font-weight:700;letter-spacing:-.4px}
+.caltext small{font-size:12.5px;color:var(--t-sub)}
+.calbadge{padding:6px 11px;background:var(--t-soft);color:var(--t-ink);font-size:12.5px}
+.calbadge.soon{background:var(--t-ink);color:#fff}
+.calempty{padding:18px;border-radius:20px;background:rgba(255,255,255,.6);font-size:14px;color:var(--t-sub);text-align:center}
+
+/* ---------- v3: 제목 줄 (← + 제목) · 유리 캘린더 · 월 선택 ---------- */
+.main:has(.calbox) .pageback{display:none}
+.calfhead{display:flex;align-items:center;gap:2px;height:44px;margin:0 0 16px;padding-right:52px}
+.calfhead:has(.calback){margin-left:-10px}
+.calfhead h1{margin:0;line-height:44px;white-space:nowrap}
+.calback{flex:none;width:44px;height:44px;display:grid;place-items:center;border-radius:50%}
+.calback .icon{width:24px;height:24px}
+.main:has(.calbox)>.topbar .topactions{top:0}
+.main:has(.calbox)>.topbar{margin-bottom:0}
+
+/* 유리 캘린더: 가까운 마감 콘텐츠 사진을 아주 흐리게 깔고, 그 위에 반투명 흰 유리 */
+.calbox{position:relative;isolation:isolate;overflow:hidden;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.9);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);box-shadow:0 1px 2px rgba(0,0,0,.04),0 16px 36px rgba(0,0,0,.08),inset 0 1px 0 #fff}
+.calbg{position:absolute;inset:-40px;z-index:-2;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;filter:blur(36px) saturate(1.3);opacity:.5;pointer-events:none}
+.calbox::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.72) 100%);pointer-events:none}
+.calnav button{background:rgba(255,255,255,.7);box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.calnav button:hover{background:#fff}
+.calweek span{color:#7A7A80}
+.calcell.past{color:#ABABB0}
+.calcell.range::before{background:rgba(255,255,255,.8);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.calcell:hover span{background:rgba(255,255,255,.8)}
+.calcell.today:not(.sel) span{background:#fff!important}
+
+/* 월 이름 버튼 → 월 선택 */
+.caltitle{display:flex;flex-direction:column;align-items:flex-start;padding:2px 6px 2px 0;border-radius:12px;text-align:left}
+.caltitle:hover{filter:none}
+.caltitle small{font-size:13px;font-weight:500;color:var(--t-sub);margin-bottom:2px}
+.caltitle span{display:inline-flex;align-items:center;gap:4px;font-size:26px;font-weight:700;letter-spacing:-.8px;line-height:1.15}
+.caltitle span .icon{width:20px;height:20px;stroke-width:2.2;transition:transform .2s}
+.caltitle[aria-expanded="true"] span .icon{transform:rotate(180deg)}
+.calmonths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:4px 2px 8px}
+.calmon{height:52px;border-radius:16px;background:rgba(255,255,255,.7);font-size:15.5px;font-weight:600;color:var(--t-ink);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.calmon:hover{filter:none;background:#fff}
+.calmon.now{box-shadow:inset 0 0 0 1.5px var(--t-ink)}
+.calmon.on{background:var(--t-ink);color:#fff;box-shadow:none}
+/* v4: 유리 취소 → 흰 카드 · 제목은 다른 화면과 같은 크기 */
+.calbox{background:#fff;border:0;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:var(--t-shadow)}
+.calbox::before{content:none}
+.calnav button{background:var(--t-soft);box-shadow:none}
+.calnav button:hover{background:#E4E4E7}
+.calweek span{color:#A1A1A6}
+.calcell.past{color:#C4C4C8}
+.calcell.range::before{background:var(--t-soft);box-shadow:none}
+.calcell:hover span{background:var(--t-soft)}
+.calmon{background:var(--t-soft);box-shadow:none}
+.calmon:hover{background:#E4E4E7}
+.calfhead h1{font-size:24px;font-weight:600;letter-spacing:-.6px}
+.caltitle span{font-size:22px;letter-spacing:-.6px}
+/* 월 선택 v2: 연도별 세로 스크롤 목록 (심플) */
+.calmonths{display:block;height:296px;overflow-y:auto;overscroll-behavior:contain;margin:0 -16px -14px;padding:0 16px 8px;scrollbar-width:none;-webkit-mask-image:linear-gradient(180deg,#000 85%,transparent);mask-image:linear-gradient(180deg,#000 85%,transparent)}
+.calmonths::-webkit-scrollbar{display:none}
+.calyr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px 4px;padding-bottom:10px}
+.calyr>b{grid-column:1/-1;position:sticky;top:0;z-index:1;padding:10px 6px 6px;background:#fff;font-size:13px;font-weight:600;color:var(--t-sub)}
+.calmon{position:relative;height:44px;border-radius:22px;background:none;box-shadow:none!important;font-size:15px;font-weight:500;color:var(--t-ink)}
+.calmon:hover{background:var(--t-soft)}
+.calmon small{position:absolute;left:0;right:0;bottom:2px;font-size:9.5px;font-weight:500;color:var(--t-sub);line-height:1}
+.calmon.on{background:var(--t-ink);color:#fff;font-weight:700}
+.calmon.on small{color:rgba(255,255,255,.7)}
+.calmonths{margin-bottom:0}

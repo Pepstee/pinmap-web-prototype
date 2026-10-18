@@ -298,3 +298,22 @@ body.dtscrolled:has(.dt)::before{content:"";position:fixed;inset:0 0 auto;height
 .ntghost:hover,.ntprimary:hover{filter:none}
 .ntsheet .nttext{align-items:stretch}
 .ntgroup{grid-template-columns:minmax(0,1fr)}.ntrow{min-width:0}
+
+/* ---------- 상세 v2: 카테고리 · 제목 · 출처를 사진 위 그라데이션에 흰 글씨로 ---------- */
+.dtshade{background:linear-gradient(180deg,rgba(0,0,0,.18) 0%,rgba(0,0,0,0) 22%,rgba(0,0,0,0) 40%,rgba(0,0,0,.35) 62%,rgba(0,0,0,.78) 100%)}
+.dthtitle{display:block;bottom:48px;color:#fff}
+.dthpill{display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:13px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font-size:12.5px;font-weight:600;color:#fff}
+.dt .dthtitle h1{margin:10px 0 6px;font-size:27px;font-weight:700;letter-spacing:-.8px;line-height:1.28;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.25);word-break:keep-all}
+.dthtitle small{display:block;font-size:13px;font-weight:500;color:rgba(255,255,255,.75)}
+.dthead{align-items:center}
+.dthead .dtsub{font-size:14.5px}
+.dtfav{margin:-4px -10px -4px 0}
+.dt .dthtitle{bottom:96px}
+/* v3: 사진 위 글씨 조금 아래로 · 아래 설명 영역은 반투명 없이 흰색 */
+.dt .dthtitle{bottom:84px}
+.dtsheet{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 -6px 20px rgba(0,0,0,.08)}
+/* v4: 길찾기 · 원본 보기는 하단 메뉴 바로 위에 떠 있게 (겹치지 않게) */
+.dtbar{bottom:calc(90px + env(safe-area-inset-bottom));padding:0 20px;background:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border-top:0!important}
+.dtbar::before{content:'';position:absolute;left:0;right:0;top:-24px;bottom:calc(-90px - env(safe-area-inset-bottom));z-index:-1;background:linear-gradient(180deg,rgba(255,255,255,0) 0,rgba(255,255,255,.92) 26px,#fff 50px);pointer-events:none}
+.dtbar>a,.dtbar>button{box-shadow:0 6px 16px rgba(0,0,0,.08)}
+.dt{padding-bottom:170px}

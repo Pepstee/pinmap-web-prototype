@@ -77,9 +77,8 @@ function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected 
       <svg class="cf-shade" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
       <span class="cf-front"></span>
       <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
-      <span class="cf-icon">${icon(ic)}</span>
+      <span class="cf-meta"><span class="cf-title">${esc(title)}</span><span class="cf-count">${count}</span></span>
     </span>
-    <span class="cf-meta"><span class="cf-title">${esc(title)}</span><span class="cf-count">${count}</span></span>
   </button>`;
 }
 // 폴더 모양 (clipPath · 블러는 한 번만 정의해 모든 폴더가 같이 써요)
@@ -190,7 +189,17 @@ resultCards = function(){
     const inFolder = items.filter(x => x.collection === n);
     return CollectionFolder({id:n, title:n, icon:'folder', count:inFolder.length, thumbnails:cfThumbs(inFolder), attr:`data-collection="${esc(n)}"`});
   });
-  const folders = [...mine, ...cfFolderData(list).map(CollectionFolder)];
+  // 새 폴더 추가 타일: 항상 맨 앞(좌측 상단) · 검색 중엔 숨겨요
+  const addTile = q ? [] : [`<button type="button" class="cf-folder cf-add" data-action="newfolder" aria-label="새 폴더 만들기">
+    <span class="cf-shell" aria-hidden="true">
+      <span class="cf-back"><span class="cf-backshape"></span></span>
+      <span class="cf-front"></span>
+      <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
+      <span class="cf-addplus">${icon('plus')}</span>
+      <span class="cf-meta"><span class="cf-title">새 폴더</span></span>
+    </span>
+  </button>`];
+  const folders = [...addTile, ...mine, ...cfFolderData(list).map(CollectionFolder)];
   const grid = folders.length ? `<div class="cf-grid">${folders.join('')}</div>` : '';
   if (!q) return grid;
   if (!list.length) return cfEmpty('search', '찾는 콘텐츠가 없어요', '다른 키워드나 카테고리로 다시 찾아보세요.', `<button class="tonal" data-action="resetfilter">전체 컬렉션 보기</button>`);
@@ -202,7 +211,8 @@ pages.library = function(){
   const open = cfOpenTitle(), sel = cfSelected();
   // 다른 폴더로 가면 선택 모드는 꺼요
   if (cfSelKey !== open) { cfSel = null; cfSelKey = open; }
-  const chip = (id, on) => `<button class="libchip ${on ? 'on' : ''}" data-filter="${esc(id)}" aria-pressed="${on}">${esc(id)}</button>`;
+  const chipIc = id => { const f = CF_ALL.find(f => f.id === id); return f ? icon(f.icon) : ''; };
+  const chip = (id, on) => `<button class="libchip ${on ? 'on' : ''}" data-filter="${esc(id)}" aria-pressed="${on}">${chipIc(id)}${esc(id)}</button>`;
   // 칩은 컬렉션 첫 화면에서만 (폴더 안에서는 숨김)
   const chips = open ? '' : `<div class="libchips cfchips" role="group" aria-label="카테고리 필터">${chip('전체', !sel.length)}${CF_FOLDERS.map(f => chip(f.id, sel.includes(f.id))).join('')}</div>`;
   // 제목 줄: 높이를 고정해 폴더 안 · 밖, 홈에서 들어온 경우 모두 제목 · 검색창 위치가 같아요
@@ -218,7 +228,7 @@ pages.library = function(){
     </div>` : '';
   return `<div class="libpage cfpage ${open ? 'cf-infolder' : ''} ${cfSel ? 'cf-selecting' : ''}">${CF_DEFS}
     <div class="libhead cf-fhead${back ? ' hasback' : ''}">${back}<h1>${esc(open || '컬렉션')}</h1>${open ? `<span class="cf-hcount" aria-label="저장 ${cfTotal()}개">${cfTotal()}</span>` : ''}${collection && cfCustom().includes(collection) && !cfSel ? `<button type="button" class="cf-delfolder" data-action="cfdelfolder" aria-label="‘${esc(collection)}’ 폴더 삭제">${icon('trash')}</button>` : ''}</div>
-    <label class="libsearch">${icon('search')}<input id="search" type="search" enterkeyhint="search" aria-label="${esc(ph)}" placeholder="${esc(ph)}" value="${esc(query)}"><button class="iconbtn" data-action="clear" aria-label="검색 지우기" ${query ? '' : 'hidden'}>${icon('close')}</button></label>
+    <label class="libsearch">${icon('search')}<input id="search" type="search" enterkeyhint="search" aria-label="${esc(ph)}" placeholder="${esc(ph)}" value="${esc(query)}"><button class="iconbtn" data-action="clear" aria-label="검색 지우기" ${query ? '' : 'hidden'}>${icon('close')}</button><button type="button" class="libgo" data-action="libgo" aria-label="검색">${icon('arrow')}</button></label>
     ${chips}
     <p id="resultcount" class="sr" role="status">${cfStatus()}</p>
     <div id="results" class="cf-results">${resultCards()}</div>
@@ -276,6 +286,8 @@ document.addEventListener('keydown', e => {
 // 폴더 밖으로 (홈에서 들어온 경우의 ← 는 컬렉션 첫 화면에서 다시 보여요)
 actions.cfback = () => { filter = '전체'; collection = null; query = ''; render(); window.scrollTo(0, 0); };
 
+// 검색창 → 버튼: 키보드만 내려요 (검색은 입력하는 대로 바로 돼요)
+actions.libgo = () => document.activeElement?.blur();
 // 새 폴더 만들기
 actions.newfolder = () => {
   modal('새 폴더', `<form id="cfnewform" class="cf-form" novalidate>
@@ -284,7 +296,7 @@ actions.newfolder = () => {
     <p class="error" id="cferr" role="alert"></p>
     <div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">만들기</button></div>
   </form>`);
-  $('#sheet').classList.add('cfsheet');
+  $('#sheet').classList.add('cfsheet', 'cfcenter');
   setTimeout(() => $('#cfname')?.focus(), 50);
 };
 // 폴더에 콘텐츠 담기 (한 콘텐츠는 한 폴더에만 담겨요)
@@ -316,7 +328,7 @@ document.addEventListener('input', e => {
   $('.cf-picknone').hidden = !!shown;
 });
 document.addEventListener('change', e => { if (e.target.closest?.('#cfpickform') && e.target.name === 'pick') cfPickCount(); });
-$('#sheet').addEventListener('close', () => $('#sheet').classList.remove('cfsheet'));
+$('#sheet').addEventListener('close', () => $('#sheet').classList.remove('cfsheet', 'cfcenter'));
 document.addEventListener('submit', e => {
   if (e.target.id === 'cfnewform') {
     e.preventDefault();
