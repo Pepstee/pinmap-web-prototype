@@ -9,7 +9,7 @@
   };
   const solid=name=>`<svg class="pm-solid" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="${silhouettes[name]}"></path></svg>`;
   nav=function(){
-    const entry=(p,label)=>{const current=(typeof PARENT_TAB!=='undefined'&&PARENT_TAB[page])||page;const active=current===p||(current==='course'&&p==='map');return `<button class="navitem ${active?'active':''}" data-page="${p}" aria-label="${label}" ${active?'aria-current="page"':''}><span class="navicon">${p==='my'?avatarHtml('pm-nav-avatar'):solid(p==='library'?'bookmark':p)}</span><span>${label}</span></button>`};
+    const entry=(p,label)=>{const current=(typeof PARENT_TAB!=='undefined'&&PARENT_TAB[page])||page;const active=current===p||(['course','courses'].includes(current)&&p==='map');return `<button class="navitem ${active?'active':''}" data-page="${p}" aria-label="${label}" ${active?'aria-current="page"':''}><span class="navicon">${p==='my'?avatarHtml('pm-nav-avatar'):solid(p==='library'?'bookmark':p)}</span><span>${label}</span></button>`};
     return `<span class="pm-nav-main">${entry('home','홈')}${entry('map','지도')}${entry('library','저장함')}${entry('my','마이')}</span>`;
   };
   // Keep the loaded basemap in the same moving pane as the markers.
