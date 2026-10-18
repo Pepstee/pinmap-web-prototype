@@ -216,10 +216,10 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 .course-edit-bar{position:absolute;right:20px;top:-48px;margin:0;z-index:410}
 
 /* Match the shared page surface and use a compact accessible course icon. */
-.live-map .lm-header .lm-course-link{width:40px;padding:0;display:grid;place-items:center}
+.live-map .lm-header button.lm-course-link{width:40px;padding:0;display:grid;place-items:center;background:transparent!important;color:var(--t-ink,#111)!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .live-map .lm-header .lm-course-link svg{width:20px;height:20px}
-.lm-expanded-pin{display:flex;flex-direction:column;align-items:stretch;gap:0;width:260px;height:210px;padding:0;overflow:hidden;transform-origin:center}
-.lm-pin-photo,.lm-pin-photo-placeholder{display:block;width:100%;height:120px;flex:0 0 120px;object-fit:cover}
-.lm-pin-photo-placeholder{display:grid;place-items:center;font-size:44px;background:var(--t-soft,#EFEFF1)}
-.lm-expanded-pin .lm-pin-copy{padding:10px 12px;gap:3px}
-.lm-pin-collapse{display:grid;place-items:center;width:24px;height:24px;right:8px;top:8px;border-radius:50%;background:#ffffffe8;color:#444;font-size:19px;box-shadow:0 1px 5px #0002}
+.lm-expanded-pin{flex-direction:row;align-items:center;gap:10px;width:240px;height:88px;padding:12px 24px 12px 8px;overflow:hidden;transform-origin:23px center}
+.lm-pin-photo,.lm-pin-photo-placeholder{display:block;width:60px;height:60px;flex:0 0 60px;object-fit:cover;border-radius:11px}
+.lm-pin-photo-placeholder{display:grid;place-items:center;font-size:28px;background:var(--t-soft,#EFEFF1)}
+.lm-expanded-pin .lm-pin-copy{padding:0;gap:3px}
+.lm-pin-collapse{display:grid;place-items:center;width:16px;height:16px;right:6px;top:7px;background:transparent;color:#888;font-size:16px;box-shadow:none}
