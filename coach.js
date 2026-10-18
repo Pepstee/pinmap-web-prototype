@@ -1,9 +1,9 @@
 // 온보딩이 끝난 뒤 홈 화면 코치마크 튜토리얼 (4단계)
 const COACH_STEPS = [
-  {sel:'.placebar', title:'내 동네', text:'동네 이름을 누르면 동네를 추가·수정할 수 있어요. 최대 2개까지 등록하고, 회색 동네를 누르면 바로 바뀌어요.'},
-  {sel:'.mainpick', title:'관심사 추천 콘텐츠', text:'켜진 관심사에 맞는 저장 콘텐츠를 크게 보여줘요. 좌우로 넘겨 보고, 누르면 상세로 가요.'},
-  {sel:'.chiprows', title:'나에게 맞춘 홈', text:'키워드를 눌러 보고 싶은 관심사를 골라 봐요. 두 줄을 각각 좌우로 넘길 수 있어요. 온보딩에서 고른 관심사가 기본으로 켜져 있고, 기본값은 마이에서 바꿔요.'},
-  {sel:'.bottomnav', title:'홈 · 지도 · 저장됨 · 계획 · 마이', text:'저장한 장소는 지도에서, 모든 콘텐츠는 저장됨에서 찾아요. SNS 저장 체험과 설정은 마이에 있어요.'}
+  {sel:'.placebar', area:'.placemain, .placesub', title:'현재 위치', text:'위치 이름을 누르면 위치를 추가·수정할 수 있어요. 최대 2개까지 등록하고, 회색 위치를 누르면 바로 바뀌어요.'},
+  {sel:'.mainpick', title:'관심사 추천 콘텐츠', text:'관심사에 맞는 저장 콘텐츠를 보여줘요. 좌우로 넘겨보고, 누르면 상세페이지로 이동해요.'},
+  {sel:'.chiprows', title:'키워드 보기', text:'관심사에 맞는 키워드를 골라봐요. 두 줄을 각각 좌우로 넘길 수 있어요. 키워드를 누르면 키워드에 맞는 콘텐츠 목록을 보여줘요.'},
+  {sel:'.bottomnav', title:'홈 · 지도 · 컬렉션 · 마이', text:'저장한 장소는 지도에서, 모든 저장 콘텐츠는 컬렉션에서 한눈에 볼 수 있어요.'}
 ];
 let coachStep = 0;
 function startCoach(){
@@ -30,9 +30,9 @@ function drawCoach(){
   const fixed = getComputedStyle(target).position === 'fixed';
   if (!fixed) { const r = target.getBoundingClientRect(); window.scrollTo(0, Math.max(0, window.scrollY + r.top - window.innerHeight/2 + r.height/2 - 60)); }
   const last = coachStep === COACH_STEPS.length-1;
-  $('#coach').innerHTML = `<div class="cm-hole"></div><div class="cm-tip" aria-live="polite">
+  $('#coach').innerHTML = `<button class="cm-close" data-coach="skip" aria-label="튜토리얼 닫기">${icon('close')}</button><div class="cm-hole"></div><div class="cm-tip" aria-live="polite">
       <span class="cm-step">${coachStep+1} / ${COACH_STEPS.length}</span><b>${s.title}</b><p>${s.text}</p>
-      <div class="cm-btns">${last?'':'<button class="cm-skip" data-coach="skip">건너뛰기</button>'}<button class="cm-next" data-coach="next">${last?'시작하기':'다음'}</button></div>
+      <div class="cm-btns">${coachStep>0?`<button class="cm-prev" data-coach="prev" aria-label="이전 설명 보기">${icon('back')}</button>`:''}${last?'':'<button class="cm-skip" data-coach="skip">건너뛰기</button>'}<button class="cm-next" data-coach="next">${last?'시작하기':'다음'}</button></div>
     </div>`;
   requestAnimationFrame(placeCoach);
   window.addEventListener('resize', placeCoach);
@@ -42,7 +42,9 @@ function drawCoach(){
 function placeCoach(){
   const c = $('#coach'); if (!c) return;
   const target = document.querySelector(COACH_STEPS[coachStep].sel); if (!target) return;
-  const r = target.getBoundingClientRect(), pad = 6, hole = c.querySelector('.cm-hole'), tip = c.querySelector('.cm-tip');
+  // area가 있으면 그 요소들만 감싸서 강조해요 (예: 위치 이름만, 검색 · 알림 아이콘은 빼고)
+  const parts = COACH_STEPS[coachStep].area ? [...document.querySelectorAll(COACH_STEPS[coachStep].area)].map(el => el.getBoundingClientRect()) : [];
+  const r = parts.length ? (() => { const L = Math.min(...parts.map(x => x.left)), T = Math.min(...parts.map(x => x.top)), R = Math.max(...parts.map(x => x.right)), B = Math.max(...parts.map(x => x.bottom)); return {left:L, top:T, right:R, bottom:B, width:R-L, height:B-T}; })() : target.getBoundingClientRect(), pad = 6, hole = c.querySelector('.cm-hole'), tip = c.querySelector('.cm-tip');
   Object.assign(hole.style, {left:`${r.left-pad}px`, top:`${r.top-pad}px`, width:`${r.width+pad*2}px`, height:`${r.height+pad*2}px`});
   const tw = Math.min(320, window.innerWidth - 32), th = tip.offsetHeight;
   const below = r.bottom + pad + 14 + th < window.innerHeight;
@@ -55,6 +57,12 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-coach]');
   if (!b) return;
   if (b.dataset.coach === 'skip') { endCoach(); return; }
+  if (b.dataset.coach === 'prev') { if (coachStep > 0) { coachStep--; drawCoach(); } return; }
   if (coachStep < COACH_STEPS.length-1) { coachStep++; drawCoach(); } else { endCoach(); window.scrollTo(0,0); }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#coach')) endCoach(); });
+// 튜토리얼 중에는 말풍선 버튼 말고 아무것도 누를 수 없어요 (하단 메뉴 포함)
+['click','pointerdown','mousedown','touchstart'].forEach(t => window.addEventListener(t, e => {
+  if (!document.getElementById('coach') || e.target.closest?.('#coach .cm-tip, #coach .cm-close')) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+}, {capture:true, passive:false}));

@@ -136,3 +136,6 @@
 .calmon.on{background:var(--t-ink);color:#fff;font-weight:700}
 .calmon.on small{color:rgba(255,255,255,.7)}
 .calmonths{margin-bottom:0}
+
+/* 지난 날짜: 가운데 줄 없이 (색만 연하게 유지) */
+.calcell.past,.calcell.past span{text-decoration:none!important}

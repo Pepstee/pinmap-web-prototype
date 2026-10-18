@@ -78,7 +78,7 @@ pages.calendar = function(){
   // 월 선택: 작년 ~ 내년을 연도별로 묶은 세로 스크롤 목록
   const y0 = calToday.getFullYear();
   const months = [y0 - 1, y0, y0 + 1].map(yy => `<div class="calyr"><b>${yy}년</b>${Array.from({length:12}, (_, i) => `<button class="calmon ${yy === y && i === m ? 'on' : ''} ${yy === y0 && i === calToday.getMonth() ? 'now' : ''}" data-calmon="${yy}-${i}">${i + 1}월${yy === y0 && i === calToday.getMonth() ? '<small>이번 달</small>' : ''}</button>`).join('')}</div>`).join('');
-  return `<div class="calfhead">${back}<h1>마감 캘린더</h1></div>` + `
+  return `<div class="calfhead">${back}<h1>캘린더</h1></div>` + `
     <section class="calbox">${bg}
       <div class="calhead">
         <button class="caltitle" data-calpick aria-expanded="${calPick}" aria-label="다른 달로 이동"><small>${y}</small><span>${m + 1}월${icon('chevron')}</span></button>

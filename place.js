@@ -18,12 +18,12 @@ const mainPlace = () => myPlaces()[0];
 // 저장 장소가 메인 동네에 있는지 (동 이름의 숫자·'가'를 빼고 주소와 비교)
 const inMainPlace = x => (x.address||'').includes(mainPlace().replace(/\d+가?\d*동$|동$/, ''));
 
-let placeSwapped = false; // 동네를 바꿨을 때만 글자 애니메이션
+let placeSwapped = false; // 위치를 바꿨을 때만 글자 애니메이션
 function placebar(){
   const [main, sub] = myPlaces();
   const swapped = placeSwapped; placeSwapped = false;
-  return `<div class="placebar${swapped ? ' swapped' : ''}" role="group" aria-label="내 동네">
-    <button class="placemain" data-action="placesheet" aria-label="내 동네 설정 · 현재 ${esc(main)}">${icon('pin')}<b>${esc(main)}</b>${sub ? '' : icon('chevron')}</button>
+  return `<div class="placebar${swapped ? ' swapped' : ''}" role="group" aria-label="현재 위치">
+    <button class="placemain" data-action="placesheet" aria-label="현재 위치 설정 · 현재 ${esc(main)}">${icon('pin')}<b>${esc(main)}</b>${sub ? '' : icon('chevron')}</button>
     ${sub ? `<button class="placesub" data-place-swap aria-label="${esc(sub)}(으)로 바꾸기">${esc(sub)}</button>` : ''}
   </div>`;
 }
@@ -34,30 +34,30 @@ function setMain(i){
   const p = myPlaces();
   if (i <= 0 || i >= p.length) return;
   const [picked] = p.splice(i, 1); p.unshift(picked); placeSwapped = true;
-  afterChange(); render(); toast(`동네를 '${picked}'(으)로 변경했어요.`);
+  afterChange(); render(); toast(`위치를 '${picked}'(으)로 변경했어요.`);
 }
 
-/* ---------- 내 동네 설정 시트 ---------- */
+/* ---------- 현재 위치 설정 시트 ---------- */
 function placeSheet(){
   const p = myPlaces();
   const rows = p.map((name, i) => `<div class="prow">
       <button class="pradio ${i===0?'on':''}" data-place-pick="${i}" role="radio" aria-checked="${i===0}" aria-label="${esc(name)} 선택"></button>
-      <button class="pname" data-place-pick="${i}"><b>${esc(name)}</b><small>${esc(dongOf(name).full)}${i===0?' · 현재 동네':''}</small></button>
+      <button class="pname" data-place-pick="${i}"><b>${esc(name)}</b><small>${esc(dongOf(name).full)}${i===0?' · 현재 위치':''}</small></button>
       <button class="picon" data-place-edit="${i}" aria-label="${esc(name)} 수정">${icon('edit')}</button>
       <button class="picon" data-place-del="${i}" aria-label="${esc(name)} 삭제" ${p.length===1?'disabled':''}>${icon('close')}</button>
     </div>`).join('');
-  modal('내 동네 설정', `<p class="muted psub">최대 ${MAX_PLACES}개의 동네를 선택할 수 있어요.</p>
-    <div class="plist" role="radiogroup" aria-label="현재 동네">${rows}</div>
-    ${p.length < MAX_PLACES ? `<button class="padd" data-action="placeadd">${icon('plus')} 동네 추가</button>` : `<p class="hint pfull">동네를 바꾸려면 ✎ 수정을 누르거나, 하나를 삭제한 뒤 추가하세요.</p>`}
-    ${p.length===1 ? '<p class="hint pfull">동네는 최소 1개가 필요해서 삭제할 수 없어요.</p>' : ''}`);
+  modal('현재 위치 설정', `<p class="muted psub">최대 ${MAX_PLACES}개의 위치를 선택할 수 있어요.</p>
+    <div class="plist" role="radiogroup" aria-label="현재 위치">${rows}</div>
+    ${p.length < MAX_PLACES ? `<button class="padd" data-action="placeadd">${icon('plus')} 위치 추가</button>` : `<p class="hint pfull">위치를 바꾸려면 ✎ 수정을 누르거나, 하나를 삭제한 뒤 추가하세요.</p>`}
+    ${p.length===1 ? '<p class="hint pfull">위치는 최소 1개가 필요해서 삭제할 수 없어요.</p>' : ''}`);
   $('#sheet').classList.add('bottomsheet');
 }
 
-/* ---------- 동네 검색 (추가 · 수정) ---------- */
+/* ---------- 위치 검색 (추가 · 수정) ---------- */
 let placeMode = {type:'add', index:-1};
 function placeSearch(mode){
   placeMode = mode;
-  modal('', `<div class="psearchtop"><label class="psearch">${icon('search')}<input id="placeq" placeholder="동, 읍, 면으로 검색" aria-label="동네 검색" autocomplete="off"></label><button class="pclose" data-action="placesheet">닫기</button></div>
+  modal('', `<div class="psearchtop"><label class="psearch">${icon('search')}<input id="placeq" placeholder="동, 읍, 면으로 검색" aria-label="위치 검색" autocomplete="off"></label><button class="pclose" data-action="placesheet">닫기</button></div>
     <div id="placeresults">${placeResults('')}</div>`);
   $('#sheet').classList.add('placesearch', 'bottomsheet');
   setTimeout(() => $('#placeq')?.focus(), 50);
@@ -72,18 +72,18 @@ function placeResults(q){
   const recent = (settings.recentPlaces||[]).filter(n => !mine.includes(n)).slice(0,5);
   // 지금 있는 동네: 예시 현재 위치(성동구) 주변
   const near = DONGS.filter(d => /성동구|광진구/.test(d.full));
-  return `${recent.length ? `<h3 class="plabel">최근 설정한 동네</h3><div class="pchips">${recent.map(n => `<button class="pchip" data-place-choose="${esc(n)}">${esc(n)}</button>`).join('')}</div>` : ''}
-    <h3 class="plabel">지금 있는 동네 <small>예시 위치 기준</small></h3><div class="presults">${near.map(row).join('')}</div>`;
+  return `${recent.length ? `<h3 class="plabel">최근 설정한 위치</h3><div class="pchips">${recent.map(n => `<button class="pchip" data-place-choose="${esc(n)}">${esc(n)}</button>`).join('')}</div>` : ''}
+    <h3 class="plabel">지금 있는 위치 <small>예시 위치 기준</small></h3><div class="presults">${near.map(row).join('')}</div>`;
 }
 function choosePlace(name){
   const p = myPlaces();
-  if (p.includes(name)) { toast('이미 설정한 동네예요.'); return; }
+  if (p.includes(name)) { toast('이미 설정한 위치예요.'); return; }
   const before = placeMode.type === 'edit' ? p[placeMode.index] : null;
   if (placeMode.type === 'edit' && placeMode.index >= 0) p[placeMode.index] = name;
-  else { if (p.length >= MAX_PLACES) { toast(`동네는 최대 ${MAX_PLACES}개까지 설정할 수 있어요.`); return; } p.unshift(name); }
+  else { if (p.length >= MAX_PLACES) { toast(`위치는 최대 ${MAX_PLACES}개까지 설정할 수 있어요.`); return; } p.unshift(name); }
   settings.recentPlaces = [...new Set([before, ...(settings.recentPlaces||[])].filter(n => n && !p.includes(n)))].slice(0,5);
   afterChange(); $('#sheet').close(); render();
-  toast(placeMode.type === 'edit' ? `'${before}'을(를) '${name}'(으)로 수정했어요.` : `동네를 '${name}'(으)로 변경했어요.`);
+  toast(placeMode.type === 'edit' ? `'${before}'을(를) '${name}'(으)로 수정했어요.` : `위치를 '${name}'(으)로 변경했어요.`);
 }
 
 Object.assign(actions, {
@@ -102,7 +102,7 @@ document.addEventListener('click', e => {
     const p = myPlaces(); if (p.length === 1) return;
     const [gone] = p.splice(Number(del.dataset.placeDel), 1);
     settings.recentPlaces = [gone, ...(settings.recentPlaces||[]).filter(n => n !== gone)].slice(0,5);
-    afterChange(); render(); placeSheet(); toast(`'${gone}'을(를) 내 동네에서 삭제했어요.`);
+    afterChange(); render(); placeSheet(); toast(`'${gone}'을(를) 위치 목록에서 삭제했어요.`);
     return;
   }
   const ch = e.target.closest('[data-place-choose]');

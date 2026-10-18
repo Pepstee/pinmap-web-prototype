@@ -10,7 +10,7 @@ const interestOptions = [
   {id:'food',   emoji:'🍴', label:'먹을 곳을 찾을 때', short:'맛집'},
   {id:'study',  emoji:'📚', label:'공부/자료를 찾을 때', short:'공부·자료'},
   {id:'idea',   emoji:'💡', label:'아이디어를 찾을 때', short:'아이디어'},
-  {id:'later',  emoji:'🔖', label:'그냥 나중에 보려고 저장해요', short:'나중에 보기'}
+  {id:'later',  emoji:'🔖', label:'기타', short:'나중에 보기'}
 ];
 const interestIds = interestOptions.map(x => x.id);
 const MAX_INTERESTS = Infinity; // 관심사 키워드 개수 제한 없음
@@ -158,56 +158,50 @@ const loader = text => `<div class="ob-loader" role="status"><div class="ob-bar"
 function onboardScreen() {
   const s = onboardStep;
   // 첫 화면: 로고만 심플하게 (화면을 누르면 바로 다음 단계)
-  if (s === 0) return `<button class="ob-splash" data-ob="next" aria-label="핀맵 시작"><img src="img/logo-splash.png" alt="PINMAP"></button>`;
+  if (s === 0) return `<button class="ob-splash" data-ob="next" aria-label="핀맵 시작"><img src="img/onboarding-splash.jpg" alt="Pinmap"></button>`;
   if (s === 1) return `
     <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를<br><em>발견</em>했다면?</h1>
-    <p class="ob-desc">Instagram 등에서<br><b>공유 → [핀맵]</b>을 선택하세요.</p>
     <ol class="ob-flow">
       <li class="ob-flowcard"><div class="ob-flowtext"><h3><span class="ob-num">1</span>콘텐츠 발견</h3><p>SNS에서 마음에 드는 콘텐츠를 찾아요.</p></div>
-        <div class="ob-mock ob-post" aria-hidden="true"><div class="ob-postimg">${art('park')}</div><div class="ob-postbar">${icon('heart')}${icon('comment')}<span class="ob-hl">${icon('send')}</span><span class="ob-gap"></span>${icon('more')}</div></div></li>
+        <div class="ob-mock ob-post" aria-hidden="true"><div class="ob-postimg">${art('park')}</div><div class="ob-postbar">${icon('heart')}${icon('comment')}<span class="ob-hl"><img class="ob-sendico" src="img/send.png" alt=""></span><span class="ob-gap"></span>${icon('more')}</div></div></li>
       <li class="ob-arrow" aria-hidden="true">↓</li>
       <li class="ob-flowcard"><div class="ob-flowtext"><h3><span class="ob-num">2</span>공유하기</h3><p>공유하기 버튼을 눌러주세요.</p></div>
-        <div class="ob-mock ob-sheet" aria-hidden="true"><span><i>${icon('link')}</i>링크 복사</span><span><i>${icon('story')}</i>스토리</span><span class="on"><i>${icon('share')}</i>공유하기</span><span><i>${icon('comment')}</i>메시지</span></div></li>
+        <div class="ob-mock ob-sheet" aria-hidden="true"><span><i>${icon('link')}</i>링크 복사</span><span><i>${icon('story')}</i>스토리</span><span class="on"><i><img class="ob-sendico" src="img/send.png" alt=""></i>공유하기</span><span><i>${icon('comment')}</i>메시지</span></div></li>
       <li class="ob-arrow" aria-hidden="true">↓</li>
       <li class="ob-flowcard"><div class="ob-flowtext"><h3><span class="ob-num">3</span>핀맵으로 보내기</h3><p>[핀맵]을 선택하면 저장 완료!</p></div>
-        <div class="ob-mock ob-sheet apps" aria-hidden="true"><span><i>${icon('image')}</i>SNS</span><span class="on"><i class="pin-app">${icon('bookmark')}</i>핀맵</span><span><i>${icon('more')}</i>더보기</span></div></li>
+        <div class="ob-mock ob-sheet apps" aria-hidden="true"><span><i>${icon('image')}</i>SNS</span><span class="on"><i class="pin-app"><img src="img/pinmap-logo.png" alt=""></i>핀맵</span><span><i>${icon('more')}</i>더보기</span></div></li>
     </ol>
-    <p class="ob-note">시작한 뒤 ‘새로 저장 → SNS에서 공유로 저장하기’에서 직접 체험해볼 수 있어요.</p>
     <div class="ob-actions"><button class="filled ob-next" data-ob="next">다음</button></div>`;
   if (s === 2) return `
     <h1 class="ob-title" tabindex="-1">저장한 콘텐츠를<br><em>주로 언제 다시 찾아보나요?</em></h1>
-    <p class="ob-desc">선택하신 내용에 맞춰<br>더 적합한 콘텐츠를 추천해드려요. (복수 선택 가능)</p>
+    <p class="ob-desc">(복수 선택 가능)</p>
     <div class="ob-options" role="group" aria-label="관심사 · 활용 목적">
-      ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${o.emoji}</span><span class="ob-label">${o.label}</span><span class="ob-check" aria-hidden="true">${icon('check')}</span></button>`; }).join('')}
+      ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${o.emoji}</span><span class="ob-label">${o.label}</span></button>`; }).join('')}
     </div>
-    <div class="ob-actions"><p class="ob-need" ${onboardDraft.length?'hidden':''}>하나 이상 선택해 주세요.</p><button class="filled ob-next" data-ob="next" ${onboardDraft.length?'':'disabled'}>다음</button></div>`;
+    <div class="ob-actions"><button class="filled ob-next" data-ob="next">시작하기</button></div>`;
   // 마지막 화면: 문구 없이, 저장 카드에서 핀맵으로 점이 하나씩 채워지며 이어지는 애니메이션
-  return `<div class="ob-send" role="img" aria-label="나에게 맞는 홈을 준비하고 있어요">
-    <span class="obs-card">${icon('bookmark')}</span>
-    <span class="obs-dots">${'<i></i>'.repeat(6)}</span>
-    <span class="obs-pin"><img src="img/logo-pin.png" alt=""></span>
-  </div>`;
+  return '';
 }
 function drawOnboarding() {
   clearTimeout(onboardTimer);
   const el = $('#onboarding');
   if (!el) return;
-  const bare = onboardStep === 0 || onboardStep === 3; // 첫 · 마지막 화면은 위쪽 단계 표시 없이
+  const bare = onboardStep === 0; // 첫 화면은 위쪽 단계 표시 없이
   el.innerHTML = `<div class="ob-screen step${onboardStep+1}${bare ? ' bare' : ''}">
     <div class="ob-top">
       <div class="ob-topleft">${onboardStep===1||onboardStep===2?`<button class="ob-back" data-ob="back" aria-label="이전">${icon('back')}</button>`:''}<span class="ob-count" aria-label="${onboardStep}단계, 전체 2단계"><b>${onboardStep}</b> / 2</span></div>
-      ${onboardStep<3?'<button class="ob-skip" data-ob="skip">건너뛰기</button>':''}
+      ${'<button class="ob-skip" data-ob="skip">건너뛰기</button>'}
     </div>
     ${onboardScreen()}
   </div>`;
   el.scrollTop = 0;
   el.querySelector('.ob-title')?.focus?.();
   if (onboardStep === 0) onboardTimer = setTimeout(() => { onboardStep = 1; drawOnboarding(); }, 1400);
-  if (onboardStep === 3) onboardTimer = setTimeout(finishOnboarding, 2600);
 }
+let onboardPreview = false; // 마이 > 온보딩 다시 보기: 고른 관심사를 반영하지 않고, 끝나면 마이로
 let onboardFull = false; // 처음부터 본 온보딩일 때만 끝나고 튜토리얼을 보여줘요
 function openOnboarding(step = 0) {
-  onboardFull = step === 0;
+  onboardFull = step === 0; onboardPreview = false;
   onboardDraft = onboardFull ? [] : [...preferences];
   onboardStep = step;
   if ($('#sheet').open) $('#sheet').close();
@@ -231,6 +225,7 @@ function closeOnboarding() {
   $('#app').inert = false;
 }
 function finishOnboarding() {
+  if (onboardPreview) { onboardPreview = false; closeOnboarding(); go('my'); return; }
   onboardDone = true;
   persist();
   closeOnboarding();
@@ -240,6 +235,8 @@ function finishOnboarding() {
   else if (preferences.length) toast('관심사 기본값을 바꿨어요.');
 }
 intro = function() { openOnboarding(0); };
+// 온보딩 다시 보기 (처음 온보딩과 같은 화면이지만 연습용: 관심사 저장 안 함 · 끝나면 마이)
+function openOnboardingPreview(){ openOnboarding(0); onboardPreview = true; onboardFull = false; onboardDraft = []; drawOnboarding(); }
 
 actions.interests = () => openOnboarding(2);
 
@@ -251,18 +248,18 @@ document.addEventListener('click',e=>{
     onboardDraft=onboardDraft.includes(id)?onboardDraft.filter(v=>v!==id):[...onboardDraft,id];
     const on=onboardDraft.includes(id);
     choice.classList.toggle('on',on);choice.setAttribute('aria-checked',on);
-    const next=$('#onboarding .ob-next');if(next)next.disabled=!onboardDraft.length;
-    const need=$('#onboarding .ob-need');if(need)need.hidden=!!onboardDraft.length;
+    
+    
     return;
   }
   const step=e.target.closest('[data-ob]');
   if(!step)return;
   const v=step.dataset.ob;
-  if(v==='skip'){finishOnboarding();return;}
+  if(v==='skip'){if(onboardFull&&!onboardPreview)preferences=[...onboardDraft];homeViewIds=null;finishOnboarding();return;}
   if(v==='back'){onboardStep=Math.max(1,onboardStep-1);drawOnboarding();return;}
   if(v==='next'){
-    if(onboardStep===2){if(!onboardDraft.length)return;preferences=[...onboardDraft];homeViewIds=null;}
-    onboardStep=Math.min(3,onboardStep+1);drawOnboarding();
+    if(onboardStep===2){if(!onboardPreview){preferences=[...onboardDraft];homeViewIds=null;}finishOnboarding();return;}
+    onboardStep=Math.min(2,onboardStep+1);drawOnboarding();
   }
 });
 render();

@@ -1,0 +1,42 @@
+/* 마이 하위 페이지 (mypages.js) */
+.mypage .subhead{margin-bottom:16px}
+.mypage .mycard.settings{background:#fff;border-radius:22px;padding:4px 16px;box-shadow:var(--t-shadow,none)}
+.mypage .setrow{width:100%;text-align:left}
+.mypage .setrow.danger b{color:#D23B3B}
+.mpdesc{margin:-6px 0 16px;font-size:14px;line-height:1.5}
+.mpnote{margin-top:14px}
+/* 현재 위치 */
+.placepage .plist{background:#fff;border-radius:22px;padding:4px 12px;margin:12px 0}
+.placepage .psub{margin:-6px 0 0}
+/* 관심 키워드: 2열 카드 · 고르면 반투명 회색 칠 */
+.kwgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kwopt{display:flex;align-items:center;gap:10px;min-height:56px;padding:0 16px;border-radius:18px;background:#fff;color:#3A3A3A;font-size:15px;font-weight:600;text-align:left;transition:background-color .15s}
+.kwopt .kwico{display:grid;place-items:center;width:22px}
+.kwopt .kwico .icon{width:20px;height:20px}
+.kwopt.on{background:rgba(17,17,17,.12);color:#111}
+/* 저장하는 방법: 온보딩 2번째 화면 내용만 (위 단계 표시 · 건너뛰기 없이) */
+.howtopage .subhead{margin-bottom:0}
+.howtopage .subhead h1:empty{display:none}
+.howtobody.ob-screen{min-height:auto!important;padding:0!important;background:none!important;animation:none!important}
+.howtobody .ob-title{margin-top:8px}
+.howtobody .ob-flow{margin-top:24px!important}
+.howtobody .ob-actions{position:static!important;margin-top:28px!important;padding:0!important;background:none!important}
+.howtobody .ob-next{width:100%}
+/* 확인 팝업: 화면 가운데 · 확인(회색 왼쪽) / 유지하기(검정 오른쪽) */
+#sheet.confirmpop{margin:auto!important;width:calc(100% - 48px)!important;max-width:340px!important;border-radius:24px!important;padding:26px 20px 18px!important}
+#sheet.confirmpop .handle,#sheet.confirmpop .dialoghead{display:none!important}
+.cfpop{text-align:center}
+.cfpop b{display:block;font-size:18px;font-weight:700;letter-spacing:-.4px}
+.cfpop p{margin:8px 0 20px;font-size:14px;line-height:1.5;color:#8A8A8E;word-break:keep-all}
+.cfpopbtns{display:flex;gap:8px}
+.cfpopbtns button{flex:1;min-height:50px;border-radius:999px;font-size:15px;font-weight:700}
+.cfok{background:#EBEBED;color:#6B6B70}
+.cfkeep{background:#111;color:#fff}
+/* 저장하는 방법 (10/18 밤): 제목 + 서브 문구, 순서 영역 뒤 그라데이션 없이, 버튼 더 높고 덜 둥글게, 알림 버튼 숨김 */
+.howtobody.ob-screen::before,.howtobody.ob-screen::after{display:none!important;content:none!important}
+.howtobody .ob-title{font-size:26px!important;margin:8px 0 6px!important}
+.howtobody .howtosub{margin:0;font-size:15px;color:#8A8A8E}
+.howtobody .ob-flowcard{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid #ECECEE!important;box-shadow:none!important}
+.howtobody .ob-mock{background:#F6F6F7!important;border:0!important}
+.howtobody .ob-next{min-height:60px!important;border-radius:16px!important}
+.main:has(.howtopage)>.topbar .bellbtn{display:none!important}

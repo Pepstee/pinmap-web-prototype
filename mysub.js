@@ -14,7 +14,7 @@ pages.profile = function(){
     <div class="pfbtns"><label class="tonal small" for="avatarfile">사진 변경</label>${settings.avatar ? '<button class="textbtn" data-action="avatarreset">기본 이미지로</button>' : ''}</div>
     <form id="profilepage" class="pfform">
       <label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label>
-      <p class="hint">동네는 ‘내 동네’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p>
+      <p class="hint">위치는 ‘현재 위치’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p>
       <button class="filled pfsave" type="submit">저장</button>
     </form>
   </div>`;
@@ -60,7 +60,7 @@ pages.accounts = function(){
   ${syncBtn()}
   <button class="accall" data-page="library"><span><b>모든 계정의 저장 모음 보기</b><small>${acc.length}개 계정 · 저장 ${total}개</small></span>${icon('arrow')}</button>
   <section class="mgroup"><h2>연동된 계정 ${acc.length}개</h2>
-    ${acc.length ? acc.map(a => `<div class="accrow">${snsLogo(a.sns)}<span class="acctext"><b>${esc(a.handle)}</b><small>${SNS[a.sns].name} · 저장 ${accountCount(a)}개</small></span><button class="accoff" data-acc-off="${a.id}">연동 중지</button></div>`).join('')
+    ${acc.length ? acc.map(a => `<div class="accrow">${snsLogo(a.sns)}<span class="acctext"><b>${esc(a.handle)}</b><small>${SNS[a.sns].name} · 저장 ${accountCount(a)}개 · ${syncingAcc === a.id ? '가져오는 중…' : syncTime(settings.accSync?.[a.id])}</small></span>${accSyncBtn(a)}<button class="accoff" data-acc-off="${a.id}">연동 중지</button></div>`).join('')
       : '<p class="hint accnone">연동된 계정이 없어요. 아래에서 추가해 보세요.</p>'}
   </section>
   <button class="padd accadd" data-action="accadd">${icon('plus')} SNS 계정 연동 추가</button>
@@ -104,28 +104,51 @@ document.addEventListener('submit', e => {
 
 /* ---------- 연동 새로고침 ---------- */
 // 계정마다 아직 반영되지 않은 저장 콘텐츠가 있다고 가정한 예시 (한 번 가져오면 다시 나오지 않아요)
-const SYNC_POOL = {
-  instagram:{id:101, title:'연남동 골목 와인바', type:'맛집·카페', category:'와인바', ago:'방금', desc:'작은 골목 안 조용한 와인바', memo:'', art:'cafe', distance:'지하철 20분', address:'서울 마포구 연남동 · 예시 장소', aiClassified:true},
-  youtube:{id:102, title:'10분 아침 스트레칭 루틴', type:'생활 정보', category:'운동', ago:'방금', desc:'출근 전 가볍게 따라 하기', memo:'', art:'tips', aiClassified:true},
-  tiktok:{id:103, title:'편의점 디저트 꿀조합', type:'레시피', category:'디저트', ago:'방금', desc:'5분이면 끝나는 간단 디저트', memo:'', art:'food', recipe:'5분 · 재료 3가지', aiClassified:true},
-  x:{id:104, title:'성수 플리마켓 일정 정리', type:'전시·팝업', category:'마켓', ago:'방금', desc:'이번 달 주말 플리마켓 모음', memo:'', art:'exhibit', address:'서울 성동구 성수동 · 예시 장소', distance:'도보 10분', aiClassified:true}
+const SYNC_POOL = { // SNS마다 아직 안 가져온 저장이 2개씩 있다고 가정해요
+  instagram:[
+    {id:101, title:'연남동 골목 와인바', type:'맛집·카페', category:'와인바', ago:'방금', desc:'작은 골목 안 조용한 와인바', memo:'', art:'cafe', distance:'지하철 20분', address:'서울 마포구 연남동 · 예시 장소', aiClassified:true},
+    {id:105, title:'망원동 빈티지 소품샵', type:'쇼핑', category:'소품', ago:'방금', desc:'주말에 들르기 좋은 작은 가게', memo:'', art:'bag', price:'1만 원대', aiClassified:true}],
+  youtube:[
+    {id:102, title:'10분 아침 스트레칭 루틴', type:'생활 정보', category:'운동', ago:'방금', desc:'출근 전 가볍게 따라 하기', memo:'', art:'tips', aiClassified:true},
+    {id:106, title:'원룸 조명 바꾸기 꿀팁', type:'생활 정보', category:'인테리어', ago:'방금', desc:'스탠드 하나로 분위기 바꾸기', memo:'', art:'tips', aiClassified:true}],
+  tiktok:[
+    {id:103, title:'편의점 디저트 꿀조합', type:'레시피', category:'디저트', ago:'방금', desc:'5분이면 끝나는 간단 디저트', memo:'', art:'food', recipe:'5분 · 재료 3가지', aiClassified:true},
+    {id:107, title:'에어프라이어 감자칩', type:'레시피', category:'간식', ago:'방금', desc:'기름 없이 바삭하게', memo:'', art:'food', recipe:'20분 · 재료 2가지', aiClassified:true}],
+  x:[
+    {id:104, title:'성수 플리마켓 일정 정리', type:'전시·팝업', category:'마켓', ago:'방금', desc:'이번 달 주말 플리마켓 모음', memo:'', art:'exhibit', address:'서울 성동구 성수동 · 예시 장소', distance:'도보 10분', aiClassified:true},
+    {id:108, title:'이번 주 무료 전시 모음', type:'전시·팝업', category:'전시', ago:'방금', desc:'예약 없이 볼 수 있는 곳', memo:'', art:'exhibit', aiClassified:true}]
 };
-let syncing = false;
-const syncLabel = () => settings.lastSync ? (Date.now() - settings.lastSync < 60000 ? '방금 업데이트' : `${new Date(settings.lastSync).toLocaleString('ko-KR', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'})} 업데이트`) : '아직 업데이트 안 함';
-actions.accsync = () => {
-  if (syncing) return;
+let syncing = false, syncingAcc = null; // 전체 새로고침 중 / 계정 하나만 새로고침 중
+const syncTime = t => t ? (Date.now() - t < 60000 ? '방금 업데이트' : `${new Date(t).toLocaleString('ko-KR', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'})} 업데이트`) : '아직 업데이트 안 함';
+const syncLabel = () => syncTime(settings.lastSync);
+// 계정 하나에서 아직 안 가져온 저장을 모두 가져와요
+function pullAccount(a){
+  const got = [];
+  (SYNC_POOL[a.sns] || []).forEach(p => { if (!items.some(x => x.id === p.id)) { items.unshift({...p, source:SNS[a.sns].name, account:a.id}); got.push(p); } });
+  settings.accSync = {...(settings.accSync || {}), [a.id]: Date.now()};
+  return got;
+}
+const syncToast = (n, who) => toast(n ? `${who ? who + '에서 ' : ''}새 저장 콘텐츠 ${n}개를 가져왔어요.` : `${who ? who + '에서 ' : ''}새로 가져올 저장 콘텐츠가 없어요.`);
+actions.accsync = () => { // 연동한 계정 전체
+  if (syncing || syncingAcc) return;
   syncing = true; render();
   setTimeout(() => {
-    const got = [];
-    myAccounts().forEach(a => {
-      const p = SYNC_POOL[a.sns]; if (!p || items.some(x => x.id === p.id)) return;
-      items.unshift({...p, source:SNS[a.sns].name, account:a.id}); got.push(p);
-    });
-    settings.lastSync = Date.now(); syncing = false; afterChange(); render();
-    toast(got.length ? `새 저장 콘텐츠 ${got.length}개를 가져왔어요.` : '새로 가져올 저장 콘텐츠가 없어요.');
+    const got = myAccounts().flatMap(pullAccount);
+    settings.lastSync = Date.now(); syncing = false; afterChange(); render(); syncToast(got.length);
   }, 1200);
 };
-const syncBtn = () => `<button class="syncbtn ${syncing ? 'on' : ''}" data-action="accsync" ${syncing ? 'aria-busy="true"' : ''}><span class="syncico">${icon('sync')}</span><span><b>${syncing ? '가져오는 중…' : '연동 새로고침'}</b><small>${syncing ? '연동한 계정의 새 저장을 확인하고 있어요' : syncLabel()}</small></span></button>`;
+document.addEventListener('click', e => { // 계정별 새로고침
+  const b = e.target.closest('[data-acc-sync]'); if (!b) return;
+  if (syncing || syncingAcc) return;
+  const a = myAccounts().find(x => x.id === b.dataset.accSync); if (!a) return;
+  syncingAcc = a.id; render();
+  setTimeout(() => {
+    const got = pullAccount(a); syncingAcc = null; afterChange(); render(); syncToast(got.length, a.handle);
+  }, 1000);
+});
+const syncBtn = () => `<button class="syncbtn ${syncing ? 'on' : ''}" data-action="accsync" ${syncing ? 'aria-busy="true"' : ''}><span class="syncico">${icon('sync')}</span><span><b>${syncing ? '가져오는 중…' : '전체 연동 새로고침'}</b><small>${syncing ? '연동한 모든 계정의 새 저장을 확인하고 있어요' : syncLabel()}</small></span></button>`;
+const accSyncBtn = a => { const on = syncing || syncingAcc === a.id;
+  return `<button class="accsync ${on ? 'on' : ''}" data-acc-sync="${a.id}" aria-label="${esc(a.handle)} 새로고침" ${on ? 'aria-busy="true"' : ''}>${icon('sync')}</button>`; };
 paths.sync = 'M20 11a8 8 0 0 0-14.3-4.9L4 8 M4 4v4h4 M4 13a8 8 0 0 0 14.3 4.9L20 16 M20 20v-4h-4';
 
 /* 하위 페이지와 캘린더에서도 하단 메뉴의 해당 탭이 켜져 있게 */
