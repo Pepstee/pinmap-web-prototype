@@ -211,10 +211,6 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 .course-drag-handle:hover,.course-drag-handle:focus-visible{color:#444;background:#f2f2f2}
 .course-drag-handle:active{cursor:grabbing}
 
-/* Keep the map visible behind every bottom control. */
-.live-map .lm-bottom:before{display:none}
-.live-map .lm-bottom button,.live-map .lm-bottom .pm-nav-main,.live-map .lm-bottom .navicon{background:transparent!important;border-color:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-
 /* Editing controls must not shift the rows while a grip is being dragged. */
 .course-body{position:relative}
 .course-edit-bar{position:absolute;right:20px;top:-48px;margin:0;z-index:410}
