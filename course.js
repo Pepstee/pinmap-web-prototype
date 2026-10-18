@@ -1,4 +1,4 @@
-// 지도에서 여는 날짜별 코스 편집 화면.
+// 지도에서 여는 단일 코스 편집 화면.
 (() => {
   const storageKey='pinmap-courses-v1';
   const draftKey='pinmap-course-draft-v1';
@@ -10,15 +10,20 @@
   const validDate=value=>/^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(Date.parse(value));
   const normalize=value=>{
     if(!value||!Array.isArray(value.days)||!value.days.length)return null;
+    const seen=new Set();
+    const stops=value.days.flatMap(day=>Array.isArray(day)?day:[]).filter(stop=>{
+      if(!stop||!Number.isFinite(stop.id)||!/^\d{2}:\d{2}$/.test(stop.time)||seen.has(stop.id))return false;
+      seen.add(stop.id);return true;
+    }).map(({id,time})=>({id,time}));
     return {
       id:typeof value.id==='string'?value.id:newId(),
       title:typeof value.title==='string'?value.title.slice(0,50):'새 코스',
       date:validDate(value.date)?value.date:today,
-      days:value.days.slice(0,14).map(day=>Array.isArray(day)?day.filter(stop=>stop&&Number.isFinite(stop.id)&&/^\d{2}:\d{2}$/.test(stop.time)).map(({id,time})=>({id,time})):[])
+      days:[stops]
     };
   };
   let courses=[],course={id:newId(),title:'새 코스',date:today,days:[[]]},draft=null;
-  let selectedDay=0,pickerOpen=false,courseMap=null,editing=false;
+  let pickerOpen=false,courseMap=null,editing=false;
   try {
     const stored=localStorage.getItem(storageKey);
     if(stored!==null){const values=JSON.parse(stored);if(Array.isArray(values))courses=values.map(normalize).filter(Boolean);}
@@ -26,18 +31,15 @@
       const legacy=normalize(JSON.parse(localStorage.getItem('pinmap-course-v2')));
       if(legacy){courses=[legacy];localStorage.setItem(storageKey,JSON.stringify(courses));}
     }
-    draft=normalize(JSON.parse(localStorage.getItem(draftKey)));
-    if(draft)course=clone(draft);
   } catch {}
   // Editing saves a recoverable draft; only the Save button updates the saved list.
   const save=()=>{draft=clone(course);try{localStorage.setItem(draftKey,JSON.stringify(draft));return true}catch{toast('임시 저장 공간을 확인해 주세요.');return false}};
-  const openCourse=value=>{course=clone(value);selectedDay=0;pickerOpen=false;editing=false;save();go('course')};
+  const openCourse=value=>{course=clone(value);pickerOpen=false;editing=false;save();go('course')};
   const eligible=()=>items.filter(item=>isPlace(item)&&item.address&&!item.pending);
-  const dayStops=()=>course.days[selectedDay];
+  const dayStops=()=>course.days[0];
   const findPlace=id=>eligible().find(item=>item.id===id);
   const thumbnail=item=>({cafe:'img/cafe.jpg',food:'img/brunch.jpg',exhibit:'img/exhibit.jpg',park:'img/park.jpg',sea:'img/park.jpg'})[item.art]||'img/park.jpg';
   const stopTime=()=>{const last=dayStops().at(-1)?.time||'08:30';const [h,m]=last.split(':').map(Number);const total=Math.min(h*60+m+90,23*60+45);return `${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`};
-  const dayDate=index=>{const [y,m,d]=course.date.split('-').map(Number);const date=new Date(y,m-1,d+index);return `${date.getMonth()+1}.${date.getDate()}`};
   const coordinates=item=>item.lat!=null&&item.lng!=null?[item.lat,item.lng]:({1:[37.5461,127.0434],4:[37.5441,127.0495],6:[37.5445,127.0374],8:[37.5490,127.0460],13:[37.5441,127.0495]})[item.id];
   pageName.course='코스 만들기';
   pageName.courses='저장한 코스';
@@ -46,7 +48,6 @@
       <header class="course-header"><div class="course-toolbar"><button class="course-close" data-page="map" aria-label="지도로 돌아가기">${icon('back')}</button></div><h1>저장한 코스</h1><p>나만의 동선을 모아두고 다시 꺼내보세요.</p></header>
       <div class="course-list-body">
         <button class="course-new" data-course-new>${icon('plus')} 새 코스 만들기</button>
-        ${draft?`<button class="course-resume" data-course-resume><span>작성 중인 코스 이어서 만들기</span>${icon('arrow')}</button>`:''}
         <div class="course-list-heading">코스 ${courses.length}개</div>
         ${courses.length?courses.map(saved=>{const places=saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean);return `<button class="course-saved-card" data-course-open="${esc(saved.id)}">${places[0]?`<img src="${thumbnail(places[0])}" alt="">`:`<span class="course-saved-placeholder">${icon('map')}</span>`}<span><b>${esc(saved.title)}</b><small>${esc(saved.date)} · 장소 ${places.length}곳</small><span class="course-saved-stops">${places.map(place=>esc(place.title)).join(' → ')||'장소를 추가해 주세요'}</span></span>${icon('arrow')}</button>`}).join(''):'<div class="course-list-empty">아직 저장한 코스가 없어요.<br>저장한 장소로 첫 코스를 만들어 보세요.</div>'}
       </div></section>`;
@@ -62,11 +63,10 @@
       </header>
       <div class="course-map-wrap"><div id="course-map" aria-label="코스 장소 지도"></div></div>
       <div class="course-body">
-        ${course.days.length>1?`<div class="course-days" aria-label="코스 날짜">${course.days.map((_,index)=>`<button data-course-day="${index}" class="${selectedDay===index?'selected':''}" aria-pressed="${selectedDay===index}">${index+1}일차 <small>${dayDate(index)}</small></button>`).join('')}</div>`:''}
         <div class="course-edit-bar" ${editing?'':'hidden'}><button data-course-done ${editing?'':'hidden'}>완료</button></div>
-        ${stops.length?`<div class="course-timeline">${stops.map((stop,index)=>`<div class="course-row" data-course-id="${stop.id}"><span class="course-badge" style="background:${stopColor(index)}">${index+1}</span><article class="course-card" tabindex="0" aria-label="${esc(stop.place.title)} 일정 편집"><button class="course-remove" data-course-remove="${stop.id}" aria-label="${esc(stop.place.title)} 삭제" ${editing?'':'hidden'}>×</button><div class="course-card-head"><img src="${thumbnail(stop.place)}" alt=""><div><b>${esc(stop.place.title)}</b><small>${esc(stop.place.category||stop.place.type)} · ${esc(stop.place.address)}</small></div></div></article><button class="course-drag-handle" data-course-drag aria-label="${esc(stop.place.title)} 순서 변경" title="드래그로 순서 변경 · 방향키 위/아래로 이동"><svg viewBox="0 0 16 24" aria-hidden="true"><circle cx="5" cy="5" r="1.7"/><circle cx="11" cy="5" r="1.7"/><circle cx="5" cy="12" r="1.7"/><circle cx="11" cy="12" r="1.7"/><circle cx="5" cy="19" r="1.7"/><circle cx="11" cy="19" r="1.7"/></svg></button></div>`).join('')}</div>`:'<div class="course-empty">이 날의 코스가 비어 있어요.<br>저장한 장소를 추가해 보세요.</div>'}
+        ${stops.length?`<div class="course-timeline">${stops.map((stop,index)=>`<div class="course-row" data-course-id="${stop.id}"><span class="course-badge" style="background:${stopColor(index)}">${index+1}</span><article class="course-card" tabindex="0" aria-label="${esc(stop.place.title)} 일정 편집"><button class="course-remove" data-course-remove="${stop.id}" aria-label="${esc(stop.place.title)} 삭제" ${editing?'':'hidden'}>×</button><div class="course-card-head"><img src="${thumbnail(stop.place)}" alt=""><div><b>${esc(stop.place.title)}</b><small>${esc(stop.place.category||stop.place.type)} · ${esc(stop.place.address)}</small></div></div></article><button class="course-drag-handle" data-course-drag aria-label="${esc(stop.place.title)} 순서 변경" title="드래그로 순서 변경 · 방향키 위/아래로 이동"><svg viewBox="0 0 16 24" aria-hidden="true"><circle cx="5" cy="5" r="1.7"/><circle cx="11" cy="5" r="1.7"/><circle cx="5" cy="12" r="1.7"/><circle cx="11" cy="12" r="1.7"/><circle cx="5" cy="19" r="1.7"/><circle cx="11" cy="19" r="1.7"/></svg></button></div>`).join('')}</div>`:'<div class="course-empty">코스가 비어 있어요.<br>저장한 장소를 추가해 보세요.</div>'}
         <button class="course-add-place" data-course-picker aria-label="장소 추가하기">${icon('plus')}</button>
-        ${pickerOpen?`<section id="course-picker" class="course-picker"><div class="course-picker-heading"><h2>저장한 장소</h2><button data-course-picker aria-label="장소 목록 닫기">${icon('close')}</button></div>${available.length?available.map(item=>`<div class="course-option"><img src="${thumbnail(item)}" alt=""><div><b>${esc(item.title)}</b><small>${esc(item.category||item.type)}</small></div><button data-course-add="${item.id}" aria-label="${esc(item.title)} 추가">추가</button></div>`).join(''):'<p>이 날짜에 추가할 장소가 없습니다.</p>'}</section>`:''}
+        ${pickerOpen?`<section id="course-picker" class="course-picker"><div class="course-picker-heading"><h2>저장한 장소</h2><button data-course-picker aria-label="장소 목록 닫기">${icon('close')}</button></div>${available.length?available.map(item=>`<div class="course-option"><img src="${thumbnail(item)}" alt=""><div><b>${esc(item.title)}</b><small>${esc(item.category||item.type)}</small></div><button data-course-add="${item.id}" aria-label="${esc(item.title)} 추가">추가</button></div>`).join(''):'<p>추가할 장소가 없습니다.</p>'}</section>`:''}
 
       </div>
     </section>`;
@@ -142,7 +142,7 @@
     if(!cancelled&&g.row.isConnected){
       placeRow(g);
       const ids=[...g.row.parentNode.querySelectorAll('[data-course-id]')].map(row=>Number(row.dataset.courseId));
-      const original=dayStops();course.days[selectedDay]=[...ids.map(id=>original.find(stop=>stop.id===id)).filter(Boolean),...original.filter(stop=>!ids.includes(stop.id))];
+      const original=dayStops();course.days[0]=[...ids.map(id=>original.find(stop=>stop.id===id)).filter(Boolean),...original.filter(stop=>!ids.includes(stop.id))];
       save();
     }
     if(page==='course')renderInPlace();
@@ -186,7 +186,6 @@
   document.addEventListener('click',async event=>{
     if(page==='courses'){
       if(event.target.closest('[data-course-new]'))openCourse({id:newId(),title:'새 코스',date:today,days:[[]]});
-      else if(event.target.closest('[data-course-resume]')&&draft)openCourse(draft);
       else {const button=event.target.closest('[data-course-open]');const saved=button&&courses.find(value=>value.id===button.dataset.courseOpen);if(saved)openCourse(saved);}
       return;
     }
@@ -213,15 +212,12 @@
       else shareFallback(text);
       return;
     }
-    const button=event.target.closest('[data-course-day],[data-course-add-day],[data-course-remove-day],[data-course-picker],[data-course-add],[data-course-remove],[data-course-done]');
+    const button=event.target.closest('[data-course-picker],[data-course-add],[data-course-remove],[data-course-done]');
     if(!button)return;
     if(button.hasAttribute('data-course-done')){editing=false;render();return}
-    if(button.dataset.courseDay!==undefined){editing=false;selectedDay=Number(button.dataset.courseDay);pickerOpen=false;render();window.scrollTo(0,0);return}
-    if(button.hasAttribute('data-course-add-day')){if(course.days.length<14){course.days.push([]);selectedDay=course.days.length-1;pickerOpen=true;refresh()}return}
-    if(button.hasAttribute('data-course-remove-day')){if(selectedDay>0){course.days.splice(selectedDay,1);selectedDay=Math.max(0,selectedDay-1);pickerOpen=false;refresh()}return}
     if(button.hasAttribute('data-course-picker')){pickerOpen=!pickerOpen;render();if(pickerOpen)requestAnimationFrame(()=>document.getElementById('course-picker')?.scrollIntoView({behavior:'smooth',block:'start'}));return}
     if(button.dataset.courseAdd){const id=Number(button.dataset.courseAdd);if(findPlace(id)&&!dayStops().some(stop=>stop.id===id)){dayStops().push({id,time:stopTime()});refresh()}return}
-    if(button.dataset.courseRemove&&editing){course.days[selectedDay]=dayStops().filter(stop=>stop.id!==Number(button.dataset.courseRemove));refresh();return}
+    if(button.dataset.courseRemove&&editing){course.days[0]=dayStops().filter(stop=>stop.id!==Number(button.dataset.courseRemove));refresh();return}
 
   });
   document.addEventListener('input',event=>{if(page==='course'&&event.target.dataset.courseField==='title'){course.title=event.target.value;save()}});

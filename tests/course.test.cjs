@@ -7,9 +7,9 @@ const source = fs.readFileSync(require('node:path').join(__dirname, '../course.j
 function app(seed = {}) {
   const storage = new Map(Object.entries(seed));
   const listeners = {};
-  let sequence = 0, failSave = false;
+  let failSave = false;
   const context = vm.createContext({
-    crypto: { randomUUID: () => `course-${++sequence}` },
+    crypto: { randomUUID: require('node:crypto').randomUUID },
     localStorage: {
       getItem: key => storage.get(key) ?? null,
       setItem: (key, value) => { if (failSave && key === 'pinmap-courses-v1') throw Error('quota'); storage.set(key, value); },
@@ -68,16 +68,17 @@ test('new course stays a draft until Save; reload and editing update the existin
   assert.equal(saved[0].title, 'Updated');
 });
 
-test('legacy data migrates once, preserving days and the original storage', async () => {
+test('legacy days merge into one ordered course without losing places or original storage', async () => {
   const old = JSON.stringify({ title: 'Legacy', date: '2026-10-19', friends: ['Name'], days: [[{ id: 1, time: '10:00' }], [{ id: 4, time: '12:00' }]] });
   const a = app({ 'pinmap-course-v2': old });
   const saved = JSON.parse(a.storage.get('pinmap-courses-v1'));
   assert.equal(saved.length, 1);
-  assert.equal(saved[0].days.length, 2);
+  assert.equal(saved[0].days.length, 1);
+  assert.deepEqual(saved[0].days[0].map(stop => stop.id), [1, 4]);
   assert.equal(a.storage.get('pinmap-course-v2'), old);
   assert.equal(saved[0].friends, undefined);
   await a.click('data-course-open', saved[0].id);
-  assert.match(a.html('course'), /2일차/);
+  assert.doesNotMatch(a.html('course'), /일차|data-course-day|data-course-add-day/);
   assert.doesNotMatch(a.html('course'), /course-friends|course-companions|course-card-summary/);
   const reloaded = app(Object.fromEntries(a.storage));
   assert.match(reloaded.html('courses'), /코스 1개/);
@@ -95,16 +96,27 @@ test('save failure keeps the draft and does not claim success', async () => {
   assert.equal(a.storage.has('pinmap-course-draft-v1'), true);
 });
 
-test('a second saved course keeps the first and drafts can be resumed after reload', async () => {
+test('new courses start empty without a resume action; existing saved courses remain', async () => {
   const a = app();
   await a.click('data-course-new'); await a.click('data-course-add', '1'); await a.click('data-course-save');
-  await a.click('data-course-new'); a.input('Second'); await a.click('data-course-add', '4');
-  const resumed = app(Object.fromEntries(a.storage));
-  assert.match(resumed.html('courses'), /이어서 만들기/);
-  await resumed.click('data-course-resume');
-  assert.match(resumed.html('course'), /Second/);
-  await resumed.click('data-course-save');
-  const saved = JSON.parse(resumed.storage.get('pinmap-courses-v1'));
+  await a.click('data-course-new'); a.input('Unfinished'); await a.click('data-course-add', '4');
+  const reloaded = app(Object.fromEntries(a.storage));
+  assert.doesNotMatch(reloaded.html('courses'), /이어서|course-resume/);
+  await reloaded.click('data-course-new');
+  assert.doesNotMatch(reloaded.html('course'), /Unfinished|Place 4/);
+  await reloaded.click('data-course-add', '8'); await reloaded.click('data-course-save');
+  const saved = JSON.parse(reloaded.storage.get('pinmap-courses-v1'));
   assert.equal(saved.length, 2);
-  assert.equal(new Set(saved.map(value => value.id)).size, 2);
+  assert.deepEqual(saved.map(course => course.days[0].map(stop => stop.id)), [[8], [1]]);
+});
+
+test('existing multi-day courses become a single editable list with unique places', async () => {
+  const seed = [{id:'old',title:'Old',date:'2026-10-19',days:[[{id:1,time:'10:00'}],[{id:4,time:'11:00'},{id:1,time:'12:00'}]]}];
+  const a = app({'pinmap-courses-v1':JSON.stringify(seed)});
+  await a.click('data-course-open', 'old');
+  assert.doesNotMatch(a.html('course'), /일차|course-days/);
+  await a.click('data-course-save');
+  const saved = JSON.parse(a.storage.get('pinmap-courses-v1'));
+  assert.equal(saved[0].days.length, 1);
+  assert.deepEqual(saved[0].days[0].map(stop=>stop.id), [1,4]);
 });
