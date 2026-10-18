@@ -158,18 +158,18 @@ const loader = text => `<div class="ob-loader" role="status"><div class="ob-bar"
 function onboardScreen() {
   const s = onboardStep;
   // 첫 화면: 로고만 심플하게 (화면을 누르면 바로 다음 단계)
-  if (s === 0) return `<button class="ob-splash" data-ob="next" aria-label="핀맵 시작"><img src="img/onboarding-splash.jpg" alt="Pinmap"></button>`;
+  if (s === 0) return `<button class="ob-splash" data-ob="next" aria-label="핀맵 시작"><img src="${PM_IMG.splash}" alt="Pinmap"></button>`;
   if (s === 1) return `
     <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를<br><em>발견</em>했다면?</h1>
     <ol class="ob-flow">
       <li class="ob-flowcard"><div class="ob-flowtext"><h3><span class="ob-num">1</span>콘텐츠 발견</h3><p>SNS에서 마음에 드는 콘텐츠를 찾아요.</p></div>
-        <div class="ob-mock ob-post" aria-hidden="true"><div class="ob-postimg">${art('park')}</div><div class="ob-postbar">${icon('heart')}${icon('comment')}<span class="ob-hl"><img class="ob-sendico" src="img/send.png" alt=""></span><span class="ob-gap"></span>${icon('more')}</div></div></li>
+        <div class="ob-mock ob-post" aria-hidden="true"><div class="ob-postimg">${art('park')}</div><div class="ob-postbar">${icon('heart')}${icon('comment')}<span class="ob-hl"><img class="ob-sendico" src="${PM_IMG.send}" alt=""></span><span class="ob-gap"></span>${icon('more')}</div></div></li>
       <li class="ob-arrow" aria-hidden="true">↓</li>
       <li class="ob-flowcard"><div class="ob-flowtext"><h3><span class="ob-num">2</span>공유하기</h3><p>공유하기 버튼을 눌러주세요.</p></div>
-        <div class="ob-mock ob-sheet" aria-hidden="true"><span><i>${icon('link')}</i>링크 복사</span><span><i>${icon('story')}</i>스토리</span><span class="on"><i><img class="ob-sendico" src="img/send.png" alt=""></i>공유하기</span><span><i>${icon('comment')}</i>메시지</span></div></li>
+        <div class="ob-mock ob-sheet" aria-hidden="true"><span><i>${icon('link')}</i>링크 복사</span><span><i>${icon('story')}</i>스토리</span><span class="on"><i><img class="ob-sendico" src="${PM_IMG.send}" alt=""></i>공유하기</span><span><i>${icon('comment')}</i>메시지</span></div></li>
       <li class="ob-arrow" aria-hidden="true">↓</li>
       <li class="ob-flowcard"><div class="ob-flowtext"><h3><span class="ob-num">3</span>핀맵으로 보내기</h3><p>[핀맵]을 선택하면 저장 완료!</p></div>
-        <div class="ob-mock ob-sheet apps" aria-hidden="true"><span><i>${icon('image')}</i>SNS</span><span class="on"><i class="pin-app"><img src="img/pinmap-logo.png" alt=""></i>핀맵</span><span><i>${icon('more')}</i>더보기</span></div></li>
+        <div class="ob-mock ob-sheet apps" aria-hidden="true"><span><i>${icon('image')}</i>SNS</span><span class="on"><i class="pin-app"><img src="${PM_IMG.logo}" alt=""></i>핀맵</span><span><i>${icon('more')}</i>더보기</span></div></li>
     </ol>
     <div class="ob-actions"><button class="filled ob-next" data-ob="next">다음</button></div>`;
   if (s === 2) return `

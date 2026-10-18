@@ -40,3 +40,6 @@
 .howtobody .ob-mock{background:#F6F6F7!important;border:0!important}
 .howtobody .ob-next{min-height:60px!important;border-radius:16px!important}
 .main:has(.howtopage)>.topbar .bellbtn{display:none!important}
+
+/* 컬렉션 > 카테고리(폴더) 안: 오른쪽 위 알림 버튼 숨김 */
+.main:has(.cf-infolder)>.topbar .bellbtn{display:none!important}
