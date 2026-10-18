@@ -195,8 +195,8 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 .coursepage button:focus-visible{outline:2px solid #444;outline-offset:3px}
 
 /* Reuse the collection title/search component, including its 44/16/50px rhythm. */
-.live-map .lm-header{position:absolute;inset:0 0 auto;z-index:401;padding:var(--top) var(--gutter) 16px;background:#fff}
-.live-map .lm-header .cf-fhead{position:relative;padding-right:120px}
+.live-map .lm-header{position:absolute;inset:0 0 auto;z-index:401;padding:var(--top) var(--gutter) 16px;background:var(--t-bg,#F4F4F5)}
+.live-map .lm-header .cf-fhead{position:relative;padding-right:52px}
 .live-map .lm-header .libsearch{margin-bottom:0}
 .live-map .lm-header input{font-family:inherit}
 .live-map .lm-header .libgo{border:0;flex:none;width:28px;height:28px;padding:0;border-radius:50%;display:grid;place-items:center;color:#17191b;background:rgba(255,255,255,.62);box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
@@ -214,3 +214,12 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 /* Editing controls must not shift the rows while a grip is being dragged. */
 .course-body{position:relative}
 .course-edit-bar{position:absolute;right:20px;top:-48px;margin:0;z-index:410}
+
+/* Match the shared page surface and use a compact accessible course icon. */
+.live-map .lm-header .lm-course-link{width:40px;padding:0;display:grid;place-items:center}
+.live-map .lm-header .lm-course-link svg{width:20px;height:20px}
+.lm-expanded-pin{display:flex;flex-direction:column;align-items:stretch;gap:0;width:260px;height:210px;padding:0;overflow:hidden;transform-origin:center}
+.lm-pin-photo,.lm-pin-photo-placeholder{display:block;width:100%;height:120px;flex:0 0 120px;object-fit:cover}
+.lm-pin-photo-placeholder{display:grid;place-items:center;font-size:44px;background:var(--t-soft,#EFEFF1)}
+.lm-expanded-pin .lm-pin-copy{padding:10px 12px;gap:3px}
+.lm-pin-collapse{display:grid;place-items:center;width:24px;height:24px;right:8px;top:8px;border-radius:50%;background:#ffffffe8;color:#444;font-size:19px;box-shadow:0 1px 5px #0002}

@@ -22,16 +22,16 @@
   const savedPlaces = () => {
     const pinned = savedCoords.map(position => {
       const item = items.find(x => x.id === position.id);
-      return item && !item.pending ? {...position, title:item.title, address:item.address || '주소 확인 필요', category:item.category || item.type, description:item.desc || '', source:'저장한 콘텐츠', saved:true} : null;
+      return item && !item.pending ? {...position, image:libPhoto(item)||position.image, title:item.title, address:item.address || '주소 확인 필요', category:item.category || item.type, description:item.desc || '', source:'저장한 콘텐츠', saved:true} : null;
     }).filter(Boolean);
     const own = items.filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lng) && !x.pending && !savedCoords.some(y => y.id === x.id))
-      .map(x => ({id:x.id,lat:x.lat,lng:x.lng,kind:kindOf(x.category || ''),image:localPhoto(kindOf(x.category || '')),title:x.title,address:x.address || '',category:x.category || x.type,description:x.desc || '',source:'저장한 콘텐츠',saved:true}));
+      .map(x => ({id:x.id,lat:x.lat,lng:x.lng,kind:kindOf(x.category || ''),image:libPhoto(x)||localPhoto(kindOf(x.category || '')),title:x.title,address:x.address || '',category:x.category || x.type,description:x.desc || '',source:'저장한 콘텐츠',saved:true}));
     return [...pinned,...own];
   };
   function content() {
     return `<section class="live-map" aria-label="지도에서 장소 탐색"><div id="live-map-canvas"></div>
       <header class="lm-header cfpage">
-        <div class="libhead cf-fhead"><h1>지도페이지</h1><button class="lm-course-link" data-page="courses">${icon('calendar')} 코스 짜기</button></div>
+        <div class="libhead cf-fhead"><h1>지도페이지</h1><button class="lm-course-link" data-page="courses" aria-label="코스 짜기" title="코스 짜기">${icon('calendar')}</button></div>
         <form class="libsearch" id="lm-search" role="search">${icon('search')}<input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="장소명 또는 주소 검색" value="${safe(searchQuery)}" autocomplete="off"><button type="submit" class="libgo" aria-label="검색">${icon('arrow')}</button></form>
       </header>
       <div class="lm-status" role="status" hidden></div>
@@ -49,8 +49,8 @@
   function markerIcon(place,expanded=false) {
     const emoji=cats.find(c=>c[0]===place.kind)?.[1]||'📍';
     return L.divIcon({className:`lm-emoji-marker${expanded?' is-expanded':''}`,
-      html:expanded?`<span class="lm-expanded-pin"><span class="lm-pin-symbol">${emoji}</span><span class="lm-pin-copy"><b>${safe(place.title)}</b><small>${safe(place.category)}</small><span>${safe(place.address||'주소 정보 없음')}</span></span><span class="lm-pin-collapse" aria-hidden="true">×</span></span>`:`<span class="lm-emoji-pin">${emoji}</span>`,
-      iconSize:expanded?[240,88]:[46,46],iconAnchor:expanded?[23,44]:[23,23]});
+      html:expanded?`<span class="lm-expanded-pin">${place.saved&&place.image?`<img class="lm-pin-photo" src="${safe(place.image)}" alt="${safe(place.title)} 콘텐츠 사진">`:`<span class="lm-pin-photo-placeholder">${emoji}</span>`}<span class="lm-pin-copy"><b>${safe(place.title)}</b><small>${safe(place.category)}</small><span>${safe(place.address||'주소 정보 없음')}</span></span><span class="lm-pin-collapse" aria-hidden="true">×</span></span>`:`<span class="lm-emoji-pin">${emoji}</span>`,
+      iconSize:expanded?[260,210]:[46,46],iconAnchor:expanded?[130,105]:[23,23]});
   }
   function updateMarker(entry,expanded) {
     entry.marker.setIcon(markerIcon(entry.place,expanded));
@@ -71,7 +71,7 @@
     expandedKey=key;updateMarker(entry,true);
     const resultsPanel=$('#lm-search-results');if(resultsPanel)resultsPanel.hidden=true;
     // Leave enough room for the expanded card, search header, and bottom controls.
-    liveMap.panInside([place.lat,place.lng],{paddingTopLeft:[35,205],paddingBottomRight:[230,275],animate:false});
+    liveMap.panInside([place.lat,place.lng],{paddingTopLeft:[140,265],paddingBottomRight:[140,280],animate:false});
     entry.marker.getElement()?.focus({preventScroll:true});
   }
   function markers() {
