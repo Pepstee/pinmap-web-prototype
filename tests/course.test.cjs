@@ -120,3 +120,13 @@ test('existing multi-day courses become a single editable list with unique place
   assert.equal(saved[0].days.length, 1);
   assert.deepEqual(saved[0].days[0].map(stop=>stop.id), [1,4]);
 });
+
+test('map creation opens a fresh editor directly and preserves saved courses', async () => {
+  const a = app();
+  await a.click('data-course-new'); await a.click('data-course-add', '1'); await a.click('data-course-save');
+  a.context.page='map';
+  await a.click('data-course-new');
+  assert.equal(a.context.page, 'course');
+  assert.match(a.html('course'), /코스가 비어/);
+  assert.equal(JSON.parse(a.storage.get('pinmap-courses-v1')).length, 1);
+});

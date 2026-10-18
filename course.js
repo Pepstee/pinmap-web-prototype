@@ -206,9 +206,11 @@
     };
   }
   document.addEventListener('click',async event=>{
+    if(['map','courses'].includes(page)&&event.target.closest('[data-course-new]')){
+      openCourse({id:newId(),title:'새 코스',date:today,days:[[]]});return;
+    }
     if(page==='courses'){
-      if(event.target.closest('[data-course-new]'))openCourse({id:newId(),title:'새 코스',date:today,days:[[]]});
-      else {const button=event.target.closest('[data-course-open]');const saved=button&&courses.find(value=>value.id===button.dataset.courseOpen);if(saved)openCourse(saved);}
+      const button=event.target.closest('[data-course-open]');const saved=button&&courses.find(value=>value.id===button.dataset.courseOpen);if(saved)openCourse(saved);
       return;
     }
     if(page!=='course')return;

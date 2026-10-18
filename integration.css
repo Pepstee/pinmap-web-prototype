@@ -229,3 +229,7 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 .course-thumbnail-marker i{display:grid;place-items:center;width:19px;height:19px;border:1.5px solid #fff;border-radius:50%;font-family:inherit;font-size:11px;font-weight:700;line-height:1;font-style:normal;color:#fff;box-shadow:0 1px 4px #0004}
 .course-map-credit{margin:4px 0 0;text-align:right;font-size:9px;color:#888}
 .course-map-credit a{color:inherit}
+
+/* Direct course creation sits below search; the menu still opens saved courses. */
+.live-map button.lm-course-create{position:absolute;top:calc(var(--top) + 138px);right:var(--gutter);z-index:400;display:flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:0 16px;border-radius:22px;font-size:13px;font-weight:700;white-space:nowrap;background:#111!important;color:#fff!important;border:0!important;box-shadow:0 4px 14px #0003!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.live-map .lm-course-create svg{width:16px;height:16px}
