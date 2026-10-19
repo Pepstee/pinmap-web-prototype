@@ -49,7 +49,13 @@ const LIB_PHOTOS_BY_ID = {
   4:'img/exhibit.jpg',      // 초록 사이, 주말의 전시
   7:'img/cafe-corner.jpg',  // 댓글에서 발견한 카페 (골목 모퉁이 디저트 카페)
   8:'img/brunch-toast.jpg', // 골목 안 작은 브런치 식당
-  9:'img/sea-room.jpg'      // 바다 앞 작은 숙소
+  9:'img/sea-room.jpg',     // 바다 앞 작은 숙소
+  3:'img/pasta.jpg',        // 15분, 바질 토마토 파스타
+  11:'img/desk-organizer.jpg', // 원룸 수납 정리 아이디어
+  12:'img/classroom.jpg',   // 2026 하반기 청년 디자인 장학생 모집
+  10:'img/tote-bag.jpg',    // 매일 드는 캔버스 토트백
+  5:'img/notebook.jpg',     // 취향을 기록하는 방법
+  13:'img/popup-store.jpg'  // 성수 오브젝트 팝업 스토어
 };
 const libPhoto = x => x.photo || LIB_PHOTOS_BY_ID[x.id] || LIB_PHOTOS[x.art];
 const libThumb = x => libPhoto(x)

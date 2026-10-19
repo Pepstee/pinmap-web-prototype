@@ -341,8 +341,32 @@ body:has(.cf-selecting) .bottomnav{display:none!important}
 .cfpage .libsearch input::placeholder{color:#8A8A8E}
 .cfpage .libsearch .iconbtn{width:28px;height:28px}
 .cfpage .libsearch .iconbtn .icon{width:16px;height:16px;color:#8A8A8E}
-.libgo{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.62);color:#17191B;box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
+.libgo{flex:none;padding:0;border:0;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.62);color:#17191B;box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)}
 .libgo .icon{width:20px;height:20px;stroke-width:1.8}
 .libgo:hover{filter:none;background:#fff}
 .cfpage .libsearch:focus-within{border-color:rgba(255,255,255,.88);box-shadow:0 0 0 1.5px var(--t-ink),0 8px 28px rgba(32,32,32,.133)}
 .cf-add .cf-addplus,.cf-add:hover .cf-addplus{background:var(--t-ink);color:#fff;box-shadow:0 6px 14px rgba(0,0,0,.18)}
+
+/* v7 (10/19): 위아래 폴더 간격 1/3 줄임(좌우 그대로) · 새 폴더: 채우지 않은 + 가운데, 이름 없음 */
+.cf-grid{row-gap:16px}
+.cf-add .cf-addplus,.cf-add:hover .cf-addplus{left:50%;top:67%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:36px;height:36px;background:none;box-shadow:none;color:var(--t-ink)}
+.cf-add .cf-addplus .icon{width:26px;height:26px;stroke-width:1.8}
+/* v8 (10/19): 두 번째 사진은 오른쪽, 세 번째는 왼쪽 (2개일 때 가운데 + 오른쪽) · 새 폴더 + 조금 아래로 */
+.cf-slot1{left:53%;top:19%;transform:rotate(6deg)}
+.cf-slot2{left:7%;top:20%;transform:rotate(-7deg)}
+.cf-add .cf-addplus,.cf-add:hover .cf-addplus{top:74%}
+/* v9: 폴더 사이 위아래 간격 = 위 폴더 아래 끝 ~ 아래 폴더 사진 위 끝 40px (사진은 칸 안에서 20px 아래에 시작) */
+.cf-grid{row-gap:20px}
+
+/* v10 (10/19): 북마크 · 선택 원 = 사진 오른쪽 위 같은 자리의 글래스모피즘 버튼 */
+.cf-itemimg{position:relative}
+.cf-itemimg .cf-glass{position:absolute;top:12px;right:12px;left:auto;bottom:auto;z-index:3;width:34px;height:34px;padding:0;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(145deg,rgba(255,255,255,.38) 0%,rgba(255,255,255,.14) 100%);border:1px solid rgba(255,255,255,.5);color:#fff;
+  -webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.12),0 4px 14px rgba(0,0,0,.18)}
+.cf-itemimg .libmark.cf-glass .icon{width:15px;height:15px;fill:#fff;stroke:#fff}
+.cf-itemimg .libmark.cf-glass:hover{transform:scale(1.06);background:linear-gradient(145deg,rgba(255,255,255,.48) 0%,rgba(255,255,255,.2) 100%)}
+.cf-itemimg .cf-check.cf-glass{color:transparent;transition:background .15s,color .15s,border-color .15s}
+.cf-itemimg .cf-check.cf-glass .icon{width:16px;height:16px;stroke-width:3}
+.cf-item.on .cf-itemimg .cf-check.cf-glass{background:#fff;border-color:#fff;color:var(--t-ink)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.cf-itemimg .cf-glass{background:rgba(40,40,40,.45)}}

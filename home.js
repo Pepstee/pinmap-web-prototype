@@ -147,7 +147,7 @@ for (const p of ['calendar', 'library']) { const base = pages[p]; pages[p] = fun
    · 처음과 끝이 이어져(무한 반복) 양옆 카드가 항상 보여요
    · 화면을 다시 그려도 보던 카드 그대로, 혼자 움직이지 않아요 */
 let pickPos = 0, pickAnim = null, pickDrag = null, pickJustDragged = false;
-const PICK = {scale:0.86, peek:42, dur:520};
+const PICK = {scale:0.84, peek:38, dur:520}; // 10/19: 옆 카드 작게 · 가운데 카드 뒤에서 조금만 보이게
 const pickTrack = () => document.querySelector('.mainpick');
 const pickCount = () => pickTrack()?.children.length || 0;
 const wrapIdx = (i, n) => ((Math.round(i) % n) + n) % n;
@@ -161,7 +161,8 @@ function layoutPicks(){
   const cs = [...track.children], n = cs.length; if (!n) return;
   const w = cs[0].offsetWidth, half = track.clientWidth / 2;
   // 옆 카드(1칸)는 바깥쪽 끝이 peek만큼 보이도록, 2칸째는 그 뒤로 숨어요
-  const x1 = Math.min(half + PICK.peek - w * PICK.scale / 2, w * 0.9);
+  // 옆 카드 바깥쪽 끝 = 가운데 카드 끝 + peek (화면 가장자리에 여백이 남아요)
+  const x1 = Math.min(w / 2 + PICK.peek - w * PICK.scale / 2, half - w * PICK.scale / 2);
   cs.forEach((c, i) => {
     const d = pickOffset(i, pickPos, n), a = Math.abs(d), sg = Math.sign(d);
     const k = Math.min(a, 1), sc = 1 - k * (1 - PICK.scale);

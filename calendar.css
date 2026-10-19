@@ -139,3 +139,13 @@
 
 /* 지난 날짜: 가운데 줄 없이 (색만 연하게 유지) */
 .calcell.past,.calcell.past span{text-decoration:none!important}
+
+/* v2 (10/19): 마감 콘텐츠 블럭 — 크기는 그대로, 컬렉션 콘텐츠 카드처럼 사진 위 그라데이션 + 흰 글씨 */
+.calrow{position:relative;isolation:isolate;overflow:hidden;min-height:82px;background:#222;color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.06),0 8px 20px rgba(0,0,0,.10)}
+.calthumb{position:absolute;inset:0;z-index:-1;width:auto;height:auto;border-radius:0;background:#2a2a2a}
+.calthumb::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.3) 0%,rgba(0,0,0,.5) 50%,rgba(0,0,0,.74) 100%)}
+.caltext{padding-left:6px}
+.caltext b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.25)}
+.caltext small{color:rgba(255,255,255,.82)}
+.calbadge{background:rgba(255,255,255,.22);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.calbadge.soon{background:#fff;color:var(--t-ink)}

@@ -11,7 +11,9 @@
     {id:1, lat:37.5461, lng:127.0434, kind:'cafe', image:'img/cafe.jpg'},
     {id:4, lat:37.5441, lng:127.0495, kind:'event', image:'img/exhibit.jpg'},
     {id:6, lat:37.5445, lng:127.0374, kind:'walk', image:'img/park.jpg'},
-    {id:8, lat:37.5490, lng:127.0460, kind:'eat', image:'img/brunch.jpg'}
+    {id:8, lat:37.5490, lng:127.0460, kind:'eat', image:'img/brunch.jpg'},
+    {id:13, lat:37.5447, lng:127.0557, kind:'event', image:'img/popup-store.jpg'}, // 성수 오브젝트 팝업 (예시 위치)
+    {id:9, lat:37.7720, lng:128.9470, kind:'walk', image:'img/sea-room.jpg'}  // 바다 앞 작은 숙소 · 강릉 (예시 위치)
   ];
   const cats = [['all','✨','전체'],['eat','🍣','맛집'],['cafe','☕','카페'],['event','🎟️','전시·팝업'],['walk','🌳','산책'],['shop','🛍️','쇼핑']];
   const localPhoto = kind => ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
@@ -103,7 +105,12 @@
     if (liveMap) { liveMap.remove(); liveMap=null; locationMarker=null; }
     const isMap = page === 'map' && !detailId;
     document.body.classList.toggle('live-map-page',isMap);
-    if (isMap) { $('#app').innerHTML=content(); mount(); if(searchResults) showResults(); }
+    // 상세 페이지 '지도에서 보기' → 그 장소로 이동해 핀을 펼쳐요
+    const focusId = isMap ? window.pmMapFocus : null;
+    if (focusId != null) { window.pmMapFocus = null; searchResults = null; searchQuery = ''; category = 'all';
+      const f = savedPlaces().find(p => p.id === focusId); if (f) { center = [f.lat, f.lng]; zoom = 15; } }
+    if (isMap) { $('#app').innerHTML=content(); mount(); if(searchResults) showResults();
+      if (focusId != null) { const f = savedPlaces().find(p => p.id === focusId); if (f && liveMap) expandPlace(f); } }
     else { originalRender(); if(page==='course' && !detailId) window.mountCourseMap?.(); if(page==='courses' && !detailId) window.mountCourseThumbnails?.(); }
   };
   function drawLocation() {

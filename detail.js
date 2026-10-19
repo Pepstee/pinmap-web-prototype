@@ -42,9 +42,7 @@ detail = function(){
   const facts = [[t.place ? 'pin' : 'bookmark', x.category || shortType(x.type)], x.distance && ready ? ['walk', x.distance] : null, ['clock', `${x.ago} 저장`]].filter(Boolean);
   const factRow = `<div class="dtfacts">${facts.map(([ic, v]) => `<span>${icon(ic)}${esc(v)}</span>`).join('')}</div>`;
   if (t.place) info += ready
-    ? `<section class="dtsec"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2>${distanceOf(x) < 999
-      ? `<button type="button" class="dtmap" data-action="dtgomap" aria-label="핀맵 지도에서 위치 보기">${dtMap}<span class="dtmaptag">예시 지도</span><span class="dtmapgo">지도에서 보기${icon('arrow')}</span></button>`
-      : `<a class="dtmap" href="${mapHref}" target="_blank" rel="noopener noreferrer" aria-label="${esc(app.name)}에서 위치 보기">${dtMap}<span class="dtmaptag">예시 지도</span><span class="dtmapgo">${esc(app.name)}에서 보기${icon('external')}</span></a>`}${factRow}</section>`
+    ? `<section class="dtsec"><h2>${x.type === '여행' ? '여행지 정보' : '장소 정보'}</h2><button type="button" class="dtmap" data-action="dtgomap" aria-label="핀맵 지도에서 위치 보기">${dtMap}<span class="dtmaptag">예시 지도</span><span class="dtmapgo">지도에서 보기${icon('arrow')}</span></button>${factRow}</section>`
     : `<section class="dtsec"><h2>장소 정보</h2><div class="dtwarn"><b>장소 확인 필요</b><p>위치를 확정하지 못했어요. 원본에서 주소를 확인해 입력하면 지도에 표시돼요.</p><button class="dtsmall" data-action="edit">장소 직접 입력</button></div></section>`;
   if (x.type === '쇼핑') info += `<section class="dtsec"><h2>구매 정보</h2><div class="dtrow">${icon('bookmark')}<span>${esc(x.price || '가격 정보 없음')}</span></div><p class="dthint">${esc(x.shop || '판매처 정보 없음')} · 가격과 재고는 원본에서 다시 확인하세요.</p></section>`;
   if (x.type === '레시피') info += `<section class="dtsec"><h2>간단 정보</h2><div class="dtrow">${icon('clock')}<span>${esc(x.recipe || '정보 없음')}</span></div><p class="dthint">자세한 조리법은 원본 콘텐츠에서 확인해요.</p></section>`;
@@ -246,5 +244,5 @@ actions.dtcopyaddr = async () => {
 // 지도 누르면 핀맵 지도 탭으로 이동해 이 장소를 선택해요
 actions.dtgomap = () => {
   const x = items.find(i => i.id === detailId); if (!x) return;
-  selectedPin = x.id; go('map');
+  selectedPin = x.id; window.pmMapFocus = x.id; go('map');
 };

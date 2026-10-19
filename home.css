@@ -255,3 +255,9 @@ body.notipanel-open .bottomnav{display:none!important}
 /* 최상단 마감 배너: '마감 임박' 문구 없이, D-day · 제목을 세로 가운데로 */
 .main .strip{align-items:center!important;padding-top:0!important;padding-bottom:0!important}
 .main .strip .strip-label{display:none!important}
+
+/* ===== 홈 메인 카드 (10/19): 가운데 카드 좁게 · 옆 카드는 작게 뒤에서 살짝 · 양옆 여백 ===== */
+.mainpick{--pw:min(264px,66vw);--ph:calc(var(--pw) * 1.22);height:calc(var(--ph) + 16px)!important}
+.mainpick .pick{height:var(--ph)!important;top:8px}
+.mainpick .pickword{font-size:28px}
+.mainpick .picktext b{font-size:18px}

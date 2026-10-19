@@ -115,10 +115,20 @@ function cfStatus(){
 // 정렬: 최신 저장 순(기본) · 오래된 순 · 가까운 순(장소 폴더에서만)
 const CF_SORTS = {recent:'최신 저장 순', old:'오래된 저장 순', near:'가까운 순'};
 const cfHasPlaces = list => list.some(x => isPlace(x) && !x.pending && x.address);
+// 저장 시점('방금' · '3일 전' · '어제' · '2주 전' …)을 분 단위로 바꿔 정렬해요
+function cfAgoMin(x){
+  const a = String(x.ago || '').trim();
+  if (!a || a === '방금') return 0;
+  if (a === '어제') return 1440;
+  const m = a.match(/(\d+)\s*(분|시간|일|주|개월|달|년)/);
+  if (!m) return 0;
+  return Number(m[1]) * ({'분':1, '시간':60, '일':1440, '주':10080, '개월':43200, '달':43200, '년':525600})[m[2]];
+}
 function cfSort(list){
-  if (libSort === 'old') return [...list].reverse();          // items는 최신 저장 순
+  const byAgo = [...list].sort((a,b) => cfAgoMin(a) - cfAgoMin(b)); // 최신 저장 순 (같으면 원래 순서)
+  if (libSort === 'old') return byAgo.reverse();
   if (libSort === 'near' && cfHasPlaces(list)) return [...list].sort((a,b) => distanceOf(a) - distanceOf(b));
-  return list;
+  return byAgo;
 }
 // 선택 모드: null이면 꺼짐, Set이면 선택한 콘텐츠 id
 let cfSel = null, cfSelKey = '';
@@ -136,16 +146,15 @@ function cfMetaLine(x){
     if (x.shop) parts.push(x.shop);
   } else if (x.type === '레시피' && x.recipe) { ic = 'clock'; parts.push(x.recipe.split(' · ')[0]); }
   if (x.deadline) parts.push(x.deadline);
-  parts.push(`${x.ago} 저장`);
+  if (!parts.length) return '';
   return `<p class="cf-itemmeta${x.pending ? ' warn' : ''}">${ic ? icon(ic) : ''}<span>${parts.map(esc).join('<i aria-hidden="true">·</i>')}</span></p>`;
 }
 function cfItem(x){
   const on = cfSel?.has(x.id);
   const role = cfSel ? `role="checkbox" aria-checked="${!!on}"` : `role="button" data-detail="${x.id}"`;
   return `<div class="cf-item${on ? ' on' : ''}" tabindex="0" ${role} data-cfitem="${x.id}" aria-label="${esc(x.title)}${cfSel ? '' : ' 상세 보기'}">
-    <div class="cf-itemimg">${libThumb(x)}${cfSel ? '' : `<button type="button" class="libmark" data-unsave="${x.id}" aria-label="${esc(x.title)} 컬렉션에서 삭제">${icon('bookmark')}</button>`}</div>
+    <div class="cf-itemimg">${libThumb(x)}${cfSel ? `<span class="cf-check cf-glass" aria-hidden="true">${icon('check')}</span>` : `<button type="button" class="libmark cf-glass" data-unsave="${x.id}" aria-label="${esc(x.title)} 컬렉션에서 삭제">${icon('bookmark')}</button>`}</div>
     <div class="cf-itembody">
-      ${cfSel ? `<span class="cf-check" aria-hidden="true">${icon('check')}</span>` : ''}
       <div class="cf-itemtext"><h3>${esc(x.title)}</h3><p class="cf-itemdesc">${esc(x.desc || x.memo || '')}</p>${cfMetaLine(x)}</div>
     </div>
   </div>`;
@@ -196,7 +205,6 @@ resultCards = function(){
       <span class="cf-front"></span>
       <svg class="cf-hi" viewBox="0 0 100 80" preserveAspectRatio="none"><path d="${CF_EDGE}"/></svg>
       <span class="cf-addplus">${icon('plus')}</span>
-      <span class="cf-meta"><span class="cf-title">새 폴더</span></span>
     </span>
   </button>`];
   const folders = [...addTile, ...mine, ...cfFolderData(list).map(CollectionFolder)];
