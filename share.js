@@ -61,16 +61,16 @@ function sdLayer(){
       <div class="sd-apps">
         <button data-sd="nope"><i>${icon('comment')}</i>메시지</button>
         <button data-sd="nope"><i>${icon('mail')}</i>메일</button>
-        <button data-sd="pinmap" class="target"><i class="pinapp">${icon('bookmark')}</i>핀맵</button>
+        <button data-sd="pinmap" class="target"><i class="pinapp">${typeof PM_IMG !== 'undefined' ? `<img src="${PM_IMG.logo}" alt="">` : icon('bookmark')}</i>핀맵</button>
         <button data-sd="nope"><i>${icon('note')}</i>메모</button>
         <button data-sd="nope"><i>${icon('more')}</i>더보기</button>
       </div>
       <div class="sd-oslist"><span>복사 ${icon('copy')}</span><span>새로운 빠른 메모에 추가 ${icon('note')}</span></div>
     </div>`;
-  if (p === 'save') return `<div class="sd-dim light" data-sd="savedone" aria-label="닫고 저장"></div>${saveSheet()}`;
+  if (p === 'save') return `<div class="sd-dim light" data-sd="savedone" aria-label="닫고 저장"></div>${sdSaveSheet()}`;
   return '';
 }
-function saveSheet(){
+function sdSaveSheet(){ // 공유 체험용 저장 시트 (detail.js의 saveSheet와 이름이 겹치지 않게)
   const x = sd.item, t = typeOf(x.type);
   const cols = collectionNames().map(name => {
     const first = items.find(i => i.collection === name && i !== x), on = x.collection === name;

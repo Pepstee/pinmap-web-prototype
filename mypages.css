@@ -43,3 +43,8 @@
 
 /* 컬렉션 > 카테고리(폴더) 안: 오른쪽 위 알림 버튼 숨김 */
 .main:has(.cf-infolder)>.topbar .bellbtn{display:none!important}
+
+/* SNS 저장 체험 · 앱 밖 알림 미리보기 중에는 하단 메뉴를 숨겨요 (체험 화면 버튼을 가리지 않게) */
+body:has(#sharedemo) .bottomnav,body.pushdemo-open .bottomnav{display:none!important}
+.sd-apps .pinapp{background:#fff!important;display:grid;place-items:center}
+.sd-apps .pinapp img{width:58%;height:58%;object-fit:contain;display:block}
