@@ -46,10 +46,10 @@
         <div class="libhead cf-fhead"><h1>지도페이지</h1><button class="lm-course-link" data-page="courses" aria-label="저장한 코스 목록" title="저장한 코스 목록"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16 M4 12h16 M4 18h16"/></svg></button></div>
         <form class="libsearch" id="lm-search" role="search">${icon('search')}<input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="장소명 또는 주소 검색" value="${safe(searchQuery)}" autocomplete="off"><button type="submit" class="libgo" aria-label="검색">${icon('arrow')}</button></form>
       </header>
-      <button class="lm-course-create" data-course-new>${icon('plus')} 코스 짜기</button>
+      <div class="lm-locate-top">${round('현재 위치로 이동','target')}</div>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
-      <div class="lm-bottom"><div class="lm-area">${round('현재 위치로 이동','target')}</div>
+      <div class="lm-bottom"><div class="lm-area"><button class="lm-course-create" data-course-new>${icon('plus')} 코스 짜기</button></div>
       <div class="lm-categories" role="group" aria-label="지도 카테고리">${cats.map(([id,label]) => `<button data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-emoji">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}</div>
       <nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></div></section>`;
   }
