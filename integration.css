@@ -231,7 +231,11 @@ body:not(.onboarding-open):not(:has(.dt)):not(.live-map-page)::before{display:no
 .course-map-credit a{color:inherit}
 
 /* Direct course creation sits below search; the menu still opens saved courses. */
-.live-map button.lm-course-create{position:absolute;top:calc(var(--top) + 138px);right:var(--gutter);z-index:400;display:flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:0 16px;border-radius:22px;font-size:13px;font-weight:700;white-space:nowrap;background:#111!important;color:#fff!important;border:0!important;box-shadow:0 4px 14px #0003!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.live-map button.lm-course-create{position:static;margin-left:auto;pointer-events:auto;z-index:400;display:flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:0 16px;border-radius:22px;font-size:13px;font-weight:700;white-space:nowrap;background:#111!important;color:#fff!important;border:0!important;box-shadow:0 4px 14px #0003!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .live-map .lm-course-create svg{width:16px;height:16px}
 
 .coursepage.course-list-page,.course-list-page .course-header{background:var(--t-bg,#F4F4F5)}
+
+/* Location sits below search; course creation sits above the categories. */
+.live-map .lm-locate-top{position:absolute;top:calc(var(--top) + 138px);right:var(--gutter);z-index:400}
+.live-map .lm-locate-top .lm-round{width:42px;height:42px;box-shadow:0 2px 10px #0001}
