@@ -61,12 +61,12 @@
 
 @media(prefers-reduced-motion:reduce){.pick{transition:none}}
 
-/* 메인 카드: 제목 글씨 작게 · 점 표시는 카드 안 맨 위 가운데 */
+/* 메인 카드: 제목 글씨 작게 · 점 표시는 카드 아래 가운데 */
 .mainwrap{position:relative}
 .pickword{top:40px;font-size:30px;letter-spacing:-1px}
-.pickdots{position:absolute;left:0;right:0;top:24px;margin:0!important;z-index:2;pointer-events:none}
-.pickdots i{background:rgba(255,255,255,.55)!important}
-.pickdots i.on{background:#fff!important}
+.pickdots{position:static;margin:4px 0 8px!important;pointer-events:none}
+.pickdots i{background:var(--t-line,#D4D4D8)!important}
+.pickdots i.on{background:var(--t-ink,#111)!important}
 .pickpanel{padding:16px 60px 16px 16px}
 .pickpanel b{margin:0;font-size:17px}
 
