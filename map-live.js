@@ -15,7 +15,17 @@
     {id:13, lat:37.5447, lng:127.0557, kind:'event', image:'img/popup-store.jpg'}, // 성수 오브젝트 팝업 (예시 위치)
     {id:9, lat:37.7720, lng:128.9470, kind:'walk', image:'img/sea-room.jpg'}  // 바다 앞 작은 숙소 · 강릉 (예시 위치)
   ];
-  const cats = [['all','✨','전체'],['eat','🍣','맛집'],['cafe','☕','카페'],['event','🎟️','전시·팝업'],['walk','🌳','산책'],['shop','🛍️','쇼핑']];
+  const cats = [['all','전체'],['eat','맛집'],['cafe','카페'],['event','전시·팝업'],['walk','산책'],['shop','쇼핑']];
+  // Use the same line style as the app navigation on every platform.
+  const categoryPaths = {
+    all: paths.spark,
+    eat: 'M7 3v18 M4 3v5a3 3 0 0 0 6 0V3 M17 21v-9h3V3c-4 0-5 6-3 9',
+    cafe: paths.coffee,
+    event: 'M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4z M16 5v3 M16 11v2 M16 16v3',
+    walk: 'M12 22v-7 M12 3a5 5 0 0 0-5 5 4 4 0 0 0 1 7h8a4 4 0 0 0 1-7 5 5 0 0 0-5-5z',
+    shop: 'M5 8h14l-1 13H6z M9 8V6a3 3 0 0 1 6 0v2'
+  };
+  const categoryIcon = kind => `<svg class="lm-category-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="${categoryPaths[kind] || paths.pin}"/></svg>`;
   const localPhoto = kind => ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
   const categoryLabel = tag => ({station:'역',stop:'정류장',park:'공원',restaurant:'식당',cafe:'카페',museum:'박물관',gallery:'갤러리',shop:'상점',water:'호수',residential:'주거 지역'})[tag] || tag;
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
@@ -40,7 +50,7 @@
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
       <div class="lm-bottom"><div class="lm-area">${round('현재 위치로 이동','target')}</div>
-      <div class="lm-categories" role="group" aria-label="지도 카테고리">${cats.map(([id,emoji,label]) => `<button data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-emoji">${emoji}</span><b>${label}</b></button>`).join('')}</div>
+      <div class="lm-categories" role="group" aria-label="지도 카테고리">${cats.map(([id,label]) => `<button data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-emoji">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}</div>
       <nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></div></section>`;
   }
   function status(message) { const el = $('#app .lm-status'); if (el) { el.textContent = message; el.hidden = !/못|실패|입력|확인하고|검색하고/.test(message); } }
@@ -50,9 +60,9 @@
   }
   const placeKey=place=>`${place.saved?'saved':'search'}:${place.id}`;
   function markerIcon(place,expanded=false) {
-    const emoji=cats.find(c=>c[0]===place.kind)?.[1]||'📍';
+    const symbol=categoryIcon(place.kind);
     return L.divIcon({className:`lm-emoji-marker${expanded?' is-expanded':''}`,
-      html:expanded?`<span class="lm-expanded-pin">${place.saved&&place.image?`<img class="lm-pin-photo" src="${safe(place.image)}" alt="${safe(place.title)} 콘텐츠 사진">`:`<span class="lm-pin-photo-placeholder">${emoji}</span>`}<span class="lm-pin-copy"><b>${safe(place.title)}</b><small>${safe(place.category)}</small><span>${safe(place.address||'주소 정보 없음')}</span></span><span class="lm-pin-collapse" aria-hidden="true">×</span></span>`:`<span class="lm-emoji-pin">${emoji}</span>`,
+      html:expanded?`<span class="lm-expanded-pin">${place.saved&&place.image?`<img class="lm-pin-photo" src="${safe(place.image)}" alt="${safe(place.title)} 콘텐츠 사진">`:`<span class="lm-pin-photo-placeholder">${symbol}</span>`}<span class="lm-pin-copy"><b>${safe(place.title)}</b><small>${safe(place.category)}</small><span>${safe(place.address||'주소 정보 없음')}</span></span><span class="lm-pin-collapse" aria-hidden="true">×</span></span>`:`<span class="lm-emoji-pin">${symbol}</span>`,
       iconSize:expanded?[240,88]:[46,46],iconAnchor:expanded?[23,44]:[23,23]});
   }
   function updateMarker(entry,expanded) {

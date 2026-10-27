@@ -137,3 +137,8 @@ body.login-open #login-screen {
 
 .lm-embedded-basemap,.course-embedded-basemap{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:210;pointer-events:none;background:#e5ebe7}
 .using-embedded-basemap .leaflet-control-zoom{display:none}
+
+/* SVG category art shared by filters, map pins, and photo placeholders. */
+.live-map .lm-categories .lm-emoji{display:grid;place-items:center;width:36px;height:40px;filter:none}
+.live-map .lm-categories .lm-category-svg{display:block;width:28px;height:28px}
+.live-map .lm-emoji-pin .lm-category-svg,.live-map .lm-pin-photo-placeholder .lm-category-svg{display:block;width:24px;height:24px}
