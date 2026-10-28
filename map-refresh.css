@@ -105,14 +105,62 @@
 .live-map .leaflet-top{top:227px}
 @media(max-width:360px){.live-map .lm-header .lm-location-header .placemain{font-size:21px}.live-map .lm-header .lm-location-header .placesub{font-size:12px}}
 
-/* Keep the original compact, icon-only dock; glass changes its surface only. */
-.bottomnav .pm-nav-main{position:relative;background:linear-gradient(135deg,rgba(255,255,255,.25),rgba(255,255,255,.10) 48%,rgba(255,255,255,.18))!important;border:1px solid rgba(255,255,255,.50)!important;box-shadow:0 6px 20px #26313a1c,inset 0 1px 1px #ffffffb3,inset 0 -1px 1px #ffffff40!important;-webkit-backdrop-filter:blur(12px) saturate(1.5)!important;backdrop-filter:blur(12px) saturate(1.5)!important}
-.bottomnav .pm-nav-main .pm-nav-indicator{position:absolute;top:8px;left:4px;width:calc((100% - 8px) / 4);height:38px;display:grid;place-items:center;pointer-events:none;transform:translateX(var(--nav-position,0%));transition:transform .42s cubic-bezier(.22,1,.36,1)}
-.bottomnav .pm-nav-indicator::before{content:'';box-sizing:border-box;width:38px;height:38px;border-radius:21px;background:linear-gradient(145deg,#ffffff70,#ffffff29 55%,#ffffff4d);border:1px solid #ffffff66;box-shadow:inset 0 1px 1px #ffffffb3,inset 0 -1px 1px #ffffff40,0 2px 7px #26313a14}
-.bottomnav .pm-nav-main .navitem{position:relative;z-index:1}
+/* Beta 2-inspired clear glass. Geometry remains the original 264 x 54px dock.
+   Separate the backdrop, moving light and reflective rim so white tint does not
+   wash out the content. This is a web material, not Apple's native renderer. */
+@property --nav-light { syntax: '<percentage>'; inherits: true; initial-value: 12.5%; }
+.bottomnav .pm-nav-main{
+  position:relative;
+  background:transparent!important;
+  border:1px solid transparent!important;
+  box-shadow:0 4px 16px #18232d26,0 1px 3px #18232d12!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  transition:--nav-light .42s cubic-bezier(.22,1,.36,1);
+}
+.bottomnav .pm-nav-main::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(ellipse 35% 110% at var(--nav-light) 0%,#ffffff30,transparent 80%),linear-gradient(180deg,#ffffff1a,#ffffff05 45%,#ffffff0d);
+  -webkit-backdrop-filter:blur(3px) saturate(1.55);backdrop-filter:blur(3px) saturate(1.55);
+  box-shadow:inset 0 2px 2px #ffffff55,inset 0 -2px 3px #ffffff30;
+}
+.bottomnav .pm-nav-optics{position:absolute;width:0!important;height:0!important;overflow:hidden;pointer-events:none}
+.bottomnav .pm-nav-main[data-refraction="true"]::before{
+  backdrop-filter:url("#pm-nav-refraction") blur(1.5px) saturate(1.55);
+}
+.bottomnav .pm-nav-main::after{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1.25px;pointer-events:none;z-index:3;
+  background:conic-gradient(from 120deg,#ffffffbf,#ffffff24 12%,#52657938 23%,#ffffffeb 38%,#ffffff66 48%,#ffffff1a 62%,#52657930 73%,#ffffffd9 88%,#ffffffbf);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+}
+.bottomnav .pm-nav-main .pm-nav-indicator{
+  position:absolute;top:8px;left:4px;width:calc((100% - 8px) / 4);height:38px;
+  display:grid;place-items:center;pointer-events:none;z-index:1;
+  transform:translateX(var(--nav-position,0%));transition:transform .42s cubic-bezier(.22,1,.36,1);
+}
+.bottomnav .pm-nav-indicator::before{
+  content:'';box-sizing:border-box;width:38px;height:38px;border-radius:21px;
+  background:linear-gradient(145deg,#ffffff42,#ffffff0d 52%,#ffffff29);
+  border:1px solid #ffffff66;
+  box-shadow:inset 1px 2px 2px #ffffffb3,inset -1px -1px 2px #ffffff66,0 1px 3px #26313a1c;
+  transition:background .15s,box-shadow .15s;
+}
+.bottomnav .pm-nav-main:has(.navitem:active) .pm-nav-indicator::before{
+  background:linear-gradient(145deg,#ffffff66,#ffffff1a 52%,#ffffff40);
+  box-shadow:inset 1px 2px 3px #ffffffed,inset -1px -1px 2px #ffffff99,0 1px 5px #26313a24;
+}
+.bottomnav .pm-nav-main .navitem{position:relative;z-index:2}
+.bottomnav .pm-nav-main .navitem,.bottomnav .pm-nav-main .navitem *{color:#66696d!important}
+.bottomnav .pm-nav-main .navitem.active,.bottomnav .pm-nav-main .navitem.active *{color:#202124!important}
+.bottomnav .pm-nav-main .navitem .pm-nav-avatar{color:#fff!important}
 .bottomnav .pm-nav-main .navitem.active .navicon{background:transparent!important;box-shadow:none!important}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.bottomnav .pm-nav-main{background:rgba(255,255,255,.82)!important}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .bottomnav .pm-nav-main::before{background:rgba(255,255,255,.82)}
+}
+@media(prefers-reduced-transparency:reduce){
+  .bottomnav .pm-nav-main::before,.bottomnav .pm-nav-main[data-refraction="true"]::before{background:rgba(255,255,255,.94);-webkit-backdrop-filter:none;backdrop-filter:none}
+}
 @media(prefers-reduced-motion:reduce){
-  .bottomnav .pm-nav-main .pm-nav-indicator{transition:none}
+  .bottomnav .pm-nav-main,.bottomnav .pm-nav-main .pm-nav-indicator{transition:none}
   .live-map .lm-header .lm-categories button,.live-map .lm-header .lm-categories .lm-category-line,.live-map .lm-header .lm-categories .lm-category-solid,.live-map .lm-header .lm-categories .lm-category-indicator{transition:none}
 }
