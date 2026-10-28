@@ -9,6 +9,7 @@ function app(seed = {}) {
   const listeners = {};
   let failSave = false;
   const context = vm.createContext({
+    PM_ENV: { development: false },
     crypto: { randomUUID: require('node:crypto').randomUUID },
     localStorage: {
       getItem: key => storage.get(key) ?? null,
