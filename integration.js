@@ -8,9 +8,15 @@
     folderplus:'M2 5a2 2 0 0 1 2-2h5l3 3h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2Zm9 5v3H8v2h3v3h2v-3h3v-2h-3v-3Z'
   };
   const solid=name=>`<svg class="pm-solid" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="${silhouettes[name]}"></path></svg>`;
+  let lastNavIndex=null;
   nav=function(){
-    const entry=(p,label)=>{const current=(typeof PARENT_TAB!=='undefined'&&PARENT_TAB[page])||page;const active=current===p||(['course','courses'].includes(current)&&p==='map');return `<button class="navitem ${active?'active':''}" data-page="${p}" aria-label="${label}" ${active?'aria-current="page"':''}><span class="navicon">${p==='my'?avatarHtml('pm-nav-avatar'):solid(p==='library'?'bookmark':p)}</span><span>${label}</span></button>`};
-    return `<span class="pm-nav-main">${entry('home','홈')}${entry('map','지도')}${entry('library','저장함')}${entry('my','마이')}</span>`;
+    const current=(typeof PARENT_TAB!=='undefined'&&PARENT_TAB[page])||page;
+    const activePage=['course','courses'].includes(current)?'map':current;
+    const index=Math.max(0,['home','map','library','my'].indexOf(activePage));
+    const from=lastNavIndex??index;
+    queueMicrotask(()=>{lastNavIndex=index;});
+    const entry=(p,label)=>{const active=activePage===p;return `<button class="navitem ${active?'active':''}" data-page="${p}" aria-label="${label}" ${active?'aria-current="page"':''}><span class="navicon">${p==='my'?avatarHtml('pm-nav-avatar'):solid(p==='library'?'bookmark':p)}</span><span>${label}</span></button>`};
+    return `<span class="pm-nav-main${from===index?'':' is-sliding'}" style="--nav-from:${from*100}%;--nav-to:${index*100}%"><span class="pm-nav-indicator" aria-hidden="true"></span>${entry('home','홈')}${entry('map','지도')}${entry('library','저장함')}${entry('my','마이')}</span>`;
   };
   // Keep the loaded basemap in the same moving pane as the markers.
   const attachFallbackBasemap=map=>{
