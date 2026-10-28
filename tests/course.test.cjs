@@ -4,12 +4,12 @@ const vm = require('node:vm');
 const fs = require('node:fs');
 const source = fs.readFileSync(require('node:path').join(__dirname, '../course.js'), 'utf8');
 
-function app(seed = {}) {
+function app(seed = {}, development = false) {
   const storage = new Map(Object.entries(seed));
   const listeners = {};
   let failSave = false;
   const context = vm.createContext({
-    PM_ENV: { development: false },
+    PM_ENV: { development },
     crypto: { randomUUID: require('node:crypto').randomUUID },
     localStorage: {
       getItem: key => storage.get(key) ?? null,
@@ -130,4 +130,16 @@ test('map creation opens a fresh editor directly and preserves saved courses', a
   assert.equal(a.context.page, 'course');
   assert.match(a.html('course'), /코스가 비어/);
   assert.equal(JSON.parse(a.storage.get('pinmap-courses-v1')).length, 1);
+});
+
+test('disconnected initial mode neither loads nor overwrites stored development courses',async()=>{
+  const payload=JSON.stringify([{id:'stored-dev',title:'Stored course',date:'2026-10-28',days:[[{id:1,time:'10:00'}]]}]);
+  const originalDraft=JSON.stringify({title:'Existing draft'});
+  const current=app({'pinmap.dev.courses.v1':payload,'pinmap.dev.course-draft.v1':originalDraft},true);
+  assert(current.html('courses').includes('코스 0개'));
+  assert(!current.html('courses').includes('Stored course'));
+  await current.click('data-course-new');
+  assert.equal(current.context.page,'course');
+  assert.equal(current.storage.get('pinmap.dev.courses.v1'),payload);
+  assert.equal(current.storage.get('pinmap.dev.course-draft.v1'),originalDraft);
 });

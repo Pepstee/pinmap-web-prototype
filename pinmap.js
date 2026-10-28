@@ -26,7 +26,7 @@ function migrateType(x){
 }
 const validItems = list => Array.isArray(list) && list.every(x => x && Number.isFinite(x.id) && typeof x.title === 'string');
 try {
-  const saved = JSON.parse(localStorage.getItem(STORAGE));
+  const saved = PM_ENV.development ? null : JSON.parse(localStorage.getItem(STORAGE));
   if (saved && validItems(saved.items) && saved.items.every(x => typeIds.includes(x.type))) {
     items = saved.items;
     preferences = Array.isArray(saved.preferences) ? saved.preferences.filter(x => interestIds.includes(x)).slice(0, MAX_INTERESTS) : [];
@@ -51,6 +51,7 @@ try {
   }
 } catch { /* 저장 공간을 쓸 수 없는 브라우저에서도 현재 화면에서는 동작합니다. */ }
 function persist() {
+  if(PM_ENV.development)return;
   try { localStorage.setItem(STORAGE, JSON.stringify({items,preferences,onboardDone,settings})); }
   catch { toast('브라우저 저장 공간을 사용할 수 없어 현재 화면에서만 보관합니다.'); }
 }

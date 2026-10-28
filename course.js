@@ -26,7 +26,7 @@
   let pickerOpen=false,courseMap=null,editing=false;
   const thumbnailMaps=[];
   try {
-    const stored=localStorage.getItem(storageKey);
+    const stored=PM_ENV.development?null:localStorage.getItem(storageKey);
     if(stored!==null){const values=JSON.parse(stored);if(Array.isArray(values))courses=values.map(normalize).filter(Boolean);}
     else if(!PM_ENV.development) {
       const legacy=normalize(JSON.parse(localStorage.getItem('pinmap-course-v2')));
@@ -34,7 +34,7 @@
     }
   } catch {}
   // Editing saves a recoverable draft; only the Save button updates the saved list.
-  const save=()=>{draft=clone(course);try{localStorage.setItem(draftKey,JSON.stringify(draft));return true}catch{toast('임시 저장 공간을 확인해 주세요.');return false}};
+  const save=()=>{if(PM_ENV.development)return true;draft=clone(course);try{localStorage.setItem(draftKey,JSON.stringify(draft));return true}catch{toast('임시 저장 공간을 확인해 주세요.');return false}};
   const openCourse=value=>{course=clone(value);pickerOpen=false;editing=false;save();go('course')};
   const eligible=()=>items.filter(item=>isPlace(item)&&item.address&&!item.pending);
   const dayStops=()=>course.days[0];

@@ -135,7 +135,7 @@
     liveMap = L.map('live-map-canvas',{zoomControl:false,zoomAnimation:false}).setView(center,zoom);
     window.attachPinmapBasemap(liveMap);
     pinLayer = L.layerGroup().addTo(liveMap); markers(); drawLocation();
-    if(typeof window.DeviceOrientationEvent?.requestPermission!=='function')startOrientation();
+    if(!PM_ENV.development&&typeof window.DeviceOrientationEvent?.requestPermission!=='function')startOrientation();
     liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); });
     requestAnimationFrame(() => liveMap?.invalidateSize());
   }
@@ -187,6 +187,7 @@
     window.removeEventListener('deviceorientationabsolute',updateHeading);orientationActive=false;
   }
   function locate() {
+    if(PM_ENV.development){toast('위치 데이터가 아직 연결되지 않았어요.');return;}
     if(!liveMap||locationBusy)return;
     const request=window.DeviceOrientationEvent?.requestPermission;
     if(typeof request==='function'){
@@ -211,6 +212,7 @@
       (list.length ? list.map((x,i) => `<button class="lm-result-row" data-result="${i}"><img src="${x.image}" alt=""><span><b>${safe(x.title)}</b><small>${safe(x.address)}</small></span>${icon('arrow')}</button>`).join('') : '<p>일치하는 장소가 없어요. 다른 이름이나 주소로 검색해 보세요.</p>');
   }
   async function searchPlaces(q) {
+    if(PM_ENV.development){toast('장소 데이터가 아직 연결되지 않았어요.');return;}
     if (q.length < 2) { status('검색어를 2자 이상 입력해 주세요.'); return; }
     searchController?.abort(); searchController=new AbortController();
     const current=searchController;

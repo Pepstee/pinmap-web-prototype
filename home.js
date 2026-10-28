@@ -122,8 +122,8 @@ pages.home = function(){
   const half = Math.ceil(order.length / 2);
   const chips = `<div class="chiprows" role="group" aria-label="카테고리 바로가기"><div class="prefchips">${order.slice(0, half).map(chip).join('')}</div><div class="prefchips">${order.slice(half).map(chip).join('')}</div></div>`;
   const picks = homePicks();
-  const main = picks.length
-    ? `<div class="mainwrap"><div class="mainpick" aria-label="추천 저장 콘텐츠">${picks.map((p, i) => pickCard(p, i, picks.length)).join('')}</div></div>`
+  const main = picks.length || PM_ENV.development
+    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'aria-label="추천 저장 콘텐츠"':'aria-hidden="true"'}>${picks.map((p, i) => pickCard(p, i, picks.length)).join('')}</div></div>`
     : `<div class="empty small"><p class="muted">선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.</p><button class="tonal" data-action="save">새로 저장하기</button></div>`;
   const brand = `<div class="homebrand" aria-label="핀맵 로고"><img src="${PM_IMG.logo}" alt=""><span aria-hidden="true">PINMAP</span></div>`;
   return stripBar() + brand + main + calWidget() + chips + subWidgets();
