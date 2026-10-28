@@ -51,7 +51,7 @@
     const host=map.getContainer();
     try {
       const layer=L.maplibreGL({
-        style:'map-style.json?v=fa17969c930e',
+        style:'map-style.json?v=f7fe5b97aa00',
         interactive:false,
         attributionControl:{customAttribution:'<a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a> · © <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}
       }).addTo(map);

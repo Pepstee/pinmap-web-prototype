@@ -3174,6 +3174,75 @@
       }
     },
     {
+      "id": "pinmap-bus-stops-overview",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "poi",
+      "minzoom": 15,
+      "maxzoom": 17,
+      "filter": [
+        "all",
+        ["==", ["get", "class"], "bus"],
+        ["==", ["get", "subclass"], "bus_stop"],
+        ["<=", ["coalesce", ["get", "rank"], 999], 2]
+      ],
+      "layout": {
+        "icon-image": "bus_11",
+        "icon-size": 1.05,
+        "icon-allow-overlap": false,
+        "icon-padding": 5
+      }
+    },
+    {
+      "id": "pinmap-bus-stops-detail",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "poi",
+      "minzoom": 17,
+      "filter": [
+        "all",
+        ["==", ["get", "class"], "bus"],
+        ["==", ["get", "subclass"], "bus_stop"]
+      ],
+      "layout": {
+        "icon-image": "bus_11",
+        "icon-size": 1.05,
+        "icon-allow-overlap": false,
+        "icon-padding": 4,
+        "text-field": ["coalesce", ["get", "name:ko"], ["get", "name"]],
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 10,
+        "text-anchor": "left",
+        "text-offset": [0.9, 0],
+        "text-max-width": 9,
+        "text-optional": true,
+        "text-padding": 3
+      },
+      "paint": {
+        "text-color": "#68766E",
+        "text-halo-color": "#FFFDF7",
+        "text-halo-width": 1.5
+      }
+    },
+    {
+      "id": "pinmap-subway-entrances",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "poi",
+      "minzoom": 16,
+      "filter": [
+        "all",
+        ["==", ["get", "class"], "entrance"],
+        ["==", ["get", "subclass"], "subway_entrance"]
+      ],
+      "layout": {
+        "icon-image": "entrance_11",
+        "icon-size": 1.05,
+        "icon-allow-overlap": false,
+        "icon-padding": 4
+      }
+    },
+    {
       "id": "pinmap-transit-stations",
       "type": "symbol",
       "source": "openmaptiles",
