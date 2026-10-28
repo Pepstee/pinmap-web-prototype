@@ -64,9 +64,7 @@ pages.my = function(){
     ${myRow('mapsheet','🗺️','위치 · 지도', esc(MAP_APPS[settings.mapApp].name))}
   </section>
   <section class="mgroup"><h2>도움말</h2>
-    ${myRow('howto','📲','저장하는 방법 다시 보기')}
-    ${myRow('coachagain','👆','홈 화면 튜토리얼 다시 보기')}
-    ${myRow('intro','👋','온보딩 다시 보기')}
+    ${myRow('guide','📖','이용 가이드')}
     ${myRow('appinfo','ℹ️','앱 정보')}
     ${myRow('resetask','↺','저장 데이터 초기화')}
   </section>

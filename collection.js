@@ -60,7 +60,7 @@ function cfFolderData(list){
 /* ---------- CollectionFolder 컴포넌트 ---------- */
 // 사진 슬롯 3개는 모든 폴더에서 같은 자리 · 같은 각도 (collection.css의 .cf-slot0~2)
 // thumbnails[0] = 가장 최근 → 가운데 맨 앞
-const CF_EDGE = 'M0 36.2Q0 27.2 9 27.2L30 27.2C39 27.2 41 37.8 50 37.8L91 37.8Q100 37.8 100 46.8'; // 앞판 위 가장자리 (앞판 top 34%)
+const CF_EDGE = 'M0 40.16Q0 32 9 32L30 32C39 32 41 41.6 50 41.6L91 41.6Q100 41.6 100 49.76'; // 앞판 top 40% · cfFrontClip과 같은 가장자리
 function CollectionFolder({id, title, icon:ic, count, thumbnails = [], selected = false, attr}){
   // 있는 사진만 보여줘요 (사진이 없으면 가운데 자리표시 1장)
   const shown = Math.max(1, Math.min(3, thumbnails.length));

@@ -22,10 +22,6 @@
     }
     function load(){
       if(disposed)return;
-      // Reuse the overscanned map while swiping nearby places.
-      const covers=view=>view&&view.zoom===map.getZoom()&&view.bounds.contains(map.getBounds());
-      if(covers(pending))return;
-      if(covers(current)){pending?.el.remove();pending=null;return;}
       if(pending)pending.el.remove();
       const size=map.getSize().add([320,320]),zoom=map.getZoom();
       const center=map.project(map.getCenter(),zoom),half=size.divideBy(2);
@@ -36,7 +32,7 @@
       const bounds=L.latLngBounds(map.unproject(center.subtract(half.multiplyBy(.99)),zoom),map.unproject(center.add(half.multiplyBy(.99)),zoom));
       frame.src='https://www.openstreetmap.org/export/embed.html?bbox='+[bounds.getWest(),bounds.getSouth(),bounds.getEast(),bounds.getNorth()].join('%2C')+'&layer=mapnik';
       el.append(frame);map.getPane('tilePane').append(el);
-      const view={el,nw,zoom,bounds};pending=view;position(view);
+      const view={el,nw,zoom};pending=view;position(view);
       frame.onload=()=>{if(disposed||pending!==view)return;position(view);el.style.opacity='1';current?.el.remove();current=view;pending=null;};
     }
     const sync=()=>{if(current)position(current);if(pending)position(pending);};
