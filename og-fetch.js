@@ -22,6 +22,7 @@ if(PM_ENV.development) {
       if(!title.value.trim() || title.value === ogFilledTitle) title.value = data.title.slice(0, 80);
       ogFilledTitle = data.title;
       window.pmOgLast = data; // 커버 이미지 · 설명 (저장 항목 연결은 다음 단계)
+      document.dispatchEvent(new CustomEvent('pm-og', { detail: data }));
       ogHint(form).textContent = `링크에서 제목을 가져왔어요 · ${data.host}`;
     } catch(err) {
       if(err.name !== 'AbortError') ogHint(form).textContent = '링크 정보를 가져오지 못했어요. 직접 입력해 주세요.';
@@ -34,7 +35,7 @@ if(PM_ENV.development) {
     const form = input.closest('#saveform');
     clearTimeout(ogTimer);
     const url = input.value.trim();
-    if(!url){ogController?.abort();const h=form.querySelector('#oghint');if(h)h.remove();ogFilledTitle='';return;}
+    if(!url){ogController?.abort();const h=form.querySelector('#oghint');if(h)h.remove();ogFilledTitle='';document.dispatchEvent(new CustomEvent('pm-og', { detail: null }));return;}
     // 체험용 예시 링크와 http 가 아닌 값은 확인하지 않아요
     if(!/^https?:\/\//i.test(url) || url.includes('sample-prototype'))return;
     ogTimer = setTimeout(() => ogFill(form, url), OG_DEBOUNCE);

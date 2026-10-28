@@ -32,6 +32,7 @@ const ALLOWED=new Map([
   ['detail.js ago f9477af421eb','facts are escaped when rendered'],
   ['detail.js desc c2284849e17a','condition only; description is escaped when rendered'],
   ['detail.js address 80d05f3cdda3','toast writes textContent'],
+  ['place-find.js address d77722ddefbe','confirmation writes textContent, not innerHTML'],
   ['collection.js title 75a5731d4d77','regex source, not HTML output'],
   ['collection.js category 75a5731d4d77','regex source, not HTML output'],
 ]);
