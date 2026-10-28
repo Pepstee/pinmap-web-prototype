@@ -1,7 +1,7 @@
 // 지도에서 여는 단일 코스 편집 화면.
 (() => {
-  const storageKey='pinmap-courses-v1';
-  const draftKey='pinmap-course-draft-v1';
+  const storageKey=PM_ENV.development?'pinmap.dev.courses.v1':'pinmap-courses-v1';
+  const draftKey=PM_ENV.development?'pinmap.dev.course-draft.v1':'pinmap-course-draft-v1';
   const stopColor=index => index%3===2?'#21c5ad':index%2===1?'#ed607c':'#a65ef2';
   const now=new Date();
   const today=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
@@ -26,22 +26,22 @@
   let pickerOpen=false,courseMap=null,editing=false;
   const thumbnailMaps=[];
   try {
-    const stored=localStorage.getItem(storageKey);
+    const stored=PM_ENV.development?null:localStorage.getItem(storageKey);
     if(stored!==null){const values=JSON.parse(stored);if(Array.isArray(values))courses=values.map(normalize).filter(Boolean);}
-    else {
+    else if(!PM_ENV.development) {
       const legacy=normalize(JSON.parse(localStorage.getItem('pinmap-course-v2')));
       if(legacy){courses=[legacy];localStorage.setItem(storageKey,JSON.stringify(courses));}
     }
   } catch {}
   // Editing saves a recoverable draft; only the Save button updates the saved list.
-  const save=()=>{draft=clone(course);try{localStorage.setItem(draftKey,JSON.stringify(draft));return true}catch{toast('임시 저장 공간을 확인해 주세요.');return false}};
+  const save=()=>{if(PM_ENV.development)return true;draft=clone(course);try{localStorage.setItem(draftKey,JSON.stringify(draft));return true}catch{toast('임시 저장 공간을 확인해 주세요.');return false}};
   const openCourse=value=>{course=clone(value);pickerOpen=false;editing=false;save();go('course')};
   const eligible=()=>items.filter(item=>isPlace(item)&&item.address&&!item.pending);
   const dayStops=()=>course.days[0];
   const findPlace=id=>eligible().find(item=>item.id===id);
-  const thumbnail=item=>({cafe:'img/cafe.jpg',food:'img/brunch.jpg',exhibit:'img/exhibit.jpg',park:'img/park.jpg',sea:'img/park.jpg'})[item.art]||'img/park.jpg';
+  const thumbnail=item=>PM_ENV.development?(libPhoto(item)||PM_ENV.placeholderImage):({cafe:'img/cafe.jpg',food:'img/brunch.jpg',exhibit:'img/exhibit.jpg',park:'img/park.jpg',sea:'img/park.jpg'})[item.art]||'img/park.jpg';
   const stopTime=()=>{const last=dayStops().at(-1)?.time||'08:30';const [h,m]=last.split(':').map(Number);const total=Math.min(h*60+m+90,23*60+45);return `${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`};
-  const coordinates=item=>item.lat!=null&&item.lng!=null?[item.lat,item.lng]:({1:[37.5461,127.0434],4:[37.5441,127.0495],6:[37.5445,127.0374],8:[37.5490,127.0460],13:[37.5441,127.0495]})[item.id];
+  const coordinates=item=>item.lat!=null&&item.lng!=null?[item.lat,item.lng]:PM_ENV.development?undefined:({1:[37.5461,127.0434],4:[37.5441,127.0495],6:[37.5445,127.0374],8:[37.5490,127.0460],13:[37.5441,127.0495]})[item.id];
   pageName.course='코스 만들기';
   pageName.courses='저장한 코스';
   pages.courses=function(){
@@ -97,7 +97,7 @@
   window.mountCourseMap=()=>{
     window.unmountCourseMap();
     if(!window.L||!document.getElementById('course-map'))return;
-    courseMap=L.map('course-map',{zoomControl:false,scrollWheelZoom:false,zoomAnimation:false,dragging:false,keyboard:false}).setView([37.5445,127.043],13);
+    courseMap=L.map('course-map',{zoomControl:false,scrollWheelZoom:false,zoomAnimation:false,dragging:false,keyboard:false}).setView(PM_ENV.development?[20,0]:[37.5445,127.043],PM_ENV.development?2:13);
     const points=[];
     dayStops().forEach((stop,index)=>{const place=findPlace(stop.id),point=place&&coordinates(place);if(!point)return;points.push(point);L.marker(point,{icon:L.divIcon({className:'course-map-marker',html:`<span style="background:${stopColor(index)}">${index+1}</span>`,iconSize:[30,30],iconAnchor:[15,15]})}).addTo(courseMap)});
     if(points.length>1){L.polyline(points,{color:'#737373',weight:3,opacity:.75,dashArray:'6 6'}).addTo(courseMap);courseMap.fitBounds(points,{padding:[48,48],maxZoom:14})}

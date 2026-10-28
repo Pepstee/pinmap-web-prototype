@@ -2,7 +2,7 @@
 // 하단 시트가 아니라 페이지로 넘어가고, 왼쪽 위 ← 버튼으로 마이로 돌아가요.
 
 /* ---------- 프로필 사진 ---------- */
-const avatarHtml = (cls = '') => `<span class="pavatar ${cls}" aria-hidden="true"><img src="${settings.avatar || 'img/profile-demo.png'}" alt=""></span>`;
+const avatarHtml = (cls = '') => PM_ENV.development && !settings.avatar ? `<span class="pavatar ${cls}" aria-hidden="true">${icon('user')}</span>` : `<span class="pavatar ${cls}" aria-hidden="true"><img src="${settings.avatar || 'img/profile-demo.png'}" alt=""></span>`;
 const subHead = (title, back = 'my') => `<div class="subhead"><button class="subback" data-page="${back}" aria-label="${back === 'guide' ? '이용 가이드로' : '마이로'} 돌아가기">${icon('back')}</button><h1>${title}</h1></div>`;
 
 pages.profile = function(){
@@ -48,7 +48,7 @@ const SNS = {
   tiktok:{name:'TikTok', logo:'img/logo-tiktok.png'},
   x:{name:'X', logo:'img/logo-x.png'}
 };
-const myAccounts = () => (settings.accounts ??= [{id:'a1', sns:'instagram', handle:'@seoyeon.daily'}, {id:'a2', sns:'youtube', handle:'서연의 기록'}]);
+const myAccounts = () => (settings.accounts ??= PM_ENV.development ? [] : [{id:'a1', sns:'instagram', handle:'@seoyeon.daily'}, {id:'a2', sns:'youtube', handle:'서연의 기록'}]);
 // 계정별 저장 수: 콘텐츠의 출처(SNS)와 같은 계정 중 첫 번째에 모아 세요 (예시)
 const accountCount = a => { const first = myAccounts().find(b => b.sns === a.sns); return first === a ? items.filter(x => String(x.source||'').toLowerCase().includes(SNS[a.sns].name.toLowerCase())).length : 0; };
 const snsLogo = sns => `<img class="snslogo" src="${SNS[sns].logo}" alt="">`;
@@ -104,7 +104,7 @@ document.addEventListener('submit', e => {
 
 /* ---------- 연동 새로고침 ---------- */
 // 계정마다 아직 반영되지 않은 저장 콘텐츠가 있다고 가정한 예시 (한 번 가져오면 다시 나오지 않아요)
-const SYNC_POOL = { // SNS마다 아직 안 가져온 저장이 2개씩 있다고 가정해요
+const SYNC_POOL = PM_ENV.development ? {} : { // SNS마다 아직 안 가져온 저장이 2개씩 있다고 가정해요
   instagram:[
     {id:101, title:'연남동 골목 와인바', type:'맛집·카페', category:'와인바', ago:'방금', desc:'작은 골목 안 조용한 와인바', memo:'', art:'cafe', distance:'지하철 20분', address:'서울 마포구 연남동 · 예시 장소', aiClassified:true},
     {id:105, title:'망원동 빈티지 소품샵', type:'쇼핑', category:'소품', ago:'방금', desc:'주말에 들르기 좋은 작은 가게', memo:'', art:'bag', price:'1만 원대', aiClassified:true}],
@@ -123,6 +123,7 @@ const syncTime = t => t ? (Date.now() - t < 60000 ? '방금 업데이트' : `${n
 const syncLabel = () => syncTime(settings.lastSync);
 // 계정 하나에서 아직 안 가져온 저장을 모두 가져와요
 function pullAccount(a){
+  if(PM_ENV.development)return [];
   const got = [];
   (SYNC_POOL[a.sns] || []).forEach(p => { if (!items.some(x => x.id === p.id)) { items.unshift({...p, source:SNS[a.sns].name, account:a.id}); got.push(p); } });
   settings.accSync = {...(settings.accSync || {}), [a.id]: Date.now()};

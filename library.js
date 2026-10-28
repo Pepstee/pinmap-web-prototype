@@ -42,7 +42,7 @@ function libMeta(x){
 // 카드 사진: img 폴더에 사진이 있으면 사진, 없으면 기존 일러스트 (일러스트 종류별로 연결)
 const LIB_PHOTOS = {};
 // 예시 콘텐츠별 사진 (id 기준 · 브라우저에 저장된 예전 데이터에도 적용돼요)
-const LIB_PHOTOS_BY_ID = {
+const LIB_PHOTOS_BY_ID = PM_ENV.development ? {} : {
   1:'img/cafe-window.jpg',  // 햇살이 머무는 성수 카페 (큰 창 · 햇살)
   2:'img/lamp-orange.jpg',  // 작은 방을 바꾸는 조명
   6:'img/park-picnic.jpg',  // 서울숲에서 잠깐 쉬어가기
@@ -57,7 +57,7 @@ const LIB_PHOTOS_BY_ID = {
   5:'img/notebook.jpg',     // 취향을 기록하는 방법
   13:'img/popup-store.jpg'  // 성수 오브젝트 팝업 스토어
 };
-const libPhoto = x => x.photo || LIB_PHOTOS_BY_ID[x.id] || LIB_PHOTOS[x.art];
+const libPhoto = x => x.photo || (PM_ENV.development ? '' : LIB_PHOTOS_BY_ID[x.id] || LIB_PHOTOS[x.art]);
 const libThumb = x => libPhoto(x)
   ? `<img src="${esc(libPhoto(x))}" alt="" loading="lazy">` : art(x.art);
 function libCard(x, gallery){

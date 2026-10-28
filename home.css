@@ -265,3 +265,11 @@ body.notipanel-open .bottomnav{display:none!important}
 .homebrand{display:flex;align-items:center;gap:8px;min-height:40px;margin:0 0 16px;padding-right:100px;color:var(--t-ink,#111)}
 .homebrand img{display:block;width:30px;height:32px;object-fit:contain}
 .homebrand span{font-size:23px;font-weight:750;letter-spacing:-.8px;line-height:1}
+
+/* Empty content uses the same banner dimensions, stacking and text positions. */
+.mainpick[data-placeholder="true"]{cursor:default}
+.pick-placeholder .pickimg{background:var(--t-line,#E8E8EA)}
+.pick-placeholder .pickword i,.pick-placeholder .picktext i{display:block;border-radius:4px;background:rgba(255,255,255,.45)}
+.pick-placeholder .pickword i{width:68px;height:28px}
+.pick-placeholder .picktext b i{width:72%;height:18px}
+.pick-placeholder .picktext small i{width:90%;height:13px}

@@ -37,7 +37,7 @@ const categories = ['전체', ...typeIds];
 const typeOf = id => TYPES.find(t => t.id === id) || TYPES[TYPES.length-1];
 const isPlace = x => !!typeOf(x.type).place;
 const shortType = id => id.split('·')[0].trim();
-const COLLECTIONS = [
+const COLLECTIONS = PM_ENV.development ? [] : [
   ['이번 주말 성수','coffee','카페, 전시, 산책까지 주말 외출 후보'],
   ['나의 작은 공간','home','집을 조금 더 나답게'],
   ['일상에 영감','spark','요리부터 기록까지']
@@ -45,7 +45,7 @@ const COLLECTIONS = [
 const collectionNames = () => [...new Set([...COLLECTIONS.map(c => c[0]), ...items.map(x => x.collection).filter(Boolean)])];
 
 // 예시 데이터 · 실제 SNS 계정과 연결되지 않습니다.
-let items = [
+let items = PM_ENV.development ? [] : [
   {id:1,title:'햇살이 머무는 성수 카페',type:'맛집·카페',category:'카페',source:'Instagram',ago:'2일 전',desc:'큰 창 옆에서 커피 한 잔, 느긋한 오후.',memo:'성수에서 친구 만나기 전에 들러보기. 창가 자리!',art:'cafe',distance:'도보 5분',collection:'이번 주말 성수',address:'서울 성동구 성수동 · 예시 장소',saves:128,aiClassified:true},
   {id:2,title:'작은 방을 바꾸는 조명',type:'쇼핑',category:'조명',source:'Instagram',ago:'어제',desc:'공간의 분위기를 바꾸는 작은 빛.',memo:'책상 옆에 두고 싶은 따뜻한 조명.',art:'lamp',collection:'나의 작은 공간',price:'49,000원 · 예시 가격',shop:'예시 리빙 스토어',aiClassified:true},
   {id:3,title:'15분, 바질 토마토 파스타',type:'레시피',category:'파스타',source:'YouTube',ago:'3일 전',desc:'퇴근 후에도 가볍게 만드는 한 접시.',memo:'방울토마토, 바질, 파스타면만 준비하면 끝.',art:'food',collection:'일상에 영감',recipe:'15분 · 재료 4가지 · 1인분',saves:96,aiClassified:true},
@@ -60,7 +60,7 @@ let items = [
 ];
 let page='home', filter='전체', query='', detailId=null, selectedPin=1, collection=null, locationAllowed=false, toastTimer;
 // 마이 > 프로필 · 설정 (pinmap.js가 브라우저에 저장합니다)
-let settings = {nickname:'서연', area:'성수동', notiDeadline:true, notiNearby:true, notiReminder:false, aiDefault:true, mapApp:'naver', readNoti:[], push:false, locPerm:'none', places:['성수동','청파동'], recentPlaces:['한남동','연남동','잠실3동']};
+let settings = PM_ENV.development ? {nickname:'',area:'',notiDeadline:false,notiNearby:false,notiReminder:false,aiDefault:false,mapApp:'naver',readNoti:[],push:false,locPerm:'none',places:[],recentPlaces:[],accounts:[],calSeeded:true} : {nickname:'서연', area:'성수동', notiDeadline:true, notiNearby:true, notiReminder:false, aiDefault:true, mapApp:'naver', readNoti:[], push:false, locPerm:'none', places:['성수동','청파동'], recentPlaces:['한남동','연남동','잠실3동']};
 const LOC_PERM = {none:'허용 안 함', using:'앱을 사용하는 동안', always:'항상 허용'};
 const MAP_APPS = {
   naver:{name:'네이버 지도', url:q=>`https://map.naver.com/p/search/${q}`},
@@ -208,8 +208,8 @@ document.addEventListener('submit',e=>{
   if(e.target.id==='saveform'){
     e.preventDefault();const f=e.target;let u;
     try{u=new URL(f.url.value);if(!['https:','http:'].includes(u.protocol))throw Error()}catch{$('#saveerror').textContent='http 또는 https 링크를 입력해 주세요.';return}
-    const title=f.elements.namedItem('title').value.trim(), ai=f.type.value==='ai', type=ai?guessType(title+' '+u.href):f.type.value, sample=f.url.value.includes('sample-prototype');
-    const x={id:Date.now(),title,type,category:shortType(type),source:sample?'YouTube':u.hostname.replace(/^www\./,''),ago:'방금',desc:'새롭게 담아둔 나의 취향',memo:f.memo.value,art:typeOf(type).art,collection:f.collection.value,url:u.href,sample,aiClassified:ai};
+    const title=f.elements.namedItem('title').value.trim(), ai=!PM_ENV.development&&f.type.value==='ai', type=ai?guessType(title+' '+u.href):f.type.value, sample=!PM_ENV.development&&f.url.value.includes('sample-prototype');
+    const x={id:Date.now(),title,type,category:shortType(type),source:sample?'YouTube':u.hostname.replace(/^www\./,''),ago:'방금',desc:PM_ENV.development?'':'새롭게 담아둔 나의 취향',memo:f.memo.value,art:typeOf(type).art,collection:f.collection.value,url:u.href,sample,aiClassified:ai};
     if(typeOf(type).place)x.pending=true;
     items.unshift(x);afterChange();$('#sheet').close();page='library';openDetail(x.id);
     toast(ai?`저장했어요. AI가 ‘${type}’로 분류했어요.`:'저장했어요. 필요할 때 다시 꺼내보세요.');
