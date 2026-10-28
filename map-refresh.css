@@ -1,5 +1,5 @@
 /* Map-only layout: search/category bar, photo badges, selected place banner. */
-.live-map{--lm-surface:var(--t-card,#fff);--lm-text:var(--t-ink,#111);--lm-muted:#6B6B70;--lm-line:var(--t-line,#E8E8EA);--lm-footer:112px;font-family:inherit}
+.live-map{--lm-surface:var(--t-card,#fff);--lm-text:var(--t-ink,#111);--lm-muted:#6B6B70;--lm-line:var(--t-line,#E8E8EA);--lm-footer:80px;font-family:inherit}
 .live-map .lm-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .live-map .lm-header{inset:0 0 auto;padding:24px 20px 0;background:var(--lm-surface);border-bottom:1px solid var(--lm-line);z-index:600}
 .lm-search-row{position:relative;display:flex;align-items:center;height:58px;border:1px solid var(--lm-line);border-radius:32px;background:#F4F4F5;padding:0 8px 0 17px;gap:8px}
@@ -7,8 +7,6 @@
 .live-map .lm-search-pill>svg{width:22px;height:22px;flex:none}
 .live-map .lm-search-pill input{flex:1;min-width:0;width:100%;height:48px;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;outline:none;font:inherit;font-size:14px;color:var(--lm-text)}
 .live-map .lm-search-pill input::placeholder{color:var(--lm-muted)}
-.live-map .lm-header .lm-saved-courses{width:40px;height:40px;min-width:40px;display:grid;place-items:center;padding:0;border:1px solid #ddd!important;border-radius:50%;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-.live-map .lm-header .lm-saved-courses svg{width:20px;height:20px}
 .live-map .lm-header .lm-categories{display:flex;gap:0;justify-content:space-between;margin:9px -4px 0;padding:0}
 .live-map .lm-header .lm-categories button{position:relative;display:flex;flex:1;min-width:0;min-height:75px;align-items:center;justify-content:center;flex-direction:column;gap:6px;margin:0;padding:10px 1px 12px;border:0!important;border-radius:0;background:transparent!important;color:var(--lm-muted);box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .live-map .lm-header .lm-categories .lm-category-art{display:grid;place-items:center;width:28px;height:28px}
@@ -18,19 +16,15 @@
 .live-map .lm-header .lm-categories .selected::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2px;border-radius:2px;background:var(--lm-text)}
 .live-map .lm-status{top:180px;left:16px;right:16px;max-width:none;z-index:605;font-size:12px;background:#fff;border:1px solid var(--lm-line);padding:10px 12px;border-radius:12px}
 .live-map .lm-search-results{top:179px;left:16px;right:16px;max-height:440px;z-index:610;background:#fff;backdrop-filter:none}
-.live-map .leaflet-control-attribution{max-width:220px;margin-bottom:116px!important;font-size:8px!important}
+.live-map .leaflet-control-attribution{max-width:220px;margin-bottom:80px!important;font-size:8px!important}
 .live-map .leaflet-top{top:180px}
 
-/* Image + category mark. Marker hit area stays 76px wide. */
+/* Smaller photo-only markers; selection does not add a border. */
 .live-map .lm-photo-marker{background:transparent;border:0;outline-offset:3px;border-radius:50%}
-.lm-place-badge{position:absolute;inset:5px;display:block;width:66px;height:66px;border:3px solid #fff;border-radius:50%;background:#fff;box-shadow:0 3px 12px #1113;transition:transform .16s,border-color .16s}
+.lm-place-badge{position:absolute;inset:5px;display:block;width:50px;height:50px;border:3px solid #fff;border-radius:50%;background:#fff;box-shadow:0 3px 12px #1113;transition:transform .16s}
 .lm-badge-image{display:grid;place-items:center;position:absolute;inset:0;overflow:hidden;border-radius:50%;background:#F4F4F5}
-.lm-badge-image>.lm-category-svg{width:26px;height:26px;color:var(--lm-muted)}
 .lm-badge-image img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .lm-badge-image img[hidden]{display:none}
-.lm-badge-category{position:absolute;right:-8px;bottom:-7px;width:29px;height:29px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--lm-text);box-shadow:0 2px 7px #1112}
-.live-map .lm-badge-category .lm-category-svg{width:18px;height:18px}
-.lm-photo-marker.is-selected .lm-place-badge{border-color:var(--lm-text);transform:scale(1.1);box-shadow:0 4px 15px #1114}
 .lm-photo-marker:hover .lm-place-badge{transform:translateY(-2px)}
 .lm-photo-marker:focus-visible{outline:2px solid var(--lm-text)}
 
@@ -42,30 +36,37 @@
 .lm-location-demo{position:absolute;top:66px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#fff;border:1px solid var(--lm-line);border-radius:10px;padding:1px 5px;font-size:9px;line-height:1.5;color:var(--lm-muted);box-shadow:0 1px 4px #1111}
 
 /* Controls move above the selected-place banner instead of covering it. */
-.lm-floating-actions{position:absolute;right:20px;bottom:calc(var(--lm-footer) + 24px);display:flex;flex-direction:column;gap:12px;z-index:550;transition:bottom .18s}
-.live-map.has-place .lm-floating-actions{bottom:calc(var(--lm-footer) + 178px)}
+.lm-floating-actions{position:absolute;right:20px;bottom:calc(var(--lm-footer) + 198px);display:flex;flex-direction:column;gap:12px;z-index:550;transition:bottom .18s}
 .live-map .lm-floating-actions .lm-round{width:46px;height:46px;border-radius:50%;padding:0;background:#fff!important;color:var(--lm-text);border:1px solid var(--lm-line)!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:none!important}
 .live-map button.lm-course-create{position:static;display:grid;place-items:center;width:54px;height:54px;min-height:54px;margin:0 0 0 -4px;padding:0;border:0!important;border-radius:50%;background:var(--lm-text)!important;color:#fff!important;box-shadow:0 4px 14px #1113!important}
 .live-map .lm-course-create svg{width:26px;height:26px}
-.lm-selected-host{position:absolute;left:16px;right:16px;bottom:calc(var(--lm-footer) + 12px);z-index:560}
-.lm-selected-host[hidden]{display:none!important}
+.lm-selected-host{position:absolute;left:0;right:0;bottom:calc(var(--lm-footer) + 10px);z-index:560}
 .lm-place-banner{position:relative;background:#fff;border:1px solid #fff;border-radius:18px;box-shadow:0 7px 28px #1113;overflow:hidden}
 .live-map .lm-place-banner .lm-banner-main{display:flex;align-items:stretch;gap:13px;width:100%;min-height:138px;text-align:left;padding:10px;border:0!important;background:#fff!important;box-shadow:none!important;border-radius:0;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .lm-banner-main>img{width:108px;height:118px;flex:none;border-radius:11px;object-fit:cover}
-.lm-banner-copy{display:flex;flex-direction:column;min-width:0;flex:1;padding:3px 20px 2px 0}
+.lm-banner-copy{display:flex;flex-direction:column;min-width:0;flex:1;padding:3px 0 2px 0}
 .lm-banner-copy strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:15px;line-height:1.4;font-weight:700;color:var(--lm-text)}
 .lm-banner-copy>span{font-size:11px;line-height:1.5;color:var(--lm-muted);margin-top:4px}
 .lm-banner-copy>.lm-banner-address{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:4px}
 .lm-banner-copy>b{display:flex;align-items:center;gap:5px;margin-top:auto;padding-top:5px;font-size:11px;color:var(--lm-text)}
 .live-map .lm-banner-copy>b svg{width:14px;height:14px}
-.live-map .lm-place-banner .lm-banner-close{position:absolute;top:10px;right:8px;width:30px;height:30px;min-height:30px;padding:5px;display:grid;place-items:center;border:0!important;border-radius:50%;background:#fff!important;box-shadow:none!important;backdrop-filter:none!important}
-.live-map .lm-banner-close svg{width:17px;height:17px}
 
 /* Place count sheet. Navigation uses the unchanged shared app styles. */
-.live-map .lm-bottom{position:absolute;left:0;right:0;bottom:0;height:var(--lm-footer);padding:10px 20px 8px;background:#fff;border-top:1px solid var(--lm-line);border-radius:22px 22px 0 0;pointer-events:auto;z-index:580}
-.live-map .lm-bottom::before{display:none}
-.live-map .lm-sheet-handle{display:block;margin:0 auto;width:30px;height:4px;border-radius:3px;background:#ddd}
-.lm-place-count{margin:10px 0 8px;text-align:center;font-size:13px;line-height:18px;font-weight:650;color:var(--lm-text)}
 .live-map button:focus-visible{outline:2px solid var(--lm-text)!important;outline-offset:3px}
 @media(max-width:360px){.live-map .lm-header{padding-left:14px;padding-right:14px}.lm-banner-main>img{width:92px}.lm-banner-copy strong{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.lm-place-badge,.lm-floating-actions{transition:none}}
+
+/* Persistent place carousel. The shared four-tab navigator stays unchanged. */
+.lm-carousel{position:relative;display:flex;gap:12px;padding:4px 28px 14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:28px;scrollbar-width:none;overscroll-behavior-x:contain;touch-action:pan-x pan-y;cursor:grab}
+.lm-carousel::-webkit-scrollbar{display:none}
+.lm-carousel .lm-place-banner{flex:0 0 calc(100% - 0px);min-width:0;scroll-snap-align:center;scroll-snap-stop:always;box-shadow:0 5px 14px #1112}
+.lm-carousel.is-dragging{scroll-snap-type:none;cursor:grabbing;user-select:none}
+.lm-carousel img{-webkit-user-drag:none;user-select:none}
+.lm-carousel-controls{display:flex;align-items:center;justify-content:center;gap:12px;height:24px;margin-top:-6px;pointer-events:none}
+.live-map .lm-carousel-controls button{display:grid;place-items:center;width:28px;height:24px;padding:0;border:0!important;border-radius:12px;background:#ffffffed!important;box-shadow:0 2px 6px #1111!important;font-size:20px;line-height:1;pointer-events:auto;backdrop-filter:none!important}
+.lm-carousel-controls button:disabled{opacity:.35;cursor:default}
+.lm-carousel-position{font-size:10px;line-height:20px;padding:0 8px;border-radius:12px;background:#ffffffed;color:var(--lm-muted)}
+.lm-empty-banner{margin:4px 28px 18px;padding:24px 12px;text-align:center;border-radius:18px;background:#fff;box-shadow:0 5px 14px #1112;font-size:14px;line-height:1.7}
+.lm-empty-banner small{font-size:11px;color:var(--lm-muted)}
+.live-map .lm-directions-preview{position:absolute;top:184px;right:20px;z-index:550;width:46px;height:46px;display:grid;place-items:center;border:1px solid #fff!important;border-radius:50%;background:#ffffffdf!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:blur(15px)!important;cursor:default;color:var(--lm-text)}
+.live-map .lm-directions-preview svg{width:23px;height:23px}
