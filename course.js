@@ -51,7 +51,7 @@
         <button class="course-new" data-course-new>${icon('plus')} 새 코스 만들기</button>
         <div class="course-list-heading">코스 ${courses.length}개</div>
         ${courses.length?courses.map(saved=>{const places=saved.days.flat().map(stop=>findPlace(stop.id)).filter(Boolean);return `<button class="course-saved-card" data-course-open="${esc(saved.id)}">${places.some(place=>coordinates(place))?`<span class="course-saved-map" data-course-map="${esc(saved.id)}" role="img" aria-label="${esc(saved.title)} 장소 순서 지도" inert></span>`:`<span class="course-saved-placeholder">${icon('map')}</span>`}<span><b>${esc(saved.title)}</b><small>${esc(saved.date)} · 장소 ${places.length}곳</small><span class="course-saved-stops">${places.map(place=>esc(place.title)).join(' → ')||'장소를 추가해 주세요'}</span></span>${icon('arrow')}</button>`}).join(''):'<div class="course-list-empty">아직 저장한 코스가 없어요.<br>저장한 장소로 첫 코스를 만들어 보세요.</div>'}
-        ${courses.length?'<p class="course-map-credit">지도 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>':''}
+        ${courses.length?'<p class="course-map-credit">지도 <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a> · © <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>':''}
       </div></section>`;
   };
   pages.course=function(){
