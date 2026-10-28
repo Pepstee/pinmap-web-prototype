@@ -134,14 +134,14 @@
   -webkit-mask-composite:xor;mask-composite:exclude;
 }
 .bottomnav .pm-nav-main .pm-nav-indicator{
-  position:absolute;top:8px;left:4px;width:calc((100% - 8px) / 4);height:38px;
+  position:absolute;top:3px;left:4px;width:calc((100% - 8px) / 4);height:48px;
   display:grid;place-items:center;pointer-events:none;z-index:1;
   transform:translateX(var(--nav-position,0%));transition:transform .42s cubic-bezier(.22,1,.36,1);
 }
 .bottomnav .pm-nav-indicator::before{
-  content:'';box-sizing:border-box;width:38px;height:38px;border-radius:21px;
-  background:linear-gradient(145deg,#ffffff42,#ffffff0d 52%,#ffffff29);
-  border:1px solid #ffffff66;
+  content:'';box-sizing:border-box;width:calc(100% + 8px);height:48px;border-radius:24px;
+  background:linear-gradient(145deg,#ffffffaa,#ffffff48 52%,#ffffff88);
+  border:1px solid #ffffffe6;
   box-shadow:inset 1px 2px 2px #ffffffb3,inset -1px -1px 2px #ffffff66,0 1px 3px #26313a12;
   transition:background .15s,box-shadow .15s;
 }
