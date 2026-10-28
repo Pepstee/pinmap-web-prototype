@@ -13,7 +13,7 @@
     return `<span class="pm-nav-main">${entry('home','홈')}${entry('map','지도')}${entry('library','저장함')}${entry('my','마이')}</span>`;
   };
   // Keep the loaded basemap in the same moving pane as the markers.
-  window.attachPinmapBasemap=map=>{
+  const attachFallbackBasemap=map=>{
     let current=null,pending=null,timer,disposed=false;
     function position(view){
       const scale=map.getZoomScale(map.getZoom(),view.zoom);
@@ -45,5 +45,23 @@
     map.on('unload',()=>{disposed=true;clearTimeout(timer);current?.el.remove();pending?.el.remove();});
     map.attributionControl.addAttribution('&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>');
     load();
+  };
+  // Share one vector basemap across the place map, course editor and previews.
+  window.attachPinmapBasemap=map=>{
+    const host=map.getContainer();
+    try {
+      const layer=L.maplibreGL({
+        style:'https://tiles.openfreemap.org/styles/positron',
+        interactive:false,
+        attributionControl:{customAttribution:'<a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a> · © <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}
+      }).addTo(map);
+      host.dataset.basemap='positron';
+      layer.getMaplibreMap().on('load',()=>{host.dataset.basemapReady='true';});
+      return layer;
+    } catch(error) {
+      // Keep maps usable on devices without WebGL support.
+      host.dataset.basemap='osm-fallback';
+      return attachFallbackBasemap(map);
+    }
   };
 })();
