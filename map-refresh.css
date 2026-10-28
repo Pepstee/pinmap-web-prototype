@@ -105,25 +105,14 @@
 .live-map .leaflet-top{top:227px}
 @media(max-width:360px){.live-map .lm-header .lm-location-header .placemain{font-size:21px}.live-map .lm-header .lm-location-header .placesub{font-size:12px}}
 
-/* A floating light glass dock with a soft, elastic selection lens. */
-.bottomnav,.live-map .bottomnav{width:min(calc(100% - 40px),340px)!important;max-width:340px!important}
-.bottomnav .pm-nav-main{position:relative;overflow:visible;background:rgba(255,255,255,.6)!important;border:1px solid rgba(255,255,255,.88)!important;border-radius:32px!important;box-shadow:0 10px 28px #26313a24,inset 0 1px 0 #fff!important;-webkit-backdrop-filter:blur(24px) saturate(1.4)!important;backdrop-filter:blur(24px) saturate(1.4)!important}
-.bottomnav .pm-nav-main .pm-nav-indicator{position:absolute;top:-12px;left:4px;width:calc((100% - 8px) / 4);height:78px;display:grid;place-items:center;pointer-events:none;transform:translateX(var(--nav-position,0%));transition:transform .6s cubic-bezier(.22,.78,.22,1.04);will-change:transform}
-.bottomnav .pm-nav-indicator::before{content:'';width:calc(100% + 6px);height:78px;border-radius:29px;background:linear-gradient(155deg,#ffffffed 0%,#e9eceee0 48%,#ffffffed 100%);border:1px solid #fff;box-shadow:inset 0 2px 3px #fff,inset 0 -3px 7px #89939b3d,0 11px 25px #35414b45,0 0 0 1px #ffffffa8;-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3)}
-.bottomnav .pm-nav-indicator::after{content:'';position:absolute;inset:0;border-radius:29px;background:radial-gradient(ellipse 42% 9px at 50% 5px,#fff,transparent 85%),radial-gradient(ellipse 42% 9px at 50% calc(100% - 5px),#ffffffc9,transparent 85%);pointer-events:none}
-.bottomnav .pm-nav-main.is-morphing .pm-nav-indicator::before{animation:pm-glass-stretch .6s cubic-bezier(.22,.78,.22,1) both}
+/* Keep the original compact, icon-only dock; glass changes its surface only. */
+.bottomnav .pm-nav-main{position:relative;background:linear-gradient(135deg,rgba(255,255,255,.25),rgba(255,255,255,.10) 48%,rgba(255,255,255,.18))!important;border:1px solid rgba(255,255,255,.50)!important;box-shadow:0 6px 20px #26313a1c,inset 0 1px 1px #ffffffb3,inset 0 -1px 1px #ffffff40!important;-webkit-backdrop-filter:blur(12px) saturate(1.5)!important;backdrop-filter:blur(12px) saturate(1.5)!important}
+.bottomnav .pm-nav-main .pm-nav-indicator{position:absolute;top:8px;left:4px;width:calc((100% - 8px) / 4);height:38px;display:grid;place-items:center;pointer-events:none;transform:translateX(var(--nav-position,0%));transition:transform .42s cubic-bezier(.22,1,.36,1)}
+.bottomnav .pm-nav-indicator::before{content:'';box-sizing:border-box;width:38px;height:38px;border-radius:21px;background:linear-gradient(145deg,#ffffff70,#ffffff29 55%,#ffffff4d);border:1px solid #ffffff66;box-shadow:inset 0 1px 1px #ffffffb3,inset 0 -1px 1px #ffffff40,0 2px 7px #26313a14}
 .bottomnav .pm-nav-main .navitem{position:relative;z-index:1}
-.bottomnav .pm-nav-main .navitem,.bottomnav .pm-nav-main .navitem *{color:#898a8e!important}
-.bottomnav .pm-nav-main .navitem.active{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:1px}
-.bottomnav .pm-nav-main .navitem.active,.bottomnav .pm-nav-main .navitem.active *{color:#111!important}
-.bottomnav .pm-nav-main .navitem.active .navicon{width:38px!important;height:28px!important;background:transparent!important;box-shadow:none!important}
-.bottomnav .pm-nav-main .navitem.active>span:not(.navicon){position:static!important;display:block!important;width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important;white-space:nowrap!important;font-size:10px!important;font-weight:650;line-height:1.1}
-.bottomnav .pm-nav-main .navitem.active .pm-nav-avatar{background:#111!important;color:#fff!important}
-.bottomnav .pm-nav-main.is-morphing .navitem.active .navicon{animation:pm-glass-icon .6s ease-out both}
-@keyframes pm-glass-stretch{0%{transform:scale(1)}42%{transform:scaleX(var(--nav-stretch,1.26)) scaleY(.9)}78%{transform:scaleX(.94) scaleY(1.04)}100%{transform:scale(1)}}
-@keyframes pm-glass-icon{0%,25%{opacity:.55;transform:translateY(3px) scale(.9)}78%{opacity:1;transform:translateY(-1px) scale(1.05)}100%{opacity:1;transform:none}}
+.bottomnav .pm-nav-main .navitem.active .navicon{background:transparent!important;box-shadow:none!important}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.bottomnav .pm-nav-main{background:rgba(255,255,255,.82)!important}}
 @media(prefers-reduced-motion:reduce){
   .bottomnav .pm-nav-main .pm-nav-indicator{transition:none}
-  .bottomnav .pm-nav-main.is-morphing .pm-nav-indicator::before,.bottomnav .pm-nav-main.is-morphing .navitem.active .navicon{animation:none}
   .live-map .lm-header .lm-categories button,.live-map .lm-header .lm-categories .lm-category-line,.live-map .lm-header .lm-categories .lm-category-solid,.live-map .lm-header .lm-categories .lm-category-indicator{transition:none}
 }
