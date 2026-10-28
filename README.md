@@ -24,3 +24,17 @@
 ## 검증
 
 `node --test tests/course.test.cjs`로 코스 저장·재편집·새로고침 유지, 기존 데이터 이전, 저장 실패 처리를 확인합니다.
+
+
+## 실제 콘텐츠 실험 브랜치
+
+`experiment/real-content`는 운영 `main`과 분리된 개발 환경입니다. 루트 주소에서 온보딩 전에 시작 환경을 선택합니다.
+
+- `index.html?mode=development`: 콘텐츠·계정·프로필 사진·위치·알림·코스를 예시값 없이 시작합니다. 입력한 실제 URL과 제목을 저장합니다. SNS 인증, 자동 수집, AI 추출, 푸시는 아직 연결하지 않았습니다.
+- `index.html?mode=prototype`: 기존 13개 콘텐츠와 SNS 저장 체험 등 현재 프로토타입의 흐름을 유지합니다.
+- 개발 저장 공간: `pinmap.dev.v1`, `pinmap.dev.courses.v1`, `pinmap.dev.course-draft.v1`. 기존 체험 저장 공간과 이전 버전 데이터를 불러오거나 지우지 않습니다.
+- 개발 모드에는 예시 링크 채우기, 가짜 SNS 계정 연동/새로고침, 가짜 알림 생성이 없습니다. 사진 없는 콘텐츠에는 중립적인 자리표시자를 사용합니다.
+- 브라우저 저장은 동일한 출처(도메인·포트)의 두 모드 사이에서 분리됩니다. 온보딩은 기존처럼 진입 시 표시됩니다.
+
+실행: `python3 -m http.server 8092 --bind 127.0.0.1` 후 `http://localhost:8092/`.
+검증: `node --test tests/environment.test.cjs`.

@@ -7,9 +7,9 @@
   let userPosition = null;
   let userHeading = null, locationWatch = null, orientationActive = false;
   let locationBusy = false;
-  let center = [37.5445, 127.043], zoom = 15, category = 'all';
+  let center = PM_ENV.development ? [20,0] : [37.5445,127.043], zoom = PM_ENV.development ? 2 : 15, category = 'all';
   let searchResults = null, searchQuery = '';
-  const savedCoords = [
+  const savedCoords = PM_ENV.development ? [] : [
     {id:1, lat:37.5461, lng:127.0434, kind:'cafe', image:'img/cafe.jpg'},
     {id:4, lat:37.5441, lng:127.0495, kind:'event', image:'img/exhibit.jpg'},
     {id:6, lat:37.5445, lng:127.0374, kind:'walk', image:'img/park.jpg'},
@@ -28,7 +28,7 @@
     shop: 'M5 8h14l-1 13H6z M9 8V6a3 3 0 0 1 6 0v2'
   };
   const categoryIcon = kind => `<svg class="lm-category-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="${categoryPaths[kind] || paths.pin}"/></svg>`;
-  const localPhoto = kind => ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
+  const localPhoto = kind => PM_ENV.development ? PM_ENV.placeholderImage : ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
   const categoryLabel = tag => ({station:'역',stop:'정류장',park:'공원',restaurant:'식당',cafe:'카페',museum:'박물관',gallery:'갤러리',shop:'상점',water:'호수',residential:'주거 지역'})[tag] || tag;
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
   const round = (name, symbol) => `<button class="lm-round" data-lm="locate" aria-label="${name}" title="${name}">${icon(symbol)}</button>`;
@@ -158,6 +158,7 @@
   function drawLocation() {
     if(!liveMap)return;
     if(locationMarker)liveMap.removeLayer(locationMarker);
+    if(PM_ENV.development&&!userPosition)return;
     const point=userPosition || [37.5425,127.042];
     const demo=!userPosition,heading=userHeading??(demo?35:null);
     const label=demo?'성수동 예시 위치 · 방향 예시':heading==null?'현재 위치 · 방향 정보 없음':`현재 위치 · 북쪽 기준 ${Math.round(heading)}도`;
@@ -199,7 +200,7 @@
       // A GPS travel heading is not the direction the person is facing.
       if(first)liveMap.setView(userPosition,16);
       drawLocation();
-    },()=>{if(!liveMap||page!=='map')return;locationBusy=false;if(locationWatch!==null)navigator.geolocation.clearWatch(locationWatch);locationWatch=null;toast('위치 권한을 확인해주세요. 성수동 예시 지도를 유지합니다.');},{enableHighAccuracy:true,maximumAge:30000,timeout:12000});
+    },()=>{if(!liveMap||page!=='map')return;locationBusy=false;if(locationWatch!==null)navigator.geolocation.clearWatch(locationWatch);locationWatch=null;toast(PM_ENV.development?'위치 권한을 확인해 주세요. 예시 위치는 표시하지 않습니다.':'위치 권한을 확인해주세요. 성수동 예시 지도를 유지합니다.');},{enableHighAccuracy:true,maximumAge:30000,timeout:12000});
   }
   function showResults() {
     const panel=$('#lm-search-results'); if(!panel) return;
@@ -242,7 +243,7 @@
       case 'previous-place':stepPlace(-1);break;
       case 'next-place':stepPlace(1);break;
       case 'open-place':{if(Date.now()<suppressBannerClickUntil)return;const place=markerEntries.get(button.dataset.placeKey)?.place;if(!place)break;if(place.saved)openDetail(place.id);else window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place.lat+','+place.lng),'_blank','noopener,noreferrer');break;}
-      case 'clear-search':searchResults=null;searchQuery='';$('#lm-search input').value='';$('#lm-search-results').hidden=true;center=[37.5445,127.043];zoom=15;liveMap?.setView(center,zoom);markers();break;
+      case 'clear-search':searchResults=null;searchQuery='';$('#lm-search input').value='';$('#lm-search-results').hidden=true;center=PM_ENV.development?[20,0]:[37.5445,127.043];zoom=PM_ENV.development?2:15;liveMap?.setView(center,zoom);markers();break;
     }
   });
   document.addEventListener('click',event=>{if(event.target.closest('.lm-carousel')&&Date.now()<suppressBannerClickUntil){event.preventDefault();event.stopImmediatePropagation();}},true);

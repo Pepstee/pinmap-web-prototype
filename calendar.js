@@ -17,7 +17,7 @@ items.forEach(x => {
 });
 const e4 = items.find(x => x.id === 4); if (e4 && !e4.dueLabel) e4.dueLabel = '전시 종료';
 // 마감이 적힌 예시 콘텐츠 2개 (한 번만 추가 · 지우면 다시 생기지 않아요)
-if (!settings.calSeeded) {
+if (!PM_ENV.development && !settings.calSeeded) {
   const seeds = [
     {id:12,title:'2026 하반기 청년 디자인 장학생 모집',type:'생활 정보',category:'장학금',source:'Instagram',ago:'3일 전',desc:'학기당 200만 원 · 포트폴리오 제출',memo:'포트폴리오 PDF 미리 정리해두기',art:'tips',collection:'',deadline:'D-5',dueLabel:'지원 마감',aiClassified:true},
     {id:13,title:'성수 오브젝트 팝업 스토어',type:'전시·팝업',category:'팝업',source:'Instagram',ago:'1일 전',desc:'리빙 브랜드 12곳이 모인 2주 팝업',memo:'친구랑 주말에 같이 가보기',art:'exhibit',distance:'도보 8분',collection:'이번 주말 성수',address:'서울 성동구 성수동 · 예시 팝업',period:'10.3 – 10.21 · 예시 기간',deadline:'D-11',dueLabel:'팝업 종료',aiClassified:true}

@@ -1,7 +1,7 @@
 // SNS 공유 → 핀맵 저장 체험
 // 실제 SNS 공유 메뉴는 웹 프로토타입에서 연결할 수 없어, 예시 SNS 화면 위에서 저장 과정을 재현합니다.
 // 흐름: 게시물 공유 버튼 → SNS 공유 시트 → '공유 대상…' → 앱 목록에서 핀맵 → 핀맵 저장 시트 → 저장 배너
-const demoPost = {
+const demoPost = PM_ENV.development ? null : {
   author:'seongsu.daily', likes:'1,282',
   caption:'성수동 골목 안, 오후 햇살 가득한 창가 자리 ☕ 디저트도 맛있어요. 주말엔 웨이팅 있어요!',
   art:'cafe',
@@ -11,6 +11,7 @@ const demoPost = {
 let sd = {step:'post', item:null, aiOn:true, newCol:false, banner:null, bannerTimer:null, closeTimer:null};
 
 function openShareDemo(){
+  if(PM_ENV.development){toast('개발 테스트에서는 예시 게시물을 만들지 않아요. 실제 링크를 저장해 주세요.');return;}
   if ($('#sheet').open) $('#sheet').close();
   sd = {...sd, step:'post', newCol:false, banner:null};
   let el = $('#sharedemo');
@@ -129,6 +130,7 @@ function drawShareDemo(){
 }
 
 function sdCreateItem(){
+  if(PM_ENV.development)return;
   if (sdSaved()) return;
   const a = demoPost.ai;
   sd.item = {id:Date.now(), title:a.title, type:a.type, category:a.category, source:'SNS · '+demoPost.author, ago:'방금', desc:'공유하기로 저장한 콘텐츠', memo:'', art:demoPost.art, distance:a.distance, address:a.address, collection:'', aiClassified:true, sample:true};

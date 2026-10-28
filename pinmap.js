@@ -1,6 +1,6 @@
 // 핀맵 · 브라우저 저장, 온보딩, 관심사 기반 홈. 빌드 도구나 외부 API 없이 동작합니다.
-const STORAGE = 'pinmap.v3';
-const LEGACY_KEYS = ['pinmap.v2', 'pinmap.v1'];
+const STORAGE = PM_ENV.storageKey;
+const LEGACY_KEYS = PM_ENV.development ? [] : ['pinmap.v2', 'pinmap.v1'];
 
 // 온보딩 3단계에서 고르는 관심사 · 활용 목적 (홈 구성에 사용)
 const interestOptions = [

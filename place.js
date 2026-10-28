@@ -3,23 +3,24 @@
 // 메인 동네를 누르면 '내 동네 설정' 시트가 올라와 추가 · 삭제 · 수정할 수 있어요.
 const MAX_PLACES = 2;
 // 검색용 동네 목록 (예시)
-const DONGS = [
+const DONGS = (PM_ENV.development ? [] : [
   ['성수동','서울 성동구'],['성수1가1동','서울 성동구'],['성수2가3동','서울 성동구'],['행당동','서울 성동구'],['왕십리동','서울 성동구'],['금호동','서울 성동구'],['옥수동','서울 성동구'],
   ['자양동','서울 광진구'],['화양동','서울 광진구'],['구의동','서울 광진구'],
   ['청파동','서울 용산구'],['효창동','서울 용산구'],['남영동','서울 용산구'],['후암동','서울 용산구'],['이태원동','서울 용산구'],['한남동','서울 용산구'],['용산동','서울 용산구'],
   ['서교동','서울 마포구'],['합정동','서울 마포구'],['연남동','서울 마포구'],['망원동','서울 마포구'],['상수동','서울 마포구'],
   ['삼청동','서울 종로구'],['익선동','서울 종로구'],['혜화동','서울 종로구'],['을지로동','서울 중구'],['명동','서울 중구'],
   ['신사동','서울 강남구'],['압구정동','서울 강남구'],['역삼동','서울 강남구'],['잠실3동','서울 송파구'],['문정동','서울 송파구'],['가락2동','서울 송파구']
-].map(([name, gu]) => ({name, full:`${gu} ${name}`}));
+]).map(([name, gu]) => ({name, full:`${gu} ${name}`}));
 const dongOf = name => DONGS.find(d => d.name === name) || {name, full:name};
 
-const myPlaces = () => { if (!Array.isArray(settings.places) || !settings.places.length) settings.places = ['성수동']; return settings.places; };
-const mainPlace = () => myPlaces()[0];
+const myPlaces = () => { if(PM_ENV.development)return Array.isArray(settings.places)?settings.places:[]; if (!Array.isArray(settings.places) || !settings.places.length) settings.places = ['성수동']; return settings.places; };
+const mainPlace = () => myPlaces()[0] || '';
 // 저장 장소가 메인 동네에 있는지 (동 이름의 숫자·'가'를 빼고 주소와 비교)
-const inMainPlace = x => (x.address||'').includes(mainPlace().replace(/\d+가?\d*동$|동$/, ''));
+const inMainPlace = x => !!mainPlace() && (x.address||'').includes(mainPlace().replace(/\d+가?\d*동$|동$/, ''));
 
 let placeSwapped = false; // 위치를 바꿨을 때만 글자 애니메이션
 function placebar(){
+  if(PM_ENV.development&&!myPlaces().length)return `<div class="placebar"><button class="placemain" data-page="map">${icon('pin')}<b>위치를 아직 설정하지 않았어요</b></button></div>`;
   const [main, sub] = myPlaces();
   const swapped = placeSwapped; placeSwapped = false;
   return `<div class="placebar${swapped ? ' swapped' : ''}" role="group" aria-label="현재 위치">
@@ -63,6 +64,7 @@ function placeSearch(mode){
   setTimeout(() => $('#placeq')?.focus(), 50);
 }
 function placeResults(q){
+  if(PM_ENV.development)return '<p class="muted pempty">동네 검색은 아직 연결하지 않았어요. 지도에서는 실제 장소 검색과 현재 위치 기능을 사용할 수 있어요.</p>';
   const mine = myPlaces();
   const row = d => `<button class="pres ${mine.includes(d.name)?'mine':''}" data-place-choose="${esc(d.name)}">${esc(d.full)}${mine.includes(d.name)?'<span>설정됨</span>':''}</button>`;
   if (q.trim()) {
