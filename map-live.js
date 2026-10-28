@@ -57,7 +57,7 @@
         <h1 class="lm-sr-only">지도에서 저장한 장소 찾기</h1>
         <div class="lm-location-header" aria-label="현재 위치와 자주 가는 위치">${myPlaces().length?placebar():'<button type="button" class="lm-location-empty" data-action="placesheet">위치 설정</button>'}</div>
         <div class="lm-search-row cfpage"><form class="libsearch" id="lm-search" role="search">${icon('search')}<input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶으세요?" value="${safe(searchQuery)}" autocomplete="off"><button type="button" class="iconbtn" data-lm="clear-search" aria-label="검색 지우기" ${searchQuery?'':'hidden'}>${icon('close')}</button><button type="submit" class="libgo" aria-label="장소 검색">${icon('arrow')}</button></form></div>
-        <div class="lm-categories" role="group" aria-label="지도 카테고리">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}</div>
+        <div class="lm-categories" role="group" aria-label="지도 카테고리" style="--lm-category-position:${Math.max(0,cats.findIndex(([id])=>id===category))*100}%">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}<span class="lm-category-indicator" aria-hidden="true"></span></div>
       </header>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
@@ -66,6 +66,16 @@
       <nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></section>`;
   }
   function status(message) { const el = $('#app .lm-status'); if (el) { el.textContent = message; el.hidden = !/못|실패|입력|확인하고|검색하고/.test(message); } }
+  function selectCategory(next) {
+    category=next;
+    const bar=document.querySelector('.lm-categories');
+    bar?.style.setProperty('--lm-category-position',`${Math.max(0,cats.findIndex(([id])=>id===next))*100}%`);
+    bar?.querySelectorAll('[data-lm-cat]').forEach(button=>{
+      const selected=button.dataset.lmCat===next;
+      button.classList.toggle('selected',selected);
+      button.setAttribute('aria-pressed',String(selected));
+    });
+  }
   function visiblePlaces() {
     const list = searchResults || savedPlaces();
     return list.filter(x => category === 'all' || x.kind === category);
@@ -237,7 +247,7 @@
       }
       if (!liveMap || current !== searchController) return;
       searchQuery=q;searchResults=found;
-      category='all'; document.querySelectorAll('[data-lm-cat]').forEach(b=>{const on=b.dataset.lmCat==='all';b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on));});
+      selectCategory('all');
       markers();showResults();
       if(searchResults.length) liveMap.fitBounds(searchResults.map(x=>[x.lat,x.lng]),{maxZoom:16,paddingTopLeft:[80,200],paddingBottomRight:[80,240]});
     } catch(error) { if(error.name!=='AbortError') status('검색 연결을 확인해 주세요. 저장한 장소명으로 다시 검색할 수 있어요.'); }
@@ -247,7 +257,7 @@
     const result=event.target.closest('[data-result]');
     if(result){const found=visiblePlaces()[Number(result.dataset.result)];if(found) expandPlace(found);return;}
     const cat=event.target.closest('[data-lm-cat]');
-    if(cat){category=cat.dataset.lmCat;document.querySelectorAll('[data-lm-cat]').forEach(b=>{const on=b===cat;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on));});markers(true);showResults();return;}
+    if(cat){selectCategory(cat.dataset.lmCat);markers(true);showResults();return;}
     const button=event.target.closest('[data-lm]'); if(!button)return;
     switch(button.dataset.lm){
       case 'locate':locate();break;
