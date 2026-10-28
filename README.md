@@ -45,7 +45,7 @@
 
 ## 지도 배경
 
-장소 지도·코스 편집·코스 미리보기는 API 키 없이 OpenFreeMap의 Positron 벡터 지도를 사용합니다. MapLibre GL JS 5.21.0과 Leaflet 연결 모듈 0.1.4를 `vendor/`에 고정해 포함했습니다. 지도 데이터 출처는 OpenMapTiles와 OpenStreetMap이며 화면의 출처 표기를 유지합니다. WebGL을 지원하지 않는 기기는 기존 OpenStreetMap 배경으로 대체합니다. 장소 검색과 위치 권한 동작은 변경하지 않습니다.
+장소 지도·코스 편집·코스 미리보기는 API 키 없이 OpenFreeMap의 Positron 벡터 지도를 사용합니다. MapLibre GL JS 5.21.0과 Leaflet 연결 모듈 0.1.4를 `vendor/`에 고정해 포함했습니다. 지도 데이터 출처는 OpenMapTiles와 OpenStreetMap이며 화면의 출처 표기를 유지합니다. 지도는 지하철역과 함께 15배율부터 주요 버스정류장, 16배율부터 지하철 출입구, 17배율부터 더 많은 정류장과 이름을 표시합니다. WebGL을 지원하지 않는 기기는 기존 OpenStreetMap 배경으로 대체합니다. 장소 검색과 위치 권한 동작은 변경하지 않습니다.
 
 현재 테마는 `map-style.json`에 저장한 OpenFreeMap Positron 기반의 Pinmap Warm Minimal입니다. 미색 배경에 저채도 녹지·물을 사용하고 도로 번호·작은 도로명·철도 표시를 숨깁니다. 건물은 확대 수준 16부터 표시하며 지명은 현지 이름 한 줄로 표현합니다. 수정 후 JSON 콘텐츠 해시에 맞춰 `integration.js`의 스타일 URL 버전을 갱신하세요.
 
