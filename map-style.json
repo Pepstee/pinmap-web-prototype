@@ -3172,6 +3172,83 @@
         "text-halo-color": "#F6F2E9",
         "text-halo-width": 1.2
       }
+    },
+    {
+      "id": "pinmap-transit-stations",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "poi",
+      "minzoom": 12,
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "get",
+            "class"
+          ],
+          "railway"
+        ],
+        [
+          "match",
+          [
+            "get",
+            "subclass"
+          ],
+          [
+            "subway",
+            "station",
+            "halt"
+          ],
+          true,
+          false
+        ]
+      ],
+      "layout": {
+        "icon-image": "railway_metro_11",
+        "icon-size": 1.2,
+        "icon-allow-overlap": false,
+        "text-field": [
+          "coalesce",
+          [
+            "get",
+            "name:ko"
+          ],
+          [
+            "get",
+            "name:nonlatin"
+          ],
+          [
+            "get",
+            "name"
+          ]
+        ],
+        "text-font": [
+          "Noto Sans Regular"
+        ],
+        "text-size": 12,
+        "text-anchor": "left",
+        "text-offset": [
+          0.85,
+          0
+        ],
+        "text-padding": 5,
+        "text-max-width": 8,
+        "text-optional": false,
+        "symbol-sort-key": [
+          "coalesce",
+          [
+            "get",
+            "rank"
+          ],
+          1
+        ]
+      },
+      "paint": {
+        "text-color": "#567568",
+        "text-halo-color": "#FFFDF7",
+        "text-halo-width": 1.8
+      }
     }
   ],
   "name": "Pinmap Warm Minimal",
