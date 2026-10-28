@@ -22,9 +22,10 @@ let placeSwapped = false; // 위치를 바꿨을 때만 글자 애니메이션
 function placebar(){
   if(PM_ENV.development&&!myPlaces().length)return `<div class="placebar"><button class="placemain" data-page="map">${icon('pin')}<b>위치를 아직 설정하지 않았어요</b></button></div>`;
   const [main, ...others] = myPlaces();
+  const mainLabel = settings.placeLabels?.[main] || main;
   const swapped = placeSwapped; placeSwapped = false;
   return `<div class="placebar${swapped ? ' swapped' : ''}" role="group" aria-label="현재 위치">
-    <button class="placemain" data-action="placesheet" aria-label="현재 위치 설정 · 현재 ${esc(main)}">${icon('pin')}<b>${esc(main)}</b>${others.length ? '' : icon('chevron')}</button>
+    <button class="placemain" data-action="placesheet" aria-label="현재 위치 설정 · ${esc(mainLabel)} · ${esc(main)}">${icon('pin')}<b>${esc(mainLabel)}</b>${others.length ? '' : icon('chevron')}</button>
     ${others.map((name,index) => `<button class="placesub" data-place-swap="${index+1}" aria-label="${esc(settings.placeLabels?.[name] || name)} · ${esc(name)} 위치 선택">${esc(settings.placeLabels?.[name] || name)}</button>`).join('')}
   </div>`;
 }
@@ -37,7 +38,7 @@ function setMain(i){
   const [picked] = p.splice(i, 1); p.unshift(picked); placeSwapped = true;
   afterChange(); render();
   window.dispatchEvent(new CustomEvent('pinmap:place-changed',{detail:{name:picked}}));
-  toast(`위치를 '${picked}'(으)로 변경했어요.`);
+  toast(`위치를 '${settings.placeLabels?.[picked] || picked}'(으)로 변경했어요.`);
 }
 
 /* ---------- 현재 위치 설정 시트 ---------- */
