@@ -12,6 +12,10 @@
     "openmaptiles": {
       "type": "vector",
       "url": "https://tiles.openfreemap.org/planet"
+    },
+    "numbered-subway-exits": {
+      "type": "geojson",
+      "data": "subway-exits.geojson?v=ea4f73016f20"
     }
   },
   "sprite": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm",
@@ -3225,21 +3229,29 @@
       }
     },
     {
-      "id": "pinmap-subway-entrances",
+      "id": "pinmap-numbered-subway-exits",
       "type": "symbol",
-      "source": "openmaptiles",
-      "source-layer": "poi",
+      "source": "numbered-subway-exits",
       "minzoom": 16,
-      "filter": [
-        "all",
-        ["==", ["get", "class"], "entrance"],
-        ["==", ["get", "subclass"], "subway_entrance"]
-      ],
       "layout": {
         "icon-image": "entrance_11",
-        "icon-size": 1.05,
+        "icon-size": 1.15,
         "icon-allow-overlap": false,
-        "icon-padding": 4
+        "icon-padding": 4,
+        "text-field": ["concat", ["to-string", ["get", "number"]], "번"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 16, 10, 17, 12, 18, 13],
+        "text-anchor": "left",
+        "text-offset": [1, 0],
+        "text-max-width": 3,
+        "text-allow-overlap": false,
+        "text-optional": false,
+        "text-padding": 2
+      },
+      "paint": {
+        "text-color": "#245B8C",
+        "text-halo-color": "#FFFDF7",
+        "text-halo-width": 1.8
       }
     },
     {

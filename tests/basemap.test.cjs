@@ -1,6 +1,7 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
+const crypto=require('node:crypto');
 const vm=require('node:vm');
 test('shared Positron layer keeps Leaflet controls, credit and load status without an API key',()=>{
   const host={dataset:{}},events={};let received,addedTo;
@@ -12,7 +13,7 @@ test('shared Positron layer keeps Leaflet controls, credit and load status witho
   assert.equal(addedTo,map);
   assert.match(received.style,/^map-style\.json\?v=/);
   assert.equal(received.interactive,false);
-  for(const source of ['OpenFreeMap','OpenMapTiles','OpenStreetMap'])assert(received.attributionControl.customAttribution.includes(source));
+  for(const source of ['OpenFreeMap','OpenMapTiles','OpenStreetMap','행정안전부·Esri Korea'])assert(received.attributionControl.customAttribution.includes(source));
   assert.equal(host.dataset.basemap,'warm-minimal');
   assert.equal(host.dataset.basemapReady,undefined);
   events.load();assert.equal(host.dataset.basemapReady,'true');
@@ -30,22 +31,31 @@ test('warm map style is valid, simplifies background detail and retains orientat
   assert(fs.readFileSync('integration.js','utf8').includes('map-style.json?v='+hash));
 });
 
-test('subway entrances and bus stops use actual vector POIs at readable zoom levels',()=>{
+test('numbered subway exits and bus stops appear at readable zoom levels',()=>{
   const style=JSON.parse(fs.readFileSync('map-style.json','utf8'));
   const byId=Object.fromEntries(style.layers.map(layer=>[layer.id,layer]));
   const overview=byId['pinmap-bus-stops-overview'];
   const detail=byId['pinmap-bus-stops-detail'];
-  const entrances=byId['pinmap-subway-entrances'];
-  for(const layer of [overview,detail,entrances]){
+  const exits=byId['pinmap-numbered-subway-exits'];
+  for(const layer of [overview,detail]){
     assert.equal(layer.source,'openmaptiles');
     assert.equal(layer['source-layer'],'poi');
     assert.equal(layer.layout['icon-allow-overlap'],false);
   }
   assert.equal(overview.minzoom,15);
   assert.equal(overview.maxzoom,detail.minzoom);
-  assert.equal(entrances.minzoom,16);
   assert.equal(overview.layout['icon-image'],'bus_11');
-  assert.equal(entrances.layout['icon-image'],'entrance_11');
   assert(overview.filter.some(part=>JSON.stringify(part).includes('"rank"')));
-  assert(entrances.filter.some(part=>JSON.stringify(part).includes('"subway_entrance"')));
+  assert.equal(exits.source,'numbered-subway-exits');
+  assert.equal(exits.minzoom,16);
+  assert.equal(exits.layout['icon-image'],'entrance_11');
+  assert(JSON.stringify(exits.layout['text-field']).includes('"number"'));
+  assert(!byId['pinmap-subway-entrances'],'unnumbered entrance icons must not overlap numbered exits');
+  const geojson=JSON.parse(fs.readFileSync('subway-exits.geojson','utf8'));
+  const hash=crypto.createHash('sha256').update(fs.readFileSync('subway-exits.geojson')).digest('hex').slice(0,12);
+  assert.equal(style.sources['numbered-subway-exits'].data,'subway-exits.geojson?v='+hash);
+  assert.equal(geojson.type,'FeatureCollection');
+  assert(geojson.features.length>4000);
+  assert(geojson.features.some(feature=>feature.properties.station==='뚝섬역'&&feature.properties.number===1));
+  assert(geojson.features.every(feature=>Number.isInteger(feature.properties.number)&&feature.properties.number>0));
 });
