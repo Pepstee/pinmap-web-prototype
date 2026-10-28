@@ -1,0 +1,71 @@
+/* Map-only layout: search/category bar, photo badges, selected place banner. */
+.live-map{--lm-surface:var(--t-card,#fff);--lm-text:var(--t-ink,#111);--lm-muted:#6B6B70;--lm-line:var(--t-line,#E8E8EA);--lm-footer:112px;font-family:inherit}
+.live-map .lm-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.live-map .lm-header{inset:0 0 auto;padding:24px 20px 0;background:var(--lm-surface);border-bottom:1px solid var(--lm-line);z-index:600}
+.lm-search-row{position:relative;display:flex;align-items:center;height:58px;border:1px solid var(--lm-line);border-radius:32px;background:#F4F4F5;padding:0 8px 0 17px;gap:8px}
+.lm-search-pill{display:flex;flex:1;align-items:center;min-width:0;gap:12px;margin:0}
+.live-map .lm-search-pill>svg{width:22px;height:22px;flex:none}
+.live-map .lm-search-pill input{flex:1;min-width:0;width:100%;height:48px;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;outline:none;font:inherit;font-size:14px;color:var(--lm-text)}
+.live-map .lm-search-pill input::placeholder{color:var(--lm-muted)}
+.live-map .lm-header .lm-saved-courses{width:40px;height:40px;min-width:40px;display:grid;place-items:center;padding:0;border:1px solid #ddd!important;border-radius:50%;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.live-map .lm-header .lm-saved-courses svg{width:20px;height:20px}
+.live-map .lm-header .lm-categories{display:flex;gap:0;justify-content:space-between;margin:9px -4px 0;padding:0}
+.live-map .lm-header .lm-categories button{position:relative;display:flex;flex:1;min-width:0;min-height:75px;align-items:center;justify-content:center;flex-direction:column;gap:6px;margin:0;padding:10px 1px 12px;border:0!important;border-radius:0;background:transparent!important;color:var(--lm-muted);box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.live-map .lm-header .lm-categories .lm-category-art{display:grid;place-items:center;width:28px;height:28px}
+.live-map .lm-header .lm-categories .lm-category-svg{width:26px;height:26px}
+.live-map .lm-header .lm-categories b{font-size:10px;font-weight:600;line-height:1.2;white-space:nowrap}
+.live-map .lm-header .lm-categories .selected{color:var(--lm-text)}
+.live-map .lm-header .lm-categories .selected::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2px;border-radius:2px;background:var(--lm-text)}
+.live-map .lm-status{top:180px;left:16px;right:16px;max-width:none;z-index:605;font-size:12px;background:#fff;border:1px solid var(--lm-line);padding:10px 12px;border-radius:12px}
+.live-map .lm-search-results{top:179px;left:16px;right:16px;max-height:440px;z-index:610;background:#fff;backdrop-filter:none}
+.live-map .leaflet-control-attribution{max-width:220px;margin-bottom:116px!important;font-size:8px!important}
+.live-map .leaflet-top{top:180px}
+
+/* Image + category mark. Marker hit area stays 76px wide. */
+.live-map .lm-photo-marker{background:transparent;border:0;outline-offset:3px;border-radius:50%}
+.lm-place-badge{position:absolute;inset:5px;display:block;width:66px;height:66px;border:3px solid #fff;border-radius:50%;background:#fff;box-shadow:0 3px 12px #1113;transition:transform .16s,border-color .16s}
+.lm-badge-image{display:grid;place-items:center;position:absolute;inset:0;overflow:hidden;border-radius:50%;background:#F4F4F5}
+.lm-badge-image>.lm-category-svg{width:26px;height:26px;color:var(--lm-muted)}
+.lm-badge-image img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.lm-badge-image img[hidden]{display:none}
+.lm-badge-category{position:absolute;right:-8px;bottom:-7px;width:29px;height:29px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--lm-text);box-shadow:0 2px 7px #1112}
+.live-map .lm-badge-category .lm-category-svg{width:18px;height:18px}
+.lm-photo-marker.is-selected .lm-place-badge{border-color:var(--lm-text);transform:scale(1.1);box-shadow:0 4px 15px #1114}
+.lm-photo-marker:hover .lm-place-badge{transform:translateY(-2px)}
+.lm-photo-marker:focus-visible{outline:2px solid var(--lm-text)}
+
+/* Current position and facing direction. No heading is implied without data. */
+.lm-location-person{position:relative;display:block;width:92px;height:92px}
+.lm-heading-cone{position:absolute;width:112px;height:112px;left:-10px;top:-10px;border-radius:50%;background:conic-gradient(from -35deg at 50% 50%,#2789ef99 0deg,#2789ef22 70deg,transparent 70deg);mask-image:radial-gradient(circle,#000 28%,#0008 55%,transparent 71%);-webkit-mask-image:radial-gradient(circle,#000 28%,#0008 55%,transparent 71%);transform:rotate(var(--heading,0deg));pointer-events:none}
+.lm-location-person.no-heading .lm-heading-cone{display:none}
+.lm-location-person .lm-location-dot{position:absolute;top:36px;left:36px;width:20px;height:20px;border:3px solid #fff;border-radius:50%;background:#2789ef;box-shadow:0 0 0 5px #2789ef20,0 2px 6px #1113;z-index:2}
+.lm-location-demo{position:absolute;top:66px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#fff;border:1px solid var(--lm-line);border-radius:10px;padding:1px 5px;font-size:9px;line-height:1.5;color:var(--lm-muted);box-shadow:0 1px 4px #1111}
+
+/* Controls move above the selected-place banner instead of covering it. */
+.lm-floating-actions{position:absolute;right:20px;bottom:calc(var(--lm-footer) + 24px);display:flex;flex-direction:column;gap:12px;z-index:550;transition:bottom .18s}
+.live-map.has-place .lm-floating-actions{bottom:calc(var(--lm-footer) + 178px)}
+.live-map .lm-floating-actions .lm-round{width:46px;height:46px;border-radius:50%;padding:0;background:#fff!important;color:var(--lm-text);border:1px solid var(--lm-line)!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:none!important}
+.live-map button.lm-course-create{position:static;display:grid;place-items:center;width:54px;height:54px;min-height:54px;margin:0 0 0 -4px;padding:0;border:0!important;border-radius:50%;background:var(--lm-text)!important;color:#fff!important;box-shadow:0 4px 14px #1113!important}
+.live-map .lm-course-create svg{width:26px;height:26px}
+.lm-selected-host{position:absolute;left:16px;right:16px;bottom:calc(var(--lm-footer) + 12px);z-index:560}
+.lm-selected-host[hidden]{display:none!important}
+.lm-place-banner{position:relative;background:#fff;border:1px solid #fff;border-radius:18px;box-shadow:0 7px 28px #1113;overflow:hidden}
+.live-map .lm-place-banner .lm-banner-main{display:flex;align-items:stretch;gap:13px;width:100%;min-height:138px;text-align:left;padding:10px;border:0!important;background:#fff!important;box-shadow:none!important;border-radius:0;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.lm-banner-main>img{width:108px;height:118px;flex:none;border-radius:11px;object-fit:cover}
+.lm-banner-copy{display:flex;flex-direction:column;min-width:0;flex:1;padding:3px 20px 2px 0}
+.lm-banner-copy strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:15px;line-height:1.4;font-weight:700;color:var(--lm-text)}
+.lm-banner-copy>span{font-size:11px;line-height:1.5;color:var(--lm-muted);margin-top:4px}
+.lm-banner-copy>.lm-banner-address{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:4px}
+.lm-banner-copy>b{display:flex;align-items:center;gap:5px;margin-top:auto;padding-top:5px;font-size:11px;color:var(--lm-text)}
+.live-map .lm-banner-copy>b svg{width:14px;height:14px}
+.live-map .lm-place-banner .lm-banner-close{position:absolute;top:10px;right:8px;width:30px;height:30px;min-height:30px;padding:5px;display:grid;place-items:center;border:0!important;border-radius:50%;background:#fff!important;box-shadow:none!important;backdrop-filter:none!important}
+.live-map .lm-banner-close svg{width:17px;height:17px}
+
+/* Place count sheet. Navigation uses the unchanged shared app styles. */
+.live-map .lm-bottom{position:absolute;left:0;right:0;bottom:0;height:var(--lm-footer);padding:10px 20px 8px;background:#fff;border-top:1px solid var(--lm-line);border-radius:22px 22px 0 0;pointer-events:auto;z-index:580}
+.live-map .lm-bottom::before{display:none}
+.live-map .lm-sheet-handle{display:block;margin:0 auto;width:30px;height:4px;border-radius:3px;background:#ddd}
+.lm-place-count{margin:10px 0 8px;text-align:center;font-size:13px;line-height:18px;font-weight:650;color:var(--lm-text)}
+.live-map button:focus-visible{outline:2px solid var(--lm-text)!important;outline-offset:3px}
+@media(max-width:360px){.live-map .lm-header{padding-left:14px;padding-right:14px}.lm-banner-main>img{width:92px}.lm-banner-copy strong{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.lm-place-badge,.lm-floating-actions{transition:none}}
