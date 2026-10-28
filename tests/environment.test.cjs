@@ -58,10 +58,31 @@ test('sample pools, map coordinates, photos and neighborhoods are absent in deve
   assert(read('course.js').includes("'pinmap.dev.courses.v1'"));
   assert(read('course.js').includes('else if(!PM_ENV.development)'));
 });
-test('entry routes only explicit development/prototype modes to onboarding app',()=>{
-  for(const mode of ['', 'development','prototype','invalid']) {
-    const frame={src:'entry.html'};
-    vm.runInNewContext(read('entry-router.js'),{location:{search:mode?'?mode='+mode:''},URLSearchParams,document:{querySelector:()=>frame}});
-    assert.equal(frame.src,['development','prototype'].includes(mode)?'app.html?mode='+mode:'entry.html');
+function route(search, navigationType='navigate') {
+  const frame={src:'app.html?mode=prototype'},replacements=[];
+  vm.runInNewContext(read('entry-router.js'),{
+    location:{search,pathname:'/index.html',hash:''},
+    performance:{getEntriesByType:()=>[{type:navigationType}]},
+    history:{replaceState:(state,title,url)=>replacements.push(url)},
+    URLSearchParams,document:{querySelector:()=>frame}
+  });
+  return {src:frame.src,replacements};
+}
+test('explicit choices enter the selected app once and remove the mode from the top URL',()=>{
+  for(const mode of ['development','prototype']) {
+    const result=route('?mode='+mode);
+    assert.equal(result.src,'app.html?mode='+mode);
+    assert.deepEqual(result.replacements,['/index.html']);
   }
+  assert.equal(route('').src,'entry.html');
+  assert.equal(route('?mode=invalid').src,'entry.html');
+});
+test('refresh always returns to version selection, including old links with a mode parameter',()=>{
+  for(const query of ['', '?mode=development','?mode=prototype']) {
+    assert.equal(route(query,'reload').src,'entry.html');
+  }
+  const first=route('?mode=development&v=review');
+  assert.equal(first.src,'app.html?mode=development');
+  assert.deepEqual(first.replacements,['/index.html?v=review']);
+  assert.equal(route('?v=review','reload').src,'entry.html');
 });

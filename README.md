@@ -40,3 +40,5 @@
 검증: `node --test tests/environment.test.cjs`.
 
 스타일/스크립트 수정 후 `python3 scripts/refresh-asset-versions.py`로 자산 버전을 갱신합니다. 전체 검증은 `node --test tests/*.test.cjs`를 실행합니다. 스타일 로딩 검사는 실패한 스타일을 한 번 재시도합니다.
+
+버전 선택은 한 번의 진입에만 적용됩니다. 새로고침하면 항상 버전 선택 화면으로 돌아오며, 각 모드에 저장한 콘텐츠와 설정은 유지됩니다.
