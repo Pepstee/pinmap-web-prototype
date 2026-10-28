@@ -5,7 +5,9 @@
   let expandedKey=null;
   const markerEntries=new Map();
   let userPosition = null;
-  let center = [37.5445, 127.043], zoom = 14, category = 'all';
+  let userHeading = null, locationWatch = null, orientationActive = false;
+  let locationBusy = false;
+  let center = [37.5445, 127.043], zoom = 15, category = 'all';
   let searchResults = null, searchQuery = '';
   const savedCoords = [
     {id:1, lat:37.5461, lng:127.0434, kind:'cafe', image:'img/cafe.jpg'},
@@ -29,7 +31,8 @@
   const localPhoto = kind => ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
   const categoryLabel = tag => ({station:'역',stop:'정류장',park:'공원',restaurant:'식당',cafe:'카페',museum:'박물관',gallery:'갤러리',shop:'상점',water:'호수',residential:'주거 지역'})[tag] || tag;
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
-  const round = (name, symbol) => `<button class="lm-round" data-lm="locate" aria-label="${name}">${icon(symbol)}</button>`;
+  const round = (name, symbol) => `<button class="lm-round" data-lm="locate" aria-label="${name}" title="${name}">${icon(symbol)}</button>`;
+  const routeIcon = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M5 7v8a4 4 0 0 0 4 4h2a4 4 0 0 0 0-8h2a6 6 0 0 0 6-6 M16 5h3v3"/></svg>';
   const safe = value => esc(value || '');
   const savedPlaces = () => {
     const pinned = savedCoords.map(position => {
@@ -42,16 +45,16 @@
   };
   function content() {
     return `<section class="live-map" aria-label="지도에서 장소 탐색"><div id="live-map-canvas"></div>
-      <header class="lm-header cfpage">
-        <div class="libhead cf-fhead"><h1>지도페이지</h1><button class="lm-course-link" data-page="courses" aria-label="저장한 코스 목록" title="저장한 코스 목록"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16 M4 12h16 M4 18h16"/></svg></button></div>
-        <form class="libsearch" id="lm-search" role="search">${icon('search')}<input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="장소명 또는 주소 검색" value="${safe(searchQuery)}" autocomplete="off"><button type="submit" class="libgo" aria-label="검색">${icon('arrow')}</button></form>
+      <header class="lm-header">
+        <h1 class="lm-sr-only">지도에서 저장한 장소 찾기</h1>
+        <div class="lm-search-row"><form class="lm-search-pill" id="lm-search" role="search">${icon('search')}<input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶으세요?" value="${safe(searchQuery)}" autocomplete="off"><button type="submit" class="lm-sr-only" aria-label="장소 검색">검색</button></form><button type="button" class="lm-saved-courses" data-page="courses" aria-label="저장한 코스 목록" title="저장한 코스 목록">${icon('folder')}</button></div>
+        <div class="lm-categories" role="group" aria-label="지도 카테고리">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}</div>
       </header>
-      <div class="lm-locate-top">${round('현재 위치로 이동','target')}</div>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
-      <div class="lm-bottom"><div class="lm-area"><button class="lm-course-create" data-course-new>${icon('plus')} 코스 짜기</button></div>
-      <div class="lm-categories" role="group" aria-label="지도 카테고리">${cats.map(([id,label]) => `<button data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-emoji">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}</div>
-      <nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></div></section>`;
+      <div class="lm-floating-actions">${round('현재 위치로 이동','target')}<button type="button" class="lm-course-create" data-course-new aria-label="코스 짜기" title="코스 짜기">${routeIcon}</button></div>
+      <div class="lm-selected-host" id="lm-selected-place" aria-live="polite" hidden></div>
+      <footer class="lm-bottom"><span class="lm-sheet-handle" aria-hidden="true"></span><p class="lm-place-count" id="lm-place-count"></p><nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></footer></section>`;
   }
   function status(message) { const el = $('#app .lm-status'); if (el) { el.textContent = message; el.hidden = !/못|실패|입력|확인하고|검색하고/.test(message); } }
   function visiblePlaces() {
@@ -61,20 +64,23 @@
   const placeKey=place=>`${place.saved?'saved':'search'}:${place.id}`;
   function markerIcon(place,expanded=false) {
     const symbol=categoryIcon(place.kind);
-    return L.divIcon({className:`lm-emoji-marker${expanded?' is-expanded':''}`,
-      html:expanded?`<span class="lm-expanded-pin">${place.saved&&place.image?`<img class="lm-pin-photo" src="${safe(place.image)}" alt="${safe(place.title)} 콘텐츠 사진">`:`<span class="lm-pin-photo-placeholder">${symbol}</span>`}<span class="lm-pin-copy"><b>${safe(place.title)}</b><small>${safe(place.category)}</small><span>${safe(place.address||'주소 정보 없음')}</span></span><span class="lm-pin-collapse" aria-hidden="true">×</span></span>`:`<span class="lm-emoji-pin">${symbol}</span>`,
-      iconSize:expanded?[240,88]:[46,46],iconAnchor:expanded?[23,44]:[23,23]});
+    return L.divIcon({className:`lm-photo-marker${expanded?' is-selected':''}`,
+      html:`<span class="lm-place-badge"><span class="lm-badge-image">${symbol}<img src="${safe(place.image||localPhoto(place.kind))}" alt=""></span><span class="lm-badge-category">${symbol}</span></span>`,
+      iconSize:[76,76],iconAnchor:[38,38]});
   }
   function updateMarker(entry,expanded) {
     entry.marker.setIcon(markerIcon(entry.place,expanded));
     entry.marker.setZIndexOffset(expanded?2000:0);
     const element=entry.marker.getElement();
-    element?.setAttribute('aria-label',`${entry.place.title}${expanded?' · '+entry.place.category+' · '+entry.place.address:''} · 장소 정보 ${expanded?'접기':'펼치기'}`);
+    element?.setAttribute('aria-label',`${entry.place.title} · ${entry.place.category} · 장소 정보 ${expanded?'닫기':'보기'}`);
     element?.setAttribute('aria-expanded',String(expanded));
+    element?.setAttribute('aria-controls','lm-selected-place');
   }
   function collapsePlace() {
     if(expandedKey&&markerEntries.has(expandedKey))updateMarker(markerEntries.get(expandedKey),false);
     expandedKey=null;
+    const host=$('#lm-selected-place');if(host){host.hidden=true;host.innerHTML='';}
+    $('#app .live-map')?.classList.remove('has-place');
   }
   function expandPlace(place,toggle=false) {
     const key=placeKey(place),previous=expandedKey;
@@ -82,15 +88,19 @@
     if(toggle&&previous===key)return;
     const entry=markerEntries.get(key);if(!entry)return;
     expandedKey=key;updateMarker(entry,true);
+    const host=$('#lm-selected-place');
+    const address=place.address||'주소 정보 없음';
+    host.innerHTML=`<article class="lm-place-banner" aria-label="선택한 장소 정보"><button class="lm-banner-main" data-lm="open-place" aria-label="${safe(place.title)} ${place.saved?'상세 보기':'외부 지도에서 보기'}"><img src="${safe(place.image||localPhoto(place.kind))}" alt=""><span class="lm-banner-copy"><strong>${safe(place.title)}</strong><span>${safe(place.category)} · ${place.saved?'저장한 장소':'검색한 장소'}</span><span class="lm-banner-address">${safe(address)}</span><b>${place.saved?'상세 보기':'지도에서 보기'} ${icon('arrow')}</b></span></button><button type="button" class="lm-banner-close" data-lm="close-place" aria-label="장소 정보 닫기">${icon('close')}</button></article>`;
+    host.hidden=false;$('#app .live-map')?.classList.add('has-place');
     const resultsPanel=$('#lm-search-results');if(resultsPanel)resultsPanel.hidden=true;
-    // Leave enough room for the expanded card, search header, and bottom controls.
-    liveMap.panInside([place.lat,place.lng],{paddingTopLeft:[35,260],paddingBottomRight:[230,275],animate:false});
+    liveMap.panInside([place.lat,place.lng],{paddingTopLeft:[48,200],paddingBottomRight:[48,300],animate:false});
     entry.marker.getElement()?.focus({preventScroll:true});
   }
   function markers() {
     if (!liveMap) return;
     collapsePlace();markerEntries.clear();pinLayer.clearLayers();
     const list = visiblePlaces();
+    const count=$('#lm-place-count');if(count)count.textContent=list.length?`${searchResults?'검색한':'저장한'} ${category==='all'?'장소':cats.find(([id])=>id===category)?.[1]||'장소'} ${list.length}곳`:'표시할 장소가 없어요';
     list.forEach(place => {
       const marker=L.marker([place.lat,place.lng],{title:place.title,icon:markerIcon(place),bubblingMouseEvents:false}).addTo(pinLayer);
       const entry={place,marker};markerEntries.set(placeKey(place),entry);updateMarker(entry,false);
@@ -103,6 +113,7 @@
     liveMap = L.map('live-map-canvas',{zoomControl:false,zoomAnimation:false}).setView(center,zoom);
     window.attachPinmapBasemap(liveMap);
     pinLayer = L.layerGroup().addTo(liveMap); markers(); drawLocation();
+    if(typeof window.DeviceOrientationEvent?.requestPermission!=='function')startOrientation();
     liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); });
     liveMap.on('click',collapsePlace);
     requestAnimationFrame(() => liveMap?.invalidateSize());
@@ -112,6 +123,7 @@
     expandedKey=null;markerEntries.clear();
     window.unmountCourseMap?.();
     window.unmountCourseThumbnails?.();
+    stopLocation();
     if (liveMap) { liveMap.remove(); liveMap=null; locationMarker=null; }
     const isMap = page === 'map' && !detailId;
     document.body.classList.toggle('live-map-page',isMap);
@@ -126,13 +138,48 @@
   function drawLocation() {
     if(!liveMap)return;
     if(locationMarker)liveMap.removeLayer(locationMarker);
-    const point=userPosition || [37.5445,127.043];
-    locationMarker=L.marker(point,{zIndexOffset:1000,icon:L.divIcon({className:'lm-location-marker',html:'<span class="lm-location-dot"></span>',iconSize:[22,22],iconAnchor:[11,11]}),title:'현재 위치'}).addTo(liveMap);
+    const point=userPosition || [37.5425,127.042];
+    const demo=!userPosition,heading=userHeading??(demo?35:null);
+    const label=demo?'성수동 예시 위치 · 방향 예시':heading==null?'현재 위치 · 방향 정보 없음':`현재 위치 · 북쪽 기준 ${Math.round(heading)}도`;
+    locationMarker=L.marker(point,{zIndexOffset:1000,icon:L.divIcon({className:'lm-location-marker',html:`<span class="lm-location-person${heading==null?' no-heading':''}" style="--heading:${heading??0}deg"><span class="lm-heading-cone" aria-hidden="true"></span><span class="lm-location-dot"></span>${demo?'<span class="lm-location-demo">예시 위치</span>':''}</span>`,iconSize:[92,92],iconAnchor:[46,46]}),title:label}).addTo(liveMap);
+    locationMarker.getElement()?.setAttribute('aria-label',label);
+  }
+  function updateHeading(event) {
+    const angle=Number.isFinite(event.webkitCompassHeading)?event.webkitCompassHeading:event.absolute&&Number.isFinite(event.alpha)?(360-event.alpha)%360:null;
+    if(angle==null||!liveMap)return;
+    userHeading=(angle+360)%360;
+    const person=locationMarker?.getElement()?.querySelector('.lm-location-person');
+    person?.classList.remove('no-heading');person?.style.setProperty('--heading',userHeading+'deg');
+    if(userPosition)locationMarker?.getElement()?.setAttribute('aria-label',`현재 위치 · 북쪽 기준 ${Math.round(userHeading)}도`);
+  }
+  function startOrientation() {
+    if(orientationActive)return;
+    window.addEventListener('deviceorientation',updateHeading);
+    window.addEventListener('deviceorientationabsolute',updateHeading);
+    orientationActive=true;
+  }
+  function stopLocation() {
+    if(locationWatch!==null)navigator.geolocation?.clearWatch(locationWatch);
+    locationWatch=null;locationBusy=false;
+    window.removeEventListener('deviceorientation',updateHeading);
+    window.removeEventListener('deviceorientationabsolute',updateHeading);orientationActive=false;
   }
   function locate() {
-    if(!liveMap)return;
-    userPosition=[37.5445,127.043];
-    liveMap.setView(userPosition,16);drawLocation();
+    if(!liveMap||locationBusy)return;
+    const request=window.DeviceOrientationEvent?.requestPermission;
+    if(typeof request==='function'){
+      try{Promise.resolve(request.call(window.DeviceOrientationEvent,true)).then(result=>{if(result==='granted'&&page==='map'&&liveMap)startOrientation();}).catch(()=>{});}catch{}
+    }else startOrientation();
+    if(userPosition){liveMap.setView(userPosition,16);drawLocation();if(locationWatch!==null)return;}
+    if(!navigator.geolocation){toast('이 기기에서는 현재 위치를 확인할 수 없어요.');return;}
+    locationBusy=true;
+    locationWatch=navigator.geolocation.watchPosition(position=>{
+      if(!liveMap||page!=='map')return;
+      const first=!userPosition;locationBusy=false;userPosition=[position.coords.latitude,position.coords.longitude];
+      // A GPS travel heading is not the direction the person is facing.
+      if(first)liveMap.setView(userPosition,16);
+      drawLocation();
+    },()=>{if(!liveMap||page!=='map')return;locationBusy=false;if(locationWatch!==null)navigator.geolocation.clearWatch(locationWatch);locationWatch=null;toast('위치 권한을 확인해주세요. 성수동 예시 지도를 유지합니다.');},{enableHighAccuracy:true,maximumAge:30000,timeout:12000});
   }
   function showResults() {
     const panel=$('#lm-search-results'); if(!panel) return;
@@ -160,7 +207,7 @@
       searchQuery=q;searchResults=found;
       category='all'; document.querySelectorAll('[data-lm-cat]').forEach(b=>{const on=b.dataset.lmCat==='all';b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on));});
       markers();showResults();
-      if(searchResults.length) liveMap.fitBounds(searchResults.map(x=>[x.lat,x.lng]),{maxZoom:16,padding:[82,180]});
+      if(searchResults.length) liveMap.fitBounds(searchResults.map(x=>[x.lat,x.lng]),{maxZoom:16,paddingTopLeft:[80,200],paddingBottomRight:[80,240]});
     } catch(error) { if(error.name!=='AbortError') status('검색 연결을 확인해 주세요. 저장한 장소명으로 다시 검색할 수 있어요.'); }
     finally { if(current===searchController && input) input.disabled=false; }
   }
@@ -172,10 +219,13 @@
     const button=event.target.closest('[data-lm]'); if(!button)return;
     switch(button.dataset.lm){
       case 'locate':locate();break;
-      case 'clear-search':searchResults=null;searchQuery='';$('#lm-search input').value='';$('#lm-search-results').hidden=true;center=[37.5445,127.043];zoom=14;liveMap?.setView(center,zoom);markers();break;
+      case 'close-place':{const key=expandedKey;collapsePlace();markerEntries.get(key)?.marker.getElement()?.focus({preventScroll:true});break;}
+      case 'open-place':{const place=markerEntries.get(expandedKey)?.place;if(!place)break;if(place.saved)openDetail(place.id);else window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place.lat+','+place.lng),'_blank','noopener,noreferrer');break;}
+      case 'clear-search':searchResults=null;searchQuery='';$('#lm-search input').value='';$('#lm-search-results').hidden=true;center=[37.5445,127.043];zoom=15;liveMap?.setView(center,zoom);markers();break;
     }
   });
-  document.addEventListener('keydown',event=>{if(page!=='map')return;if(event.key==='Escape'){collapsePlace();return;}if(event.key===' '&&event.target.closest('.lm-emoji-marker')){event.preventDefault();event.target.closest('.lm-emoji-marker').click();}});
+  document.addEventListener('error',event=>{if(event.target.matches?.('.lm-badge-image img'))event.target.hidden=true;},true);
+  document.addEventListener('keydown',event=>{if(page!=='map')return;if(event.key==='Escape'){collapsePlace();return;}if(event.key===' '&&event.target.closest('.lm-photo-marker')){event.preventDefault();event.target.closest('.lm-photo-marker').click();}});
   document.addEventListener('submit',event => { if(event.target.id==='lm-search'){event.preventDefault();searchPlaces(new FormData(event.target).get('q').trim());} });
   render();
 })();
