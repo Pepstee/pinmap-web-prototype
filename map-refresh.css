@@ -13,7 +13,11 @@
 .live-map .lm-header .lm-categories .lm-category-svg{width:26px;height:26px}
 .live-map .lm-header .lm-categories b{font-size:10px;font-weight:600;line-height:1.2;white-space:nowrap}
 .live-map .lm-header .lm-categories .selected{color:var(--lm-text)}
-.live-map .lm-header .lm-categories .selected::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2px;border-radius:2px;background:var(--lm-text)}
+.live-map .lm-header .lm-categories .selected b{text-decoration:none;font-weight:600}
+.live-map .lm-category-solid{display:none;fill:currentColor;stroke:none}
+.live-map .lm-header .lm-categories .selected .lm-category-line{display:none}
+.live-map .lm-header .lm-categories .selected .lm-category-solid{display:inline}
+.live-map .lm-header .lm-categories .selected::after{content:none}
 .live-map .lm-status{top:180px;left:16px;right:16px;max-width:none;z-index:605;font-size:12px;background:#fff;border:1px solid var(--lm-line);padding:10px 12px;border-radius:12px}
 .live-map .lm-search-results{top:179px;left:16px;right:16px;max-height:440px;z-index:610;background:#fff;backdrop-filter:none}
 .live-map .leaflet-control-attribution{max-width:220px;margin-bottom:80px!important;font-size:8px!important}

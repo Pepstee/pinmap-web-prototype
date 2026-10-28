@@ -27,7 +27,15 @@
     walk: 'M12 22v-7 M12 3a5 5 0 0 0-5 5 4 4 0 0 0 1 7h8a4 4 0 0 0 1-7 5 5 0 0 0-5-5z',
     shop: 'M5 8h14l-1 13H6z M9 8V6a3 3 0 0 1 6 0v2'
   };
-  const categoryIcon = kind => `<svg class="lm-category-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="${categoryPaths[kind] || paths.pin}"/></svg>`;
+  const categorySolidPaths = {
+    all: paths.spark,
+    eat: 'M3 3h2v5h1V3h2v5h1V3h2v5a4 4 0 0 1-3 3.87V21H6v-9.13A4 4 0 0 1 3 8V3Z M20 3v18h-2v-8h-3V9c0-3.5 2-6 5-6Z',
+    cafe: 'M4 4h12v1h2a4 4 0 0 1 0 8h-2v1a5 5 0 0 1-10 0V6H4V4Z M16 7v4h2a2 2 0 0 0 0-4h-2Z M3 20h16v2H3Z',
+    event: 'M3 5h18v4a3 3 0 0 0 0 6v4H3v-4a3 3 0 0 0 0-6V5Z M15 7v3h2V7h-2Z M15 11v2h2v-2h-2Z M15 14v3h2v-3h-2Z',
+    walk: 'M11 15H8a4 4 0 0 1-1-7 5 5 0 0 1 10 0 4 4 0 0 1-1 7h-3v7h-2v-7Z',
+    shop: 'M8 8V6a4 4 0 0 1 8 0v2h3l-1 13H6L5 8h3Z M10 8h4V6a2 2 0 0 0-4 0v2Z'
+  };
+  const categoryIcon = kind => `<svg class="lm-category-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="lm-category-line" d="${categoryPaths[kind] || paths.pin}"/><path class="lm-category-solid" fill-rule="evenodd" d="${categorySolidPaths[kind] || paths.pin}"/></svg>`;
   const localPhoto = kind => PM_ENV.development ? PM_ENV.placeholderImage : ({eat:'img/brunch.jpg',cafe:'img/cafe.jpg',event:'img/exhibit.jpg',walk:'img/park.jpg',shop:'img/lamp.jpg'})[kind] || 'img/park.jpg';
   const categoryLabel = tag => ({station:'역',stop:'정류장',park:'공원',restaurant:'식당',cafe:'카페',museum:'박물관',gallery:'갤러리',shop:'상점',water:'호수',residential:'주거 지역'})[tag] || tag;
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
