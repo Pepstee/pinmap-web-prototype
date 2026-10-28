@@ -107,13 +107,11 @@
 
 /* Move the shared dock highlight between tabs even though pages are rerendered. */
 .bottomnav .pm-nav-main{position:relative}
-.bottomnav .pm-nav-main .pm-nav-indicator{position:absolute;top:8px;left:4px;width:calc((100% - 8px) / 4);height:38px;display:grid;place-items:center;pointer-events:none;transform:translateX(var(--nav-to,0%))}
-.bottomnav .pm-nav-indicator::before{content:'';width:38px;height:38px;border-radius:21px;background:#ffffff9e;box-shadow:inset 0 1px 0 #fff}
-.bottomnav .pm-nav-main.is-sliding .pm-nav-indicator{animation:pm-nav-slide .34s cubic-bezier(.22,1,.36,1) both}
+.bottomnav .pm-nav-main .pm-nav-indicator{position:absolute;top:8px;left:4px;width:calc((100% - 8px) / 4);height:38px;display:grid;place-items:center;pointer-events:none;transform:translateX(var(--nav-position,0%));transition:transform .42s cubic-bezier(.22,1,.36,1)}
+.bottomnav .pm-nav-indicator::before{content:'';width:38px;height:38px;border-radius:21px;background:#fff;box-shadow:inset 0 1px 0 #fff,0 2px 9px #1112}
 .bottomnav .pm-nav-main .navitem{position:relative;z-index:1}
 .bottomnav .pm-nav-main .navitem.active .navicon{background:transparent!important;box-shadow:none!important}
-@keyframes pm-nav-slide{from{transform:translateX(var(--nav-from,0%))}to{transform:translateX(var(--nav-to,0%))}}
 @media(prefers-reduced-motion:reduce){
-  .bottomnav .pm-nav-main.is-sliding .pm-nav-indicator{animation:none}
+  .bottomnav .pm-nav-main .pm-nav-indicator{transition:none}
   .live-map .lm-header .lm-categories button,.live-map .lm-header .lm-categories .lm-category-line,.live-map .lm-header .lm-categories .lm-category-solid,.live-map .lm-header .lm-categories .lm-category-indicator{transition:none}
 }

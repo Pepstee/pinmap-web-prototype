@@ -9,14 +9,23 @@
   };
   const solid=name=>`<svg class="pm-solid" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="${silhouettes[name]}"></path></svg>`;
   let lastNavIndex=null;
+  function slideNav(index){
+    // Wait for the new page to paint before moving the highlight. Map mounting can
+    // otherwise finish the animation before the dock becomes visible.
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      const dock=document.querySelector('.bottomnav .pm-nav-main');
+      if(dock?.dataset.navTarget===String(index))dock.style.setProperty('--nav-position',`${index*100}%`);
+    }));
+  }
   nav=function(){
     const current=(typeof PARENT_TAB!=='undefined'&&PARENT_TAB[page])||page;
     const activePage=['course','courses'].includes(current)?'map':current;
     const index=Math.max(0,['home','map','library','my'].indexOf(activePage));
-    const from=lastNavIndex??index;
+    const from=matchMedia('(prefers-reduced-motion: reduce)').matches?index:lastNavIndex??index;
     queueMicrotask(()=>{lastNavIndex=index;});
+    if(from!==index)slideNav(index);
     const entry=(p,label)=>{const active=activePage===p;return `<button class="navitem ${active?'active':''}" data-page="${p}" aria-label="${label}" ${active?'aria-current="page"':''}><span class="navicon">${p==='my'?avatarHtml('pm-nav-avatar'):solid(p==='library'?'bookmark':p)}</span><span>${label}</span></button>`};
-    return `<span class="pm-nav-main${from===index?'':' is-sliding'}" style="--nav-from:${from*100}%;--nav-to:${index*100}%"><span class="pm-nav-indicator" aria-hidden="true"></span>${entry('home','홈')}${entry('map','지도')}${entry('library','저장함')}${entry('my','마이')}</span>`;
+    return `<span class="pm-nav-main" data-nav-target="${index}" style="--nav-position:${from*100}%"><span class="pm-nav-indicator" aria-hidden="true"></span>${entry('home','홈')}${entry('map','지도')}${entry('library','저장함')}${entry('my','마이')}</span>`;
   };
   // Keep the loaded basemap in the same moving pane as the markers.
   const attachFallbackBasemap=map=>{
