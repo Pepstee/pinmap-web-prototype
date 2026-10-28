@@ -119,7 +119,7 @@
 }
 .bottomnav .pm-nav-main::before{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  background:radial-gradient(ellipse 35% 110% at var(--nav-light) 0%,#ffffff30,transparent 80%),linear-gradient(180deg,#ffffff1a,#ffffff05 45%,#ffffff0d);
+  background:radial-gradient(ellipse 35% 110% at var(--nav-light) 0%,#ffffff30,transparent 80%),linear-gradient(180deg,#ffffff38,#ffffff1f 45%,#ffffff2e);
   -webkit-backdrop-filter:blur(3px) saturate(1.55);backdrop-filter:blur(3px) saturate(1.55);
   box-shadow:inset 0 2px 2px #ffffff55,inset 0 -2px 3px #ffffff30;
 }
@@ -149,8 +149,12 @@
   background:linear-gradient(145deg,#ffffff66,#ffffff1a 52%,#ffffff40);
   box-shadow:inset 1px 2px 3px #ffffffed,inset -1px -1px 2px #ffffff99,0 1px 5px #26313a24;
 }
-.bottomnav .pm-nav-main .navitem{position:relative;z-index:2}
-.bottomnav .pm-nav-main .navitem,.bottomnav .pm-nav-main .navitem *{color:#66696d!important}
+.bottomnav .pm-nav-main .navitem{position:relative;z-index:2;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.bottomnav .pm-nav-main .navitem .navicon{height:28px!important;background:transparent!important;box-shadow:none!important}
+.bottomnav .pm-nav-main .navitem>span.pm-nav-label{position:static!important;display:block!important;width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important;white-space:nowrap;font-size:10px;font-weight:600;line-height:11px;letter-spacing:.05px}
+.bottomnav .pm-nav-main .navitem:not(.active) .navicon{filter:drop-shadow(0 1px 2px #26313a80)}
+.bottomnav .pm-nav-main .navitem:not(.active) .pm-nav-label{text-shadow:0 1px 2px #26313aa6,0 0 4px #26313a66}
+.bottomnav .pm-nav-main .navitem,.bottomnav .pm-nav-main .navitem *{color:#fff!important}
 .bottomnav .pm-nav-main .navitem.active,.bottomnav .pm-nav-main .navitem.active *{color:#202124!important}
 .bottomnav .pm-nav-main .navitem .pm-nav-avatar{color:#fff!important}
 .bottomnav .pm-nav-main .navitem.active .navicon{background:transparent!important;box-shadow:none!important}

@@ -32,7 +32,8 @@
     const from=matchMedia('(prefers-reduced-motion: reduce)').matches?index:lastNavIndex??index;
     queueMicrotask(()=>{lastNavIndex=index;});
     if(from!==index)slideNav(index);
-    const entry=(p,label)=>{const active=activePage===p;return `<button class="navitem ${active?'active':''}" data-page="${p}" aria-label="${label}" ${active?'aria-current="page"':''}><span class="navicon">${p==='my'?avatarHtml('pm-nav-avatar'):solid(p==='library'?'bookmark':p)}</span></button>`};
+    const navLabels={home:'Home',map:'Map',library:'Saved',my:'Profile'};
+    const entry=(p,label)=>{const active=activePage===p;return `<button class="navitem ${active?'active':''}" data-page="${p}" aria-label="${label}" ${active?'aria-current="page"':''}><span class="navicon">${p==='my'?avatarHtml('pm-nav-avatar'):solid(p==='library'?'bookmark':p)}</span><span class="pm-nav-label" lang="en" aria-hidden="true">${navLabels[p]}</span></button>`};
     return `${navOptics}<span class="pm-nav-main" data-refraction="${refractsBackdrop}" data-nav-target="${index}" style="--nav-position:${from*100}%;--nav-light:${(from+.5)*25}%"><span class="pm-nav-indicator" aria-hidden="true"></span>${entry('home','홈')}${entry('map','지도')}${entry('library','저장함')}${entry('my','마이')}</span>`;
   };
   // Keep the loaded basemap in the same moving pane as the markers.
