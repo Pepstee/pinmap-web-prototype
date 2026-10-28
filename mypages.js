@@ -2,9 +2,9 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {placeset:'현재 위치', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', mapset:'위치 · 지도', howtopage:'저장하는 방법', appinfo:'앱 정보', account:'핀맵 계정 설정'};
+const MY_PAGES = {placeset:'현재 위치', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', mapset:'위치 · 지도', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', account:'핀맵 계정 설정'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
-const myPage = (title, body, cls = '') => `<div class="mypage ${cls}">${subHead(title)}${body}</div>`;
+const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
 /* ---------- 마이 첫 화면: 'SNS에서 바로 저장해보기' 빼고, 문구 · 메뉴 정리 ---------- */
 const myBase = pages.my;
@@ -72,6 +72,7 @@ Object.assign(actions, {
   mapsheet: () => go('mapset'),
   appinfo: () => go('appinfo'),
   account: () => go('account'),
+  guide: () => go('guide'),
   howto: () => go('howtopage')
 });
 // 마이의 '현재 위치' 줄은 페이지로 (홈 상단의 위치 버튼은 지금처럼 시트)
@@ -87,6 +88,14 @@ pages.appinfo = () => myPage('앱 정보', `<div class="mycard settings">
     <div class="setrow"><div><b>데이터 보관</b><small>예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.</small></div></div>
   </div>`);
 
+/* ---------- 이용 가이드 ---------- */
+pages.guide = () => myPage('이용 가이드', `<p class="muted mpdesc">핀맵 사용 방법을 언제든 다시 확인해 보세요.</p>
+  <section class="mgroup" aria-label="다시 보기 안내">
+    ${myRow('howto','📲','저장하는 방법 다시 보기')}
+    ${myRow('coachagain','👆','홈 화면 튜토리얼 다시 보기')}
+    ${myRow('intro','👋','온보딩 다시 보기')}
+  </section>`);
+
 /* ---------- 저장하는 방법 (온보딩 2번째 화면 내용만 · 다음 단계로 넘어가지 않아요) ---------- */
 pages.howtopage = function(){
   const keep = onboardStep; onboardStep = 1;
@@ -95,7 +104,7 @@ pages.howtopage = function(){
     .replace(/<h1 class="ob-title"[^>]*>[\s\S]*?<\/h1>/, '<h1 class="ob-title">저장하는 방법 다시 보기</h1><p class="ob-desc howtosub">마음에 드는 콘텐츠를 발견했다면?</p>');
   onboardStep = keep;
   return myPage('', `<div class="ob-screen step2 howtobody">${html}
-    <div class="ob-actions"><button class="filled ob-next" data-action="snsdemo">SNS 저장 체험 해보기</button></div></div>`, 'howtopage');
+    <div class="ob-actions"><button class="filled ob-next" data-action="snsdemo">SNS 저장 체험 해보기</button></div></div>`, 'howtopage', 'guide');
 };
 
 /* ---------- 핀맵 계정 설정: 로그아웃 · 탈퇴하기 (한 번 더 묻는 팝업) ---------- */

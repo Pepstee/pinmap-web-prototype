@@ -198,7 +198,7 @@ function drawOnboarding() {
   el.querySelector('.ob-title')?.focus?.();
   if (onboardStep === 0) onboardTimer = setTimeout(() => { onboardStep = 1; drawOnboarding(); }, 1400);
 }
-let onboardPreview = false; // 마이 > 온보딩 다시 보기: 고른 관심사를 반영하지 않고, 끝나면 마이로
+let onboardPreview = false; // 이용 가이드 > 온보딩 다시 보기: 고른 관심사를 반영하지 않고, 끝나면 가이드로
 let onboardFull = false; // 처음부터 본 온보딩일 때만 끝나고 튜토리얼을 보여줘요
 function openOnboarding(step = 0) {
   onboardFull = step === 0; onboardPreview = false;
@@ -225,7 +225,7 @@ function closeOnboarding() {
   $('#app').inert = false;
 }
 function finishOnboarding() {
-  if (onboardPreview) { onboardPreview = false; closeOnboarding(); go('my'); return; }
+  if (onboardPreview) { onboardPreview = false; closeOnboarding(); go('guide'); return; }
   onboardDone = true;
   persist();
   closeOnboarding();
@@ -235,7 +235,7 @@ function finishOnboarding() {
   else if (preferences.length) toast('관심사 기본값을 바꿨어요.');
 }
 intro = function() { openOnboarding(0); };
-// 온보딩 다시 보기 (처음 온보딩과 같은 화면이지만 연습용: 관심사 저장 안 함 · 끝나면 마이)
+// 온보딩 다시 보기 (처음 온보딩과 같은 화면이지만 연습용: 관심사 저장 안 함 · 끝나면 이용 가이드)
 function openOnboardingPreview(){ openOnboarding(0); onboardPreview = true; onboardFull = false; onboardDraft = []; drawOnboarding(); }
 
 actions.interests = () => openOnboarding(2);

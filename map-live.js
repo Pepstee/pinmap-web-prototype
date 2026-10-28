@@ -50,6 +50,7 @@
         <div class="lm-search-row"><form class="lm-search-pill" id="lm-search" role="search">${icon('search')}<input name="q" type="search" enterkeyhint="search" aria-label="지도 장소 검색" placeholder="어디로 가고 싶으세요?" value="${safe(searchQuery)}" autocomplete="off"><button type="submit" class="lm-sr-only" aria-label="장소 검색">검색</button></form></div>
         <div class="lm-categories" role="group" aria-label="지도 카테고리">${cats.map(([id,label]) => `<button type="button" data-lm-cat="${id}" class="${category===id?'selected':''}" aria-pressed="${category===id}"><span class="lm-category-art">${categoryIcon(id)}</span><b>${label}</b></button>`).join('')}</div>
       </header>
+      <div class="lm-neighborhood" aria-label="현재 동네">${myPlaces().length?placebar():'<span>위치 미설정</span>'}</div>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
       <button type="button" class="lm-directions-preview" aria-label="길찾기 · 준비 중" aria-disabled="true" title="길찾기 · 준비 중"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="m21 3-7 18-4-7-7-4 18-7Z M10 14 21 3"/></svg></button><div class="lm-floating-actions">${round('현재 위치로 이동','target')}<button type="button" class="lm-course-create" data-course-new aria-label="코스 짜기" title="코스 짜기">${routeIcon}</button></div>

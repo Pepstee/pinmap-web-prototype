@@ -3,7 +3,7 @@
 
 /* ---------- 프로필 사진 ---------- */
 const avatarHtml = (cls = '') => PM_ENV.development && !settings.avatar ? `<span class="pavatar ${cls}" aria-hidden="true">${icon('user')}</span>` : `<span class="pavatar ${cls}" aria-hidden="true"><img src="${settings.avatar || 'img/profile-demo.png'}" alt=""></span>`;
-const subHead = title => `<div class="subhead"><button class="subback" data-page="my" aria-label="마이로 돌아가기">${icon('back')}</button><h1>${title}</h1></div>`;
+const subHead = (title, back = 'my') => `<div class="subhead"><button class="subback" data-page="${back}" aria-label="${back === 'guide' ? '이용 가이드로' : '마이로'} 돌아가기">${icon('back')}</button><h1>${title}</h1></div>`;
 
 pages.profile = function(){
   return subHead('프로필 편집') + `

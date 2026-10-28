@@ -72,3 +72,11 @@
 .lm-empty-banner small{font-size:11px;color:var(--lm-muted)}
 .live-map .lm-directions-preview{position:absolute;top:184px;right:20px;z-index:550;width:46px;height:46px;display:grid;place-items:center;border:1px solid #fff!important;border-radius:50%;background:#ffffffdf!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:blur(15px)!important;cursor:default;color:var(--lm-text)}
 .live-map .lm-directions-preview svg{width:23px;height:23px}
+
+/* Teammate's neighborhood control, adapted to the photo-map header. */
+.live-map .lm-neighborhood{position:absolute;left:20px;top:184px;z-index:550;max-width:calc(100% - 96px);padding:9px 12px;border:1px solid #fff;border-radius:18px;background:#ffffffed;box-shadow:0 3px 12px #1112;font-size:12px;color:var(--lm-muted)}
+.live-map .lm-neighborhood .placebar{display:flex;align-items:center;gap:10px;margin:0;padding:0;min-height:26px}
+.live-map .lm-neighborhood .placemain,.live-map .lm-neighborhood .placesub{display:flex;align-items:center;gap:5px;min-width:0;padding:0;background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;white-space:nowrap}
+.live-map .lm-neighborhood .placemain{font-size:14px;line-height:1.4;font-weight:700;color:var(--lm-text)}
+.live-map .lm-neighborhood .placesub{font-size:12px;line-height:1.4;color:var(--lm-muted)}
+.live-map .lm-neighborhood svg{width:17px;height:17px;flex:none}

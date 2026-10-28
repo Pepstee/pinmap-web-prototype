@@ -63,14 +63,15 @@ function homePicks(){
   if (picks.length < 3) ready.filter(x => !seen.has(x.id)).sort(photoFirst).slice(0, 3 - picks.length).forEach(x => picks.push({x, id:null}));
   return picks;
 }
-function pickCard({x, id}, i){
+function pickCard({x, id}, i, total = 1){
   // 관심사 이름을 보여주고, '기타(나중에 보기)'나 랜덤 추천이면 콘텐츠별 키워드(가구 · 전시 · 맛집 …)를 보여줘요
   const tag = id && id !== 'later' ? interestOf(id).short : (x.category || shortType(x.type));
   const desc = (x.desc || '').trim().replace(/[.。]+$/, '');
-  return `<button class="pick" data-detail="${x.id}" data-i="${i}" aria-label="${esc(x.title)} 상세 보기">
+  return `<button class="pick" data-detail="${x.id}" data-i="${i}" aria-label="${esc(x.title)} 상세 보기${total > 1 ? `, 추천 콘텐츠 ${i + 1} / ${total}` : ''}">
     <span class="pickimg">${libThumb(x)}</span>
     <span class="pickword" aria-hidden="true">${esc(tag)}</span>
     <span class="picktext"><b>${esc(x.title)}</b>${desc ? `<small>${esc(desc)}</small>` : ''}</span>
+    ${total > 1 ? `<span class="pickdots" aria-hidden="true">${Array.from({length:total}, (_, j) => `<i class="${j === i ? 'on' : ''}"></i>`).join('')}</span>` : ''}
   </button>`;
 }
 
@@ -122,9 +123,10 @@ pages.home = function(){
   const chips = `<div class="chiprows" role="group" aria-label="카테고리 바로가기"><div class="prefchips">${order.slice(0, half).map(chip).join('')}</div><div class="prefchips">${order.slice(half).map(chip).join('')}</div></div>`;
   const picks = homePicks();
   const main = picks.length
-    ? `<div class="mainwrap"><div class="mainpick" aria-label="추천 저장 콘텐츠">${picks.map((p, i) => pickCard(p, i)).join('')}</div>${picks.length > 1 ? `<div class="herodots pickdots" aria-hidden="true">${picks.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : ''}</div>`
+    ? `<div class="mainwrap"><div class="mainpick" aria-label="추천 저장 콘텐츠">${picks.map((p, i) => pickCard(p, i, picks.length)).join('')}</div></div>`
     : `<div class="empty small"><p class="muted">선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.</p><button class="tonal" data-action="save">새로 저장하기</button></div>`;
-  return stripBar() + placebar() + main + calWidget() + chips + subWidgets();
+  const brand = `<div class="homebrand" aria-label="핀맵 로고"><img src="${PM_IMG.logo}" alt=""><span aria-hidden="true">PINMAP</span></div>`;
+  return stripBar() + brand + main + calWidget() + chips + subWidgets();
 };
 
 /* 캘린더 위젯의 날짜를 누르면 그 날짜가 선택된 캘린더로 */
@@ -175,8 +177,6 @@ function layoutPicks(){
     c.style.visibility = a > 1.7 ? 'hidden' : '';
     c.setAttribute('aria-hidden', a > 0.5 ? 'true' : 'false'); c.tabIndex = a > 0.5 ? -1 : 0;
   });
-  const cur = wrapIdx(pickPos, n);
-  track.parentNode.querySelectorAll('.pickdots i').forEach((dot, i) => dot.classList.toggle('on', i === cur));
 }
 const easeOut = t => 1 - Math.pow(1 - t, 3);
 function animatePick(to){
