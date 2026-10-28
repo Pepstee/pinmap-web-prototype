@@ -155,7 +155,7 @@
 .bottomnav .pm-nav-main .navitem>span.pm-nav-label{position:static!important;display:block!important;width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important;white-space:nowrap;font-size:10px;font-weight:600;line-height:11px;letter-spacing:.05px}
 .bottomnav .pm-nav-main .navitem:not(.active) .navicon{filter:none!important}
 .bottomnav .pm-nav-main .navitem:not(.active) .pm-nav-label{text-shadow:none!important}
-.bottomnav .pm-nav-main .navitem,.bottomnav .pm-nav-main .navitem *{color:#5f6268!important}
+.bottomnav .pm-nav-main .navitem,.bottomnav .pm-nav-main .navitem *{color:#73777d!important}
 .bottomnav .pm-nav-main .navitem.active,.bottomnav .pm-nav-main .navitem.active *{color:#202124!important}
 .bottomnav .pm-nav-main .navitem .pm-nav-avatar{color:#fff!important}
 .bottomnav .pm-nav-main .navitem.active .navicon{background:transparent!important;box-shadow:none!important}
