@@ -51,11 +51,11 @@
     const host=map.getContainer();
     try {
       const layer=L.maplibreGL({
-        style:'https://tiles.openfreemap.org/styles/positron',
+        style:'map-style.json?v=f18b114e4502',
         interactive:false,
         attributionControl:{customAttribution:'<a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a> · © <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}
       }).addTo(map);
-      host.dataset.basemap='positron';
+      host.dataset.basemap='warm-minimal';
       layer.getMaplibreMap().on('load',()=>{host.dataset.basemapReady='true';});
       return layer;
     } catch(error) {
