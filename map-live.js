@@ -64,7 +64,7 @@
   const placeKey=place=>`${place.saved?'saved':'search'}:${place.id}`;
   function markerIcon(place,expanded=false) {
     return L.divIcon({className:`lm-photo-marker${expanded?' is-selected':''}`,
-      html:`<span class="lm-place-badge"><span class="lm-badge-image"><img src="${safe(place.image||localPhoto(place.kind))}" alt=""></span></span>`,
+      html:`<span class="lm-place-badge"><span class="lm-badge-image"><img src="${safe(place.image||localPhoto(place.kind))}" alt=""></span><span class="lm-badge-category">${categoryIcon(place.kind)}</span></span>`,
       iconSize:[60,60],iconAnchor:[30,30]});
   }
   function updateMarker(entry,expanded) {
