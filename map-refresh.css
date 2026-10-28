@@ -109,11 +109,12 @@
    Separate the backdrop, moving light and reflective rim so white tint does not
    wash out the content. This is a web material, not Apple's native renderer. */
 @property --nav-light { syntax: '<percentage>'; inherits: true; initial-value: 12.5%; }
+.bottomnav,.live-map .bottomnav{box-shadow:none!important}
 .bottomnav .pm-nav-main{
   position:relative;
   background:transparent!important;
   border:1px solid transparent!important;
-  box-shadow:0 4px 14px #18232d18,0 1px 2px #18232d0a!important;
+  box-shadow:none!important;
   -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
   transition:--nav-light .42s cubic-bezier(.22,1,.36,1);
 }
@@ -121,7 +122,7 @@
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:radial-gradient(ellipse 35% 110% at var(--nav-light) 0%,#ffffff30,transparent 80%),linear-gradient(180deg,#ffffff38,#ffffff1f 45%,#ffffff2e);
   -webkit-backdrop-filter:blur(3px) saturate(1.55);backdrop-filter:blur(3px) saturate(1.55);
-  box-shadow:inset 0 2px 2px #ffffff55,inset 0 -2px 3px #ffffff30;
+  box-shadow:none;
 }
 .bottomnav .pm-nav-optics{position:absolute;width:0!important;height:0!important;overflow:hidden;pointer-events:none}
 .bottomnav .pm-nav-main[data-refraction="true"]::before{
@@ -142,19 +143,19 @@
   content:'';box-sizing:border-box;width:calc(100% + 8px);height:48px;border-radius:24px;
   background:linear-gradient(145deg,#ffffffaa,#ffffff48 52%,#ffffff88);
   border:1px solid #ffffffe6;
-  box-shadow:inset 1px 2px 2px #ffffffb3,inset -1px -1px 2px #ffffff66,0 1px 3px #26313a12;
+  box-shadow:none;
   transition:background .15s,box-shadow .15s;
 }
 .bottomnav .pm-nav-main:has(.navitem:active) .pm-nav-indicator::before{
   background:linear-gradient(145deg,#ffffff66,#ffffff1a 52%,#ffffff40);
-  box-shadow:inset 1px 2px 3px #ffffffed,inset -1px -1px 2px #ffffff99,0 1px 5px #26313a24;
+  box-shadow:none;
 }
-.bottomnav .pm-nav-main .navitem{position:relative;z-index:2;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.bottomnav .pm-nav-main .navitem{position:relative;z-index:2;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:1px;box-shadow:none!important}
 .bottomnav .pm-nav-main .navitem .navicon{height:28px!important;background:transparent!important;box-shadow:none!important}
 .bottomnav .pm-nav-main .navitem>span.pm-nav-label{position:static!important;display:block!important;width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important;white-space:nowrap;font-size:10px;font-weight:600;line-height:11px;letter-spacing:.05px}
-.bottomnav .pm-nav-main .navitem:not(.active) .navicon{filter:drop-shadow(0 1px 1px #26313a70)}
-.bottomnav .pm-nav-main .navitem:not(.active) .pm-nav-label{text-shadow:0 1px 2px #26313a90}
-.bottomnav .pm-nav-main .navitem,.bottomnav .pm-nav-main .navitem *{color:#fff!important}
+.bottomnav .pm-nav-main .navitem:not(.active) .navicon{filter:none!important}
+.bottomnav .pm-nav-main .navitem:not(.active) .pm-nav-label{text-shadow:none!important}
+.bottomnav .pm-nav-main .navitem,.bottomnav .pm-nav-main .navitem *{color:#b8bdc3!important}
 .bottomnav .pm-nav-main .navitem.active,.bottomnav .pm-nav-main .navitem.active *{color:#202124!important}
 .bottomnav .pm-nav-main .navitem .pm-nav-avatar{color:#fff!important}
 .bottomnav .pm-nav-main .navitem.active .navicon{background:transparent!important;box-shadow:none!important}
