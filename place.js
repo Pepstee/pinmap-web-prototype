@@ -1,7 +1,7 @@
-// 홈 상단 '내 동네' (최대 2개)
+// 홈과 지도 상단 '내 동네' (최대 3개)
 // 메인 동네는 검정 큰 글씨, 서브 동네는 회색 작은 글씨. 서브를 누르면 서로 자리가 바뀌어요.
 // 메인 동네를 누르면 '내 동네 설정' 시트가 올라와 추가 · 삭제 · 수정할 수 있어요.
-const MAX_PLACES = 2;
+const MAX_PLACES = 3;
 // 검색용 동네 목록 (예시)
 const DONGS = (PM_ENV.development ? [] : [
   ['성수동','서울 성동구'],['성수1가1동','서울 성동구'],['성수2가3동','서울 성동구'],['행당동','서울 성동구'],['왕십리동','서울 성동구'],['금호동','서울 성동구'],['옥수동','서울 성동구'],
@@ -21,11 +21,11 @@ const inMainPlace = x => !!mainPlace() && (x.address||'').includes(mainPlace().r
 let placeSwapped = false; // 위치를 바꿨을 때만 글자 애니메이션
 function placebar(){
   if(PM_ENV.development&&!myPlaces().length)return `<div class="placebar"><button class="placemain" data-page="map">${icon('pin')}<b>위치를 아직 설정하지 않았어요</b></button></div>`;
-  const [main, sub] = myPlaces();
+  const [main, ...others] = myPlaces();
   const swapped = placeSwapped; placeSwapped = false;
   return `<div class="placebar${swapped ? ' swapped' : ''}" role="group" aria-label="현재 위치">
-    <button class="placemain" data-action="placesheet" aria-label="현재 위치 설정 · 현재 ${esc(main)}">${icon('pin')}<b>${esc(main)}</b>${sub ? '' : icon('chevron')}</button>
-    ${sub ? `<button class="placesub" data-place-swap aria-label="${esc(sub)}(으)로 바꾸기">${esc(sub)}</button>` : ''}
+    <button class="placemain" data-action="placesheet" aria-label="현재 위치 설정 · 현재 ${esc(main)}">${icon('pin')}<b>${esc(main)}</b>${others.length ? '' : icon('chevron')}</button>
+    ${others.map((name,index) => `<button class="placesub" data-place-swap="${index+1}" aria-label="${esc(settings.placeLabels?.[name] || name)} · ${esc(name)} 위치 선택">${esc(settings.placeLabels?.[name] || name)}</button>`).join('')}
   </div>`;
 }
 paths.chevron = 'm6 9 6 6 6-6';
@@ -35,7 +35,9 @@ function setMain(i){
   const p = myPlaces();
   if (i <= 0 || i >= p.length) return;
   const [picked] = p.splice(i, 1); p.unshift(picked); placeSwapped = true;
-  afterChange(); render(); toast(`위치를 '${picked}'(으)로 변경했어요.`);
+  afterChange(); render();
+  window.dispatchEvent(new CustomEvent('pinmap:place-changed',{detail:{name:picked}}));
+  toast(`위치를 '${picked}'(으)로 변경했어요.`);
 }
 
 /* ---------- 현재 위치 설정 시트 ---------- */
@@ -43,7 +45,7 @@ function placeSheet(){
   const p = myPlaces();
   const rows = p.map((name, i) => `<div class="prow">
       <button class="pradio ${i===0?'on':''}" data-place-pick="${i}" role="radio" aria-checked="${i===0}" aria-label="${esc(name)} 선택"></button>
-      <button class="pname" data-place-pick="${i}"><b>${esc(name)}</b><small>${esc(dongOf(name).full)}${i===0?' · 현재 위치':''}</small></button>
+      <button class="pname" data-place-pick="${i}"><b>${esc(settings.placeLabels?.[name] || name)}</b><small>${esc(dongOf(name).full)}${i===0?' · 현재 위치':''}</small></button><button class="picon plabel-edit" data-place-label="${i}" aria-label="${esc(name)} 이름 지정">이름</button>
       <button class="picon" data-place-edit="${i}" aria-label="${esc(name)} 수정">${icon('edit')}</button>
       <button class="picon" data-place-del="${i}" aria-label="${esc(name)} 삭제" ${p.length===1?'disabled':''}>${icon('close')}</button>
     </div>`).join('');
@@ -51,6 +53,15 @@ function placeSheet(){
     <div class="plist" role="radiogroup" aria-label="현재 위치">${rows}</div>
     ${p.length < MAX_PLACES ? `<button class="padd" data-action="placeadd">${icon('plus')} 위치 추가</button>` : `<p class="hint pfull">위치를 바꾸려면 ✎ 수정을 누르거나, 하나를 삭제한 뒤 추가하세요.</p>`}
     ${p.length===1 ? '<p class="hint pfull">위치는 최소 1개가 필요해서 삭제할 수 없어요.</p>' : ''}`);
+  $('#sheet').classList.add('bottomsheet');
+}
+
+/* ---------- 자주 가는 위치 이름 ---------- */
+let labelPlaceIndex = -1;
+function placeLabelSheet(index){
+  const name=myPlaces()[index];if(!name)return;
+  labelPlaceIndex=index;
+  modal('위치 이름 지정', `<form id="place-label-form"><p class="muted psub">${esc(name)}에 표시할 이름을 입력하세요. 예: 집, 학교</p><label class="psearch"><input name="label" aria-label="위치 이름" maxlength="12" placeholder="집, 학교 등" value="${esc(settings.placeLabels?.[name] || '')}"></label><div class="dialogactions"><button type="submit" class="primary">저장</button></div></form>`);
   $('#sheet').classList.add('bottomsheet');
 }
 
@@ -81,10 +92,11 @@ function choosePlace(name){
   const p = myPlaces();
   if (p.includes(name)) { toast('이미 설정한 위치예요.'); return; }
   const before = placeMode.type === 'edit' ? p[placeMode.index] : null;
-  if (placeMode.type === 'edit' && placeMode.index >= 0) p[placeMode.index] = name;
+  if (placeMode.type === 'edit' && placeMode.index >= 0) { p[placeMode.index] = name; if(before && settings.placeLabels?.[before]){settings.placeLabels={...settings.placeLabels,[name]:settings.placeLabels[before]};delete settings.placeLabels[before];} }
   else { if (p.length >= MAX_PLACES) { toast(`위치는 최대 ${MAX_PLACES}개까지 설정할 수 있어요.`); return; } p.unshift(name); }
   settings.recentPlaces = [...new Set([before, ...(settings.recentPlaces||[])].filter(n => n && !p.includes(n)))].slice(0,5);
   afterChange(); $('#sheet').close(); render();
+  if(placeMode.type==='add'||placeMode.index===0)window.dispatchEvent(new CustomEvent('pinmap:place-changed',{detail:{name:myPlaces()[0]}}));
   toast(placeMode.type === 'edit' ? `'${before}'을(를) '${name}'(으)로 수정했어요.` : `위치를 '${name}'(으)로 변경했어요.`);
 }
 
@@ -94,15 +106,17 @@ Object.assign(actions, {
 });
 $('#sheet').addEventListener('close', () => $('#sheet').classList.remove('placesearch', 'bottomsheet'));
 document.addEventListener('click', e => {
-  if (e.target.closest('[data-place-swap]')) { setMain(1); return; }
+  const swap=e.target.closest('[data-place-swap]'); if (swap) { setMain(Number(swap.dataset.placeSwap)); return; }
   const pick = e.target.closest('[data-place-pick]');
   if (pick) { const i = Number(pick.dataset.placePick); if (i > 0) { setMain(i); placeSheet(); } return; }
+  const named=e.target.closest('[data-place-label]'); if(named){placeLabelSheet(Number(named.dataset.placeLabel));return;}
   const ed = e.target.closest('[data-place-edit]');
   if (ed) { placeSearch({type:'edit', index:Number(ed.dataset.placeEdit)}); return; }
   const del = e.target.closest('[data-place-del]');
   if (del) {
     const p = myPlaces(); if (p.length === 1) return;
     const [gone] = p.splice(Number(del.dataset.placeDel), 1);
+    if(settings.placeLabels)delete settings.placeLabels[gone];
     settings.recentPlaces = [gone, ...(settings.recentPlaces||[]).filter(n => n !== gone)].slice(0,5);
     afterChange(); render(); placeSheet(); toast(`'${gone}'을(를) 위치 목록에서 삭제했어요.`);
     return;
@@ -111,3 +125,14 @@ document.addEventListener('click', e => {
   if (ch) choosePlace(ch.dataset.placeChoose);
 });
 document.addEventListener('input', e => { if (e.target.id === 'placeq') $('#placeresults').innerHTML = placeResults(e.target.value); });
+
+document.addEventListener('submit',e=>{
+  if(e.target.id!=='place-label-form')return;
+  e.preventDefault();
+  const name=myPlaces()[labelPlaceIndex];if(!name)return;
+  const label=new FormData(e.target).get('label').trim().slice(0,12);
+  settings.placeLabels={...settings.placeLabels};
+  if(label)settings.placeLabels[name]=label;
+  else delete settings.placeLabels[name];
+  afterChange();$('#sheet').close();render();toast(label?`'${name}' 위치 이름을 '${label}'(으)로 저장했어요.`:`'${name}' 위치 이름을 지웠어요.`);
+});
