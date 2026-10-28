@@ -75,6 +75,15 @@ function pickCard({x, id}, i, total = 1){
   </button>`;
 }
 
+// Reuse the banner's existing cards and content slots without inventing content.
+function emptyPickCards(){
+  return Array.from({length:3},()=>`<div class="pick pick-placeholder" aria-hidden="true">
+    <span class="pickimg"></span><span class="pickword"><i></i></span>
+    <span class="picktext"><b><i></i></b><small><i></i></small></span>
+    <span class="pickdots"><i></i><i></i><i></i></span>
+  </div>`).join('');
+}
+
 /* ---------- 캘린더 위젯: 오늘부터 7일 · 마감 있는 날에 점 ---------- */
 function calWidget(){
   const due = calDueList(), byDay = {};
@@ -123,7 +132,7 @@ pages.home = function(){
   const chips = `<div class="chiprows" role="group" aria-label="카테고리 바로가기"><div class="prefchips">${order.slice(0, half).map(chip).join('')}</div><div class="prefchips">${order.slice(half).map(chip).join('')}</div></div>`;
   const picks = homePicks();
   const main = picks.length || PM_ENV.development
-    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'aria-label="추천 저장 콘텐츠"':'aria-hidden="true"'}>${picks.map((p, i) => pickCard(p, i, picks.length)).join('')}</div></div>`
+    ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div></div>`
     : `<div class="empty small"><p class="muted">선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.</p><button class="tonal" data-action="save">새로 저장하기</button></div>`;
   const brand = `<div class="homebrand" aria-label="핀맵 로고"><img src="${PM_IMG.logo}" alt=""><span aria-hidden="true">PINMAP</span></div>`;
   return stripBar() + brand + main + calWidget() + chips + subWidgets();
@@ -175,7 +184,7 @@ function layoutPicks(){
     c.style.filter = k > 0.01 ? `brightness(${(1 - k * 0.1).toFixed(3)})` : '';
     c.style.zIndex = String(100 - Math.round(a * 10));
     c.style.visibility = a > 1.7 ? 'hidden' : '';
-    c.setAttribute('aria-hidden', a > 0.5 ? 'true' : 'false'); c.tabIndex = a > 0.5 ? -1 : 0;
+    c.setAttribute('aria-hidden', a > 0.5 ? 'true' : 'false'); c.tabIndex = track.dataset.placeholder==='true' || a > 0.5 ? -1 : 0;
   });
 }
 const easeOut = t => 1 - Math.pow(1 - t, 3);
@@ -203,7 +212,7 @@ window.addEventListener('resize', layoutPicks);
 
 // 끌어서 넘기기 (터치 · 마우스 공통). 세로로 움직이면 화면 스크롤에 양보해요
 document.addEventListener('pointerdown', e => {
-  const track = e.target.closest('.mainpick'); if (!track || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  const track = e.target.closest('.mainpick'); if (!track || track.dataset.placeholder==='true' || (e.pointerType === 'mouse' && e.button !== 0)) return;
   cancelAnimationFrame(pickAnim); pickAnim = null;
   pickDrag = {id:e.pointerId, x:e.clientX, y:e.clientY, pos:pickPos, mode:null, track, w:track.children[0]?.offsetWidth || 300, hist:[[performance.now(), e.clientX]]};
 });
@@ -241,7 +250,8 @@ document.addEventListener('pointercancel', endPickDrag);
 // 트랙패드 · 마우스 가로 휠
 let wheelAcc = 0, wheelLock = 0;
 document.addEventListener('wheel', e => {
-  if (!e.target.closest?.('.mainpick') || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+  const track=e.target.closest?.('.mainpick');
+  if (!track || track.dataset.placeholder==='true' || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
   e.preventDefault();
   if (performance.now() < wheelLock) return;
   wheelAcc += e.deltaX;
@@ -249,14 +259,15 @@ document.addEventListener('wheel', e => {
 }, {passive:false});
 // 누르기: 가운데 카드는 상세, 옆 카드는 그 카드로 이동
 document.addEventListener('click', e => {
-  const card = e.target.closest('.mainpick .pick'); if (!card) return;
+  const card = e.target.closest('.mainpick .pick'); if (!card || card.classList.contains('pick-placeholder')) return;
   if (pickJustDragged) { e.preventDefault(); e.stopImmediatePropagation(); return; }
   const n = pickCount(), i = Number(card.dataset.i), d = pickOffset(i, pickPos, n);
   if (Math.abs(d) > 0.5) { e.preventDefault(); e.stopImmediatePropagation(); goPick(Math.round(pickPos) + Math.round(d)); }
 }, true);
 document.addEventListener('dragstart', e => { if (e.target.closest?.('.mainpick')) e.preventDefault(); });
 document.addEventListener('keydown', e => {
-  if (!e.target.closest?.('.mainpick') || !['ArrowLeft','ArrowRight'].includes(e.key)) return;
+  const track=e.target.closest?.('.mainpick');
+  if (!track || track.dataset.placeholder==='true' || !['ArrowLeft','ArrowRight'].includes(e.key)) return;
   e.preventDefault(); goPick(Math.round(pickPos) + (e.key === 'ArrowRight' ? 1 : -1));
   setTimeout(() => pickTrack()?.querySelector('.pick[tabindex="0"]')?.focus(), PICK.dur);
 });

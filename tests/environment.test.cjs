@@ -123,13 +123,17 @@ test('disconnected map controls do not request location or fetch external places
   assert(messages.every(text=>text.includes('연결되지')));
 });
 
-test('empty development home reserves the original banner container without adding text or buttons',()=>{
+test('empty home shows the existing card layout as placeholders without real content or actions',()=>{
   const source=read('home.js'),start=source.indexOf('pages.home = function(){'),end=source.indexOf('\n};',start)+3;
-  const html=vm.runInNewContext(source.slice(start,end)+';pages.home();',{
+  const placeholderStart=source.indexOf('function emptyPickCards(){'),placeholderEnd=source.indexOf('\n/* ---------- 캘린더',placeholderStart);
+  const html=vm.runInNewContext(source.slice(placeholderStart,placeholderEnd)+source.slice(start,end)+';pages.home();',{
     PM_ENV:{development:true},pages:{},preferences:[],interestOptions:[],homePicks:()=>[],
     stripBar:()=>'',calWidget:()=>'<section id="calendar"></section>',subWidgets:()=>'',PM_IMG:{logo:'logo.png'}
   });
-  assert(html.includes('<div class="mainwrap"><div class="mainpick" aria-hidden="true"></div></div>'));
+  assert(html.includes('class="mainpick" data-placeholder="true" aria-hidden="true"'));
+  assert.equal((html.match(/class="pick pick-placeholder"/g)||[]).length,3);
+  for(const slot of ['pickimg','pickword','picktext','pickdots'])assert(html.includes('class="'+slot+'"'));
+  assert(!html.includes('data-detail='));
   assert(!html.includes('data-action="save"'));
   assert(!html.includes('선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.'));
   assert(html.indexOf('mainpick')<html.indexOf('id="calendar"'));
