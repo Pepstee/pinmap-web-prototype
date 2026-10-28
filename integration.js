@@ -51,9 +51,9 @@
     const host=map.getContainer();
     try {
       const layer=L.maplibreGL({
-        style:'map-style.json?v=f7fe5b97aa00',
+        style:'map-style.json?v=47c49842960b',
         interactive:false,
-        attributionControl:{customAttribution:'<a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a> · © <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'}
+        attributionControl:{customAttribution:'<a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a> · © <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · 출구 © <a href="https://portal.esrikr.com/arcgis/rest/services/Hosted/MOIS_KR_Subway/FeatureServer/0" target="_blank" rel="noopener">행정안전부·Esri Korea</a>'}
       }).addTo(map);
       host.dataset.basemap='warm-minimal';
       layer.getMaplibreMap().on('load',()=>{host.dataset.basemapReady='true';});
