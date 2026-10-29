@@ -227,7 +227,7 @@
     if(!searchResults) { panel.hidden=true; return; }
     const list=visiblePlaces(); panel.hidden=false;
     panel.innerHTML=`<div class="lm-results-head"><b>장소 검색 · ${list.length}곳</b><button data-lm="clear-search" aria-label="검색 닫기">✕</button></div><small class="lm-result-credit">저장한 장소 우선 검색 · 외부 장소 © OpenStreetMap / Photon</small>`+
-      (list.length ? list.map((x,i) => `<button class="lm-result-row" data-result="${i}"><img src="${x.image}" alt=""><span><b>${safe(x.title)}</b><small>${safe(x.address)}</small></span>${icon('arrow')}</button>`).join('') : '<p>일치하는 장소가 없어요. 다른 이름이나 주소로 검색해 보세요.</p>');
+      (list.length ? list.map((x,i) => `<button class="lm-result-row" data-result="${i}"><img src="${safe(x.image)}" alt=""><span><b>${safe(x.title)}</b><small>${safe(x.address)}</small></span>${icon('arrow')}</button>`).join('') : '<p>일치하는 장소가 없어요. 다른 이름이나 주소로 검색해 보세요.</p>');
   }
   async function searchPlaces(q) {
     if(PM_ENV.development){toast('장소 데이터가 아직 연결되지 않았어요.');return;}
