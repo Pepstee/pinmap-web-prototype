@@ -106,6 +106,7 @@
     sheetStage=stage;
     const sheet=$('#lm-selected-place .lm-sheet');if(!sheet)return;
     sheet.style.removeProperty('--lm-sheet-height');sheet.classList.remove('is-dragging','is-peek','is-half','is-full');sheet.classList.add('is-'+stage);
+    sheet.closest('.live-map')?.style.removeProperty('--lm-actions-sheet-height');
     const handle=sheet.querySelector('.lm-sheet-handle');
     handle?.setAttribute('aria-expanded',String(stage!=='peek'));
   }
@@ -123,7 +124,9 @@
       if(!sheetDrag.moved)return;
       event.preventDefault();sheet.classList.add('is-dragging');
       const min=expandedKey?sheet.parentElement.clientHeight*.5:162;
-      sheet.style.setProperty('--lm-sheet-height',Math.max(min,Math.min(sheet.parentElement.clientHeight,sheetDrag.height+delta))+'px');
+      const height=Math.max(min,Math.min(sheet.parentElement.clientHeight,sheetDrag.height+delta));
+      sheet.style.setProperty('--lm-sheet-height',height+'px');
+      sheet.closest('.live-map')?.style.setProperty('--lm-actions-sheet-height',height+'px');
     });
     const finish=event=>{
       if(!sheetDrag||event.pointerId!==sheetDrag.id)return;
