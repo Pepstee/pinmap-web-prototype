@@ -7,7 +7,9 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const read=file=>fs.readFileSync(file,'utf8');
 
-const FILES=['app.js','library.js','collection.js','detail.js','home.js','pinmap.js','share.js','my.js','course.js','map-live.js','map.js','place.js','noti.js','mypages.js','mysub.js','calendar.js','push.js','login.js','coach.js','icons.js','navlabels.js','integration.js','development.js','style-health.js'];
+// Scan every root-level script automatically, so a screen file added later is
+// covered without touching this test (vendor/ lives in a subfolder and is not matched).
+const FILES=fs.readdirSync('.').filter(f=>f.endsWith('.js') && !f.includes('/'));
 const FIELDS=['title','memo','collection','address','desc','url','source','category','period','ago','image'];
 
 // file + field → why the raw interpolation is safe
