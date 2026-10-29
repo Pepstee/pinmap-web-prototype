@@ -1,5 +1,5 @@
 /* Map-only layout: search/category bar, photo badges, and draggable place sheet. */
-.live-map{--lm-surface:var(--t-card,#fff);--lm-text:var(--t-ink,#111);--lm-muted:#6B6B70;--lm-line:var(--t-line,#E8E8EA);--lm-footer:80px;font-family:inherit}
+.live-map{--lm-surface:var(--t-card,#fff);--lm-text:var(--t-ink,#111);--lm-muted:#6B6B70;--lm-line:var(--t-line,#E8E8EA);--lm-footer:80px;--lm-actions-sheet-height:162px;font-family:inherit}
 .live-map .lm-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .live-map .lm-header{inset:0 0 auto;padding:24px 20px 0;background:var(--lm-surface);border-bottom:1px solid var(--lm-line);z-index:600}
 .lm-search-row{position:relative;display:flex;align-items:center;height:58px;border:1px solid var(--lm-line);border-radius:32px;background:#F4F4F5;padding:0 8px 0 17px;gap:8px}
@@ -48,8 +48,12 @@
 .lm-location-person .lm-location-dot{position:absolute;top:36px;left:36px;width:20px;height:20px;border:3px solid #fff;border-radius:50%;background:#2789ef;box-shadow:0 0 0 5px #2789ef20,0 2px 6px #1113;z-index:2}
 .lm-location-demo{position:absolute;top:66px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#fff;border:1px solid var(--lm-line);border-radius:10px;padding:1px 5px;font-size:9px;line-height:1.5;color:var(--lm-muted);box-shadow:0 1px 4px #1111}
 
-/* Controls stay above the collapsed sheet and hide while it is expanded. */
-.lm-floating-actions{position:absolute;right:20px;bottom:calc(var(--lm-footer) + 182px);display:flex;flex-direction:column;gap:12px;z-index:550;transition:bottom .18s}
+/* The two map controls follow the sheet with a constant 16px gap through its first stop. */
+.lm-floating-actions{position:absolute;right:20px;bottom:calc(var(--lm-actions-sheet-height) + 16px);display:flex;flex-direction:column;gap:12px;z-index:550;transition:bottom .28s cubic-bezier(.22,1,.36,1)}
+.live-map:has(.lm-sheet.is-half){--lm-actions-sheet-height:42%}
+.live-map.has-selected-place:has(.lm-sheet.is-half){--lm-actions-sheet-height:50%}
+.live-map.has-selected-place .lm-floating-actions{transition:none}
+.live-map:has(.lm-sheet.is-dragging) .lm-floating-actions{transition:none}
 .live-map .lm-floating-actions .lm-round{width:46px;height:46px;border-radius:50%;padding:0;background:#fff!important;color:var(--lm-text);border:1px solid var(--lm-line)!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:none!important}
 .lm-selected-host{position:absolute;inset:0;z-index:680;pointer-events:none}
 .lm-sheet{--lm-sheet-height:162px;position:absolute;inset:auto 0 0;height:var(--lm-sheet-height);display:flex;flex-direction:column;overflow:hidden;border-radius:24px 24px 0 0;background:#fff;box-shadow:0 -5px 24px #1112;pointer-events:auto;transition:height .28s cubic-bezier(.22,1,.36,1)}
@@ -83,7 +87,7 @@
 .live-map .lm-detail-link{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;margin-top:20px;border:1px solid var(--lm-line)!important;border-radius:12px!important;font-size:13px;font-weight:700}
 .live-map .lm-detail-link svg{width:16px;height:16px}
 .live-map.has-selected-place .bottomnav{display:none!important}
-.live-map:has(.lm-sheet:not(.is-peek)) .lm-floating-actions{visibility:hidden;pointer-events:none}
+.live-map:has(.lm-sheet.is-full) .lm-floating-actions{visibility:hidden;pointer-events:none}
 
 /* Navigation stays visible over the unselected nearby sheet. */
 .live-map button:focus-visible{outline:2px solid var(--lm-text)!important;outline-offset:3px}
