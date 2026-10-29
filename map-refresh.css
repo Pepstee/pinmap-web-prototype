@@ -1,4 +1,4 @@
-/* Map-only layout: search/category bar, photo badges, selected place banner. */
+/* Map-only layout: search/category bar, photo badges, and draggable place sheet. */
 .live-map{--lm-surface:var(--t-card,#fff);--lm-text:var(--t-ink,#111);--lm-muted:#6B6B70;--lm-line:var(--t-line,#E8E8EA);--lm-footer:80px;font-family:inherit}
 .live-map .lm-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .live-map .lm-header{inset:0 0 auto;padding:24px 20px 0;background:var(--lm-surface);border-bottom:1px solid var(--lm-line);z-index:600}
@@ -30,12 +30,15 @@
 /* Photo badges with a category badge at 56% of the photo diameter. */
 .live-map .lm-photo-marker{background:transparent;border:0;outline-offset:3px;border-radius:50%}
 .lm-place-badge{position:absolute;inset:5px;display:block;width:50px;height:50px;border:3px solid #fff;border-radius:50%;background:#fff;box-shadow:0 3px 12px #1113;transition:transform .16s}
+.lm-photo-marker.is-selected .lm-place-badge{inset:5px auto auto 8px;width:70px;height:70px;border-width:4px;box-shadow:0 5px 18px #1114;transform:translateY(-4px)}
+.lm-photo-marker.is-selected .lm-place-badge::after{content:'';position:absolute;left:22px;bottom:-15px;width:20px;height:20px;background:#fff;clip-path:polygon(0 0,100% 0,50% 100%);filter:drop-shadow(0 3px 3px #1112)}
+.lm-photo-marker.is-selected .lm-badge-category{right:-7px;bottom:-4px;z-index:2}
 .lm-badge-image{display:grid;place-items:center;position:absolute;inset:0;overflow:hidden;border-radius:50%;background:#F4F4F5}
 .lm-badge-image img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .lm-badge-image img[hidden]{display:none}
 .lm-badge-category{position:absolute;right:-7px;bottom:-7px;width:28px;height:28px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--lm-text);box-shadow:0 2px 6px #1112;pointer-events:none}
 .live-map .lm-badge-category .lm-category-svg{width:16px;height:16px}
-.lm-photo-marker:hover .lm-place-badge{transform:translateY(-2px)}
+.lm-photo-marker:not(.is-selected):hover .lm-place-badge{transform:translateY(-2px)}
 .lm-photo-marker:focus-visible{outline:2px solid var(--lm-text)}
 
 /* Current position and facing direction. No heading is implied without data. */
@@ -45,33 +48,47 @@
 .lm-location-person .lm-location-dot{position:absolute;top:36px;left:36px;width:20px;height:20px;border:3px solid #fff;border-radius:50%;background:#2789ef;box-shadow:0 0 0 5px #2789ef20,0 2px 6px #1113;z-index:2}
 .lm-location-demo{position:absolute;top:66px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#fff;border:1px solid var(--lm-line);border-radius:10px;padding:1px 5px;font-size:9px;line-height:1.5;color:var(--lm-muted);box-shadow:0 1px 4px #1111}
 
-/* Controls move above the selected-place banner instead of covering it. */
+/* Controls stay above the collapsed sheet and hide while it is expanded. */
 .lm-floating-actions{position:absolute;right:20px;bottom:calc(var(--lm-footer) + 182px);display:flex;flex-direction:column;gap:12px;z-index:550;transition:bottom .18s}
 .live-map .lm-floating-actions .lm-round{width:46px;height:46px;border-radius:50%;padding:0;background:#fff!important;color:var(--lm-text);border:1px solid var(--lm-line)!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:none!important}
-.lm-selected-host{position:absolute;left:0;right:0;bottom:calc(var(--lm-footer) + 10px);z-index:560}
-.lm-place-banner{position:relative;background:#fff;border:1px solid #fff;border-radius:18px;box-shadow:0 7px 28px #1113;overflow:hidden}
-.live-map .lm-place-banner .lm-banner-main{display:flex;align-items:stretch;gap:13px;width:100%;min-height:138px;text-align:left;padding:10px;border:0!important;background:#fff!important;box-shadow:none!important;border-radius:0;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-.lm-banner-main>img{width:108px;height:118px;flex:none;border-radius:11px;object-fit:cover}
-.lm-banner-copy{display:flex;flex-direction:column;min-width:0;flex:1;padding:3px 0 2px 0}
-.lm-banner-copy strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:15px;line-height:1.4;font-weight:700;color:var(--lm-text)}
-.lm-banner-copy>span{font-size:11px;line-height:1.5;color:var(--lm-muted);margin-top:4px}
-.lm-banner-copy>.lm-banner-address{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:4px}
-.lm-banner-copy>b{display:flex;align-items:center;gap:5px;margin-top:auto;padding-top:5px;font-size:11px;color:var(--lm-text)}
-.live-map .lm-banner-copy>b svg{width:14px;height:14px}
+.lm-selected-host{position:absolute;inset:0;z-index:680;pointer-events:none}
+.lm-sheet{--lm-sheet-height:162px;position:absolute;inset:auto 0 0;height:var(--lm-sheet-height);display:flex;flex-direction:column;overflow:hidden;border-radius:24px 24px 0 0;background:#fff;box-shadow:0 -5px 24px #1112;pointer-events:auto;transition:height .28s cubic-bezier(.22,1,.36,1)}
+.lm-sheet.is-half{--lm-sheet-height:42%}
+.has-selected-place .lm-sheet.is-half{--lm-sheet-height:50%}
+.lm-sheet.is-full{--lm-sheet-height:100%;border-radius:0}
+.lm-sheet.is-dragging{transition:none}
+.lm-sheet-handle{flex:none;height:44px;display:grid;place-items:center;touch-action:none;cursor:grab}
+.lm-sheet-handle:active{cursor:grabbing}
+.lm-sheet-handle span{width:38px;height:5px;border-radius:5px;background:#D0D0D2}
+.lm-sheet-head{flex:none;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:0 22px 16px}
+.lm-sheet-head small{display:block;margin-bottom:5px;color:var(--lm-muted);font-size:12px}
+.lm-sheet-head h2{margin:0;color:var(--lm-text);font-size:20px;line-height:1.35;letter-spacing:-.5px}
+.lm-sheet-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 20px 104px}
+.lm-sheet.is-peek .lm-sheet-scroll{visibility:hidden;overflow:hidden}
+.live-map .lm-sheet button{border:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.live-map .lm-sheet-close{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;font-size:18px;color:var(--lm-muted)}
+.lm-nearby-list{margin:0;padding:0;list-style:none}
+.lm-nearby-list li+li{border-top:1px solid var(--lm-line)}
+.live-map .lm-nearby-list button{display:flex;align-items:center;gap:13px;width:100%;min-height:82px;padding:10px 0;text-align:left}
+.lm-nearby-list img{width:62px;height:62px;flex:none;border-radius:12px;object-fit:cover}
+.lm-nearby-list button span{display:block;min-width:0;flex:1}
+.lm-nearby-list strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.lm-nearby-list small{display:block;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--lm-muted);font-size:11px}
+.lm-nearby-list svg{width:16px;height:16px;flex:none;color:var(--lm-muted)}
+.lm-nearby-empty{padding:35px 0;color:var(--lm-muted);text-align:center;font-size:13px}
+.lm-detail-photo{display:block;width:100%;height:190px;border-radius:16px;object-fit:cover}
+.lm-detail-address{margin:18px 0 0;font-size:14px;font-weight:600}
+.lm-detail-description{margin:10px 0 0;font-size:13px;line-height:1.55;color:var(--lm-muted)}
+.lm-detail-source{margin:12px 0 0;font-size:11px;color:var(--lm-muted)}
+.live-map .lm-detail-link{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;margin-top:20px;border:1px solid var(--lm-line)!important;border-radius:12px!important;font-size:13px;font-weight:700}
+.live-map .lm-detail-link svg{width:16px;height:16px}
+.live-map.has-selected-place .bottomnav{display:none!important}
+.live-map:has(.lm-sheet:not(.is-peek)) .lm-floating-actions{visibility:hidden;pointer-events:none}
 
-/* Place count sheet. Navigation uses the unchanged shared app styles. */
+/* Navigation stays visible over the unselected nearby sheet. */
 .live-map button:focus-visible{outline:2px solid var(--lm-text)!important;outline-offset:3px}
 @media(max-width:360px){.live-map .lm-header{padding-left:14px;padding-right:14px}.lm-banner-main>img{width:92px}.lm-banner-copy strong{font-size:14px}}
-@media(prefers-reduced-motion:reduce){.lm-place-badge,.lm-floating-actions{transition:none}}
-
-/* Persistent place carousel. The shared four-tab navigator stays unchanged. */
-.lm-carousel{position:relative;display:flex;gap:12px;padding:4px 28px 14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:28px;scrollbar-width:none;overscroll-behavior-x:contain;touch-action:pan-x pan-y;cursor:grab}
-.lm-carousel::-webkit-scrollbar{display:none}
-.lm-carousel .lm-place-banner{flex:0 0 calc(100% - 0px);min-width:0;scroll-snap-align:center;scroll-snap-stop:always;box-shadow:0 5px 14px #1112}
-.lm-carousel.is-dragging{scroll-snap-type:none;cursor:grabbing;user-select:none}
-.lm-carousel img{-webkit-user-drag:none;user-select:none}
-.lm-empty-banner{margin:4px 28px 18px;padding:24px 12px;text-align:center;border-radius:18px;background:#fff;box-shadow:0 5px 14px #1112;font-size:14px;line-height:1.7}
-.lm-empty-banner small{font-size:11px;color:var(--lm-muted)}
+@media(prefers-reduced-motion:reduce){.lm-place-badge,.lm-floating-actions,.lm-sheet{transition:none}}
 .live-map .lm-directions-preview{position:static;flex:none;width:46px;height:46px;display:grid;place-items:center;border:1px solid #fff!important;border-radius:50%;background:#ffffffdf!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:blur(15px)!important;cursor:default;color:var(--lm-text)}
 .live-map .lm-directions-preview svg{width:23px;height:23px}
 
