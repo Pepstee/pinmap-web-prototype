@@ -26,21 +26,20 @@ test('strips site suffixes from page titles before searching',()=>{
   assert.equal(value(c,'pfCleanQuery(null)'),'');
 });
 
-test('parses Photon features into candidates sorted by name closeness',()=>{
+test('keeps Photon relevance order and maps fields faithfully',()=>{
   const c=loadPure();
   const json={features:[
-    {geometry:{coordinates:[127.05,37.54]},properties:{osm_id:2,name:'성수동 카페 거리',city:'서울특별시',state:'서울'}},
-    {geometry:{coordinates:[127.04,37.54]},properties:{osm_id:1,name:'성수동',city:'서울특별시',state:'서울'}},
-    {geometry:{coordinates:[10,50]},properties:{osm_id:3,name:'성수동',city:'부산'}},
+    {geometry:{coordinates:[127.044,37.544]},properties:{osm_id:1,name:'성수동1가',city:'서울특별시',state:'서울'}},
+    {geometry:{coordinates:[127.045,37.545]},properties:{osm_id:2,name:'성수동2가',city:'서울특별시',state:'서울'}},
+    {geometry:{coordinates:[126.9,35.1]},properties:{osm_id:3,name:'성수동',city:'광주'}},
   ]};
   const r=value(c,'pfParsePhoton('+JSON.stringify(json)+', "성수동")');
   assert.equal(r.length,3);
-  assert.equal(r[0].name,'성수동');           // exact name first
-  assert.equal(r[0].lat,37.54);
-  assert.equal(r[0].lng,127.04);
+  assert.deepEqual(r.map(x=>x.name),['성수동1가','성수동2가','성수동']);   // Photon order preserved
+  assert.equal(r[0].lat,37.544);
+  assert.equal(r[0].lng,127.044);
   assert.equal(r[0].osm_id,1);
   assert.equal(r[0].address.includes('서울특별시'),true);
-  assert.equal(r.length<=3,true);            // capped at three candidates
 });
 
 test('drops features without coordinates and tolerates missing names',()=>{

@@ -18,28 +18,23 @@ function pfComposeAddress(p) {
   return [p.street, p.city, p.county, p.state, p.country].filter(Boolean).join(', ');
 }
 
-// Photon 응답 → 후보 목록. 이름이 질의와 가까운 후보를 앞으로 정렬해요.
+// Photon 응답 → 후보 목록. Photon의 관련도(bias 포함)를 그대로 신뢰해요 — 정렬하지 않아요.
 function pfParsePhoton(json, q) {
   const features = Array.isArray(json && json.features) ? json.features : [];
-  const norm = s => String(s || '').toLowerCase();
   return features
     .map(f => {
       const p = f.properties || {};
       const coord = (f.geometry && f.geometry.coordinates) || [];
-      const name = p.name || q;
       return {
-        name,
+        name: p.name || q,
         address: pfComposeAddress(p),
         lat: coord[1],
         lng: coord[0],
         osm_id: p.osm_id ?? null,
-        exact: norm(name) === norm(q) ? 0 : (name.includes(q) || q.includes(name) ? 1 : 2),
       };
     })
     .filter(c => Number.isFinite(c.lat) && Number.isFinite(c.lng))
-    .sort((a, b) => a.exact - b.exact)
-    .slice(0, PF_LIMIT)
-    .map(({ exact, ...c }) => c);
+    .slice(0, PF_LIMIT);
 }
 
 async function pfFindPlaces(q, opts = {}) {
@@ -63,6 +58,11 @@ async function pfFindPlaces(q, opts = {}) {
 if (PM_ENV.development) {
   const pfState = { map: null, marker: null, selected: null };
   let pfController = null;
+
+  // 폼이 flex 레이아웃이라 지도 컨테이너가 눌리지 않도록 고정 높이를 보장해요
+  const pfStyle = document.createElement('style');
+  pfStyle.textContent = '#ogmap { flex: 0 0 200px !important; height: 200px !important; }';
+  document.head.append(pfStyle);
 
   const pfSection = form => {
     let el = form.querySelector('#ogplace');
