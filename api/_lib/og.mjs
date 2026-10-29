@@ -15,6 +15,26 @@ const TIMEOUT_MS = 8000;
 
 function isPrivateHost(hostname) {
   let host = String(hostname || '').toLowerCase().replace(/^\[|\]$/g, '');
+  // wildcard-DNS services (nip.io, sslip.io, …) embed an IP in the hostname and
+  // resolve it through public DNS — a public-looking name can point at a private
+  // address. Apply the same private-address rules to the embedded IP; names
+  // without a clear dotted IP fail closed.
+  if (/\.nip\.io$/.test(host)) {
+    const base = host.slice(0, -'.nip.io'.length);
+    const dotted = base.split('.').slice(-4).join('.');          // 93.184.216.34.nip.io
+    const dashed = base.split('.').pop().replace(/-/g, '.');      // 10-0-0-1.nip.io
+    if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(dotted)) return isPrivateHost(dotted);
+    if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(dashed)) return isPrivateHost(dashed);
+    return true;
+  }
+  if (/\.sslip\.io$/.test(host)) {
+    const parts = host.slice(0, -'.sslip.io'.length).split('.');
+    const dotted = parts.slice(-4).join('.');
+    if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(dotted)) return isPrivateHost(dotted);
+    const label = parts[parts.length - 1].replace(/-/g, '.');
+    if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(label)) return isPrivateHost(label);
+    return true;
+  }
   // strip zone id (fe80::1%en0)
   const percent = host.indexOf('%');
   if (percent !== -1) host = host.slice(0, percent);

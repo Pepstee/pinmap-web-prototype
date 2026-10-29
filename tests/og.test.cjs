@@ -37,6 +37,8 @@ T('rejects loopback, private and link-local addresses', (og) => {
     'http://[::1]/', 'http://[::]/', 'http://[fe80::1]/', 'http://[fc00::1]/', 'http://[fd12::1]/',
     'http://[::ffff:127.0.0.1]/', 'http://[::ffff:192.168.1.1]/',
     'http://myserver.local/', 'http://db.internal/', 'http://nas.lan/',
+    'http://127.0.0.1.nip.io/', 'http://10.0.0.1.sslip.io/',      // wildcard-DNS to private IP
+    'http://192.168.1.1.nip.io/', 'http://myhost.nip.io/',       // fail closed on non-IP wildcard names
   ];
   for (const url of hosts) {
     try {
@@ -55,6 +57,12 @@ T('does not over-block addresses that only look private', (og) => {
 });
 
 // ---- entity decoding ----
+
+T('wildcard-DNS names with public IPs stay fetchable', (og) => {
+  for (const url of ['https://93.184.216.34.nip.io/', 'https://site.public.example.sslip.io/'.replace('site.public.example.', '8.8.8.8.')]) {
+    assert.doesNotThrow(() => og.assertFetchableUrl(url), url);
+  }
+});
 
 T('decodes html entities in titles', (og) => {
   assert.equal(og.decodeEntities('A &amp; B &#39;C&#x27; &quot;D&quot;'), "A & B 'C' \"D\"");
