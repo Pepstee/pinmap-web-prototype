@@ -94,7 +94,7 @@ function calWidget(){
   return `<section class="hwidget calw">
     <div class="hwhead"><h2>${calToday.getMonth()+1}월 일정</h2><button class="textbtn calmore" data-action="gocal">전체보기 ${icon('arrow')}</button></div>
     <div class="weekstrip">${days.map((d, i) => { const k = calKey(d), has = byDay[k]; return `<button class="wday ${i===0?'today':''}" data-calday="${k}" aria-label="${d.getMonth()+1}월 ${d.getDate()}일${has?` · 마감 ${has.length}개`:''}"><small>${W[d.getDay()]}</small><b>${d.getDate()}</b><i class="${has?'on':''}"></i></button>`; }).join('')}</div>
-    ${next.length ? `<div class="calnext">${next.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cnbadge">${dLabel(x)}</span><span class="cntext">${esc(x.title)}</span></button>`).join('')}</div>` : '<p class="hint calnone">다가오는 마감이 없어요.</p>'}
+    ${next.length ? `<div class="calnext">${next.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cnbadge ${calDays(x) <= 3 ? 'soon' : ''}">${dLabel(x)}</span><span class="cntext">${esc(x.title)}</span></button>`).join('')}</div>` : '<p class="hint calnone">다가오는 마감이 없어요.</p>'}
   </section>`;
 }
 
