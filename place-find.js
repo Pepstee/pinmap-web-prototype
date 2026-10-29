@@ -98,6 +98,7 @@ if (PM_ENV.development) {
       btn.style.fontWeight = '700';
       if (!document.querySelector('#ogmap')) { const m = document.createElement('div'); m.id = 'ogmap'; m.style.cssText = 'height:200px;border-radius:12px;margin-top:6px'; el.after(m); }
       pfShowMap(c);
+      document.querySelector('#ogmap')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       const ok = document.querySelector('#ogplaceok') || (() => { const p = document.createElement('p'); p.id = 'ogplaceok'; p.className = 'hint'; el.after(p); return p; })();
       ok.textContent = `장소 확인 · ${c.name}${c.address ? ' · ' + c.address : ''}`;
     }));
