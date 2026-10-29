@@ -15,6 +15,7 @@
 .cfpage .libsearch .iconbtn .icon,.live-map .lm-header .lm-search-row .libsearch .iconbtn .icon{width:16px;height:16px;color:#8A8A8E}
 .cfpage .libsearch:focus-within,.live-map .lm-header .lm-search-row .libsearch:focus-within{box-shadow:none!important;outline:1.5px solid var(--t-ink,#111)}
 .cfpage .libsearch .libgo,.live-map .lm-header .lm-search-row .libgo{box-shadow:none!important}
+.live-map .lm-header .lm-search-row .libgo{width:20px;height:20px;min-height:20px;border:0!important;background:transparent!important;border-radius:0;box-shadow:none!important;-webkit-backdrop-filter:none;backdrop-filter:none}
 .live-map .lm-header .lm-categories{margin-top:9px}
 .live-map .lm-floating-actions .lm-round,.live-map .lm-floating-actions .lm-directions-preview{width:46px;height:46px;min-height:46px;border-radius:50%;background:#fff!important;border:1px solid var(--t-line,#E8E8EA)!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:none!important}
 .my-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 20px;padding:14px 0;border-block:1px solid var(--t-line,#E8E8EA)}

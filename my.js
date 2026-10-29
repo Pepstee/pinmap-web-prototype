@@ -57,7 +57,7 @@ pages.my = function(){
   <button class="sharepromo" data-action="snsdemo"><span aria-hidden="true">📲</span><div><b>SNS에서 바로 저장해보기</b><small>게시물에서 공유 → 핀맵, 저장 과정을 체험해요</small></div>${icon('arrow')}</button>
 
   <section class="mgroup"><h2>나의 핀맵</h2>
-    ${myRow('placesheet','📍','현재 위치', esc(myPlaces().join(' · ')))}
+    ${myRow('placesheet','📍','위치 설정', esc(myPlaces().join(' · ')))}
     ${myRow('interests','💡','관심사 · 활용 목적', esc(prefText))}
   </section>
   <section class="mgroup"><h2>계정 설정</h2>
@@ -113,7 +113,7 @@ Object.assign(actions, {
   coachagain: () => { go('home'); setTimeout(startCoach, 300); },
   appinfo: () => { modal('앱 정보', `<p>핀맵 Prototype 03</p><p class="hint">예시 데이터로 체험하는 프로토타입이에요. 데이터는 이 브라우저에만 저장돼요.</p>`); $('#sheet').classList.add('bottomsheet'); },
   howto: () => openOnboarding(1),
-  profile: () => { modal('프로필 편집', `<form id="profileform"><label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label><p class="hint">위치는 ‘현재 위치’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`); $('#sheet').classList.add('bottomsheet'); },
+  profile: () => { modal('프로필 편집', `<form id="profileform"><label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label><p class="hint">위치는 ‘위치 설정’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p><div class="dialogactions"><button type="button" class="textbtn" data-action="close">취소</button><button class="filled" type="submit">저장</button></div></form>`); $('#sheet').classList.add('bottomsheet'); },
   resetask: () => modal('저장 데이터 초기화', `<p>이 브라우저에 저장한 콘텐츠, 관심사, 설정이 모두 지워지고 예시 상태로 돌아가요.</p><div class="dialogactions"><button class="textbtn" data-action="close">취소</button><button class="filled danger" data-action="resetdata">초기화</button></div>`),
   resetdata: () => { try { [STORAGE, ...LEGACY_KEYS].forEach(k => localStorage.removeItem(k)); } catch {} location.reload(); },
   logout: () => toast('프로토타입에서는 로그아웃 기능을 제공하지 않아요.')

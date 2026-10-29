@@ -14,7 +14,7 @@ pages.profile = function(){
     <div class="pfbtns"><label class="tonal small" for="avatarfile">사진 변경</label>${settings.avatar ? '<button class="textbtn" data-action="avatarreset">기본 이미지로</button>' : ''}</div>
     <form id="profilepage" class="pfform">
       <label class="field"><span>닉네임</span><input name="nickname" value="${esc(settings.nickname)}" required maxlength="12"></label>
-      <p class="hint">위치는 ‘현재 위치’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p>
+      <p class="hint">위치는 ‘위치 설정’에서 바꿀 수 있어요. 이 브라우저에만 저장돼요.</p>
       <button class="filled pfsave" type="submit">저장</button>
     </form>
   </div>`;

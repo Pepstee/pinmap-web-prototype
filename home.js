@@ -26,7 +26,7 @@ const dLabel = x => calDays(x) === 0 ? 'D-day' : 'D-' + calDays(x);
 function stripBar(){
   const due = calDueList().filter(x => calDays(x) <= 14);
   if (!due.length || stripHiddenToday()) return '';
-  const item = x => `<button class="strip-item" data-detail="${x.id}"><b>${dLabel(x)}</b><span>${esc(x.title)}</span></button>`;
+  const item = x => `<button class="strip-item ${calDays(x) <= 3 ? 'soon' : ''}" data-detail="${x.id}"><b>${dLabel(x)}</b><span>${esc(x.title)}</span></button>`;
   // 끝에서 처음으로 자연스럽게 이어지도록 첫 항목을 한 번 더 붙여요
   return `<div class="strip" role="region" aria-label="마감 임박 콘텐츠"><div class="strip-roll"><div class="strip-track" data-n="${due.length}">${due.map(item).join('')}${due.length > 1 ? item(due[0]) : ''}</div></div><button class="strip-hide" data-action="striphide">오늘 다시 보지 않기</button></div>`;
 }
@@ -94,7 +94,7 @@ function calWidget(){
   return `<section class="hwidget calw">
     <div class="hwhead"><h2>${calToday.getMonth()+1}월 일정</h2><button class="textbtn calmore" data-action="gocal">전체보기 ${icon('arrow')}</button></div>
     <div class="weekstrip">${days.map((d, i) => { const k = calKey(d), has = byDay[k]; return `<button class="wday ${i===0?'today':''}" data-calday="${k}" aria-label="${d.getMonth()+1}월 ${d.getDate()}일${has?` · 마감 ${has.length}개`:''}"><small>${W[d.getDay()]}</small><b>${d.getDate()}</b><i class="${has?'on':''}"></i></button>`; }).join('')}</div>
-    ${next.length ? `<div class="calnext">${next.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cnbadge">${dLabel(x)}</span><span class="cntext">${esc(x.title)}</span></button>`).join('')}</div>` : '<p class="hint calnone">다가오는 마감이 없어요.</p>'}
+    ${next.length ? `<div class="calnext">${next.map(x => `<button class="cnrow" data-detail="${x.id}"><span class="cnbadge ${calDays(x) <= 3 ? 'soon' : ''}">${dLabel(x)}</span><span class="cntext">${esc(x.title)}</span></button>`).join('')}</div>` : '<p class="hint calnone">다가오는 마감이 없어요.</p>'}
   </section>`;
 }
 
@@ -281,10 +281,10 @@ function notiPanelHtml(){
   const row = n => { const x = notiItem(n), unread = isNew(n);
     return `<button type="button" class="ntrow ${unread ? 'unread' : ''}" data-noti="${esc(n.id)}" aria-label="${esc(n.title)}${unread ? ', 안 읽음' : ''}">
       <span class="ntthumb">${x ? libThumb(x) : `<span class="ntemoji">${icon(notiBadge(n))}</span>`}</span>
-      <span class="nttext"><b>${esc(n.title)}</b><span class="ntbody">${esc(n.body)}</span><span class="nttime">${icon(notiBadge(n))}${esc(n.time)}</span></span>
+      <span class="nttext"><b>${esc(n.title)}</b><span class="nttime">${esc(n.time)}</span><span class="ntbody">${esc(n.body)}</span></span>
       ${unread ? '<i class="ntdot" aria-hidden="true"></i>' : ''}</button>`; };
   const group = (label, arr) => arr.length ? `<section class="ntgroup"><h3>${label}</h3>${arr.map(row).join('')}</section>` : '';
-  const body = list.length ? group('새 알림', fresh) + group('지난 알림', seen)
+  const body = list.length ? fresh.map(row).join('') + group('지난 알림', seen)
     : `<div class="ntempty">${icon('bell')}<b>${allOff ? '알림이 모두 꺼져 있어요' : '새 알림이 없어요'}</b><p>${allOff ? '알림 설정에서 필요한 알림을 켤 수 있어요.' : '마감 임박 · 주변 장소 소식이 생기면 알려드릴게요.'}</p></div>`;
   return `<div class="npwrap">
     <header class="nphead"><button type="button" class="subback npback" data-action="notiback" aria-label="뒤로 가기">${icon('back')}</button><h1>알림${fresh.length ? ` <span>${fresh.length}</span>` : ''}</h1>

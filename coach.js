@@ -1,8 +1,8 @@
 // 온보딩이 끝난 뒤 홈 화면 코치마크 튜토리얼 (3단계)
 const COACH_STEPS = [
-  {sel:'.mainpick', title:'관심사 추천 콘텐츠', text:'관심사에 맞는 저장 콘텐츠를 보여줘요. 좌우로 넘겨보고, 누르면 상세페이지로 이동해요.'},
-  {sel:'.chiprows', title:'키워드 보기', text:'관심사에 맞는 키워드를 골라봐요. 두 줄을 각각 좌우로 넘길 수 있어요. 키워드를 누르면 키워드에 맞는 콘텐츠 목록을 보여줘요.'},
-  {sel:'.bottomnav', title:'홈 · 지도 · 컬렉션 · 마이', text:'저장한 장소는 지도에서, 모든 저장 콘텐츠는 컬렉션에서 한눈에 볼 수 있어요.'}
+  {sel:'.mainpick', title:'관심사 추천 콘텐츠', text:'관심사에 맞는 저장 콘텐츠를 보여줘요. 좌우로 넘기거나 눌러서 상세 내용을 확인하세요.'},
+  {sel:'.chiprows', title:'키워드 보기', text:'관심사 키워드를 골라보세요. 각 줄을 좌우로 넘기고, 키워드를 누르면 관련 콘텐츠를 볼 수 있어요.'},
+  {sel:'.bottomnav', title:'홈 · 지도 · 컬렉션 · 마이', text:'저장한 장소는 지도에서 확인하세요. 모든 저장 콘텐츠는 컬렉션에서 볼 수 있어요.'}
 ];
 let coachStep = 0;
 function startCoach(){
@@ -29,9 +29,9 @@ function drawCoach(){
   const fixed = getComputedStyle(target).position === 'fixed';
   if (!fixed) { const r = target.getBoundingClientRect(); window.scrollTo(0, Math.max(0, window.scrollY + r.top - window.innerHeight/2 + r.height/2 - 60)); }
   const last = coachStep === COACH_STEPS.length-1;
-  $('#coach').innerHTML = `<button class="cm-close" data-coach="skip" aria-label="튜토리얼 닫기">${icon('close')}</button><div class="cm-hole"></div><div class="cm-tip" aria-live="polite">
+  $('#coach').innerHTML = `<button class="cm-close" data-coach="skip" aria-label="튜토리얼 건너뛰기">건너뛰기</button><div class="cm-hole"></div><div class="cm-tip" aria-live="polite">
       <span class="cm-step">${coachStep+1} / ${COACH_STEPS.length}</span><b>${s.title}</b><p>${s.text}</p>
-      <div class="cm-btns">${coachStep>0?`<button class="cm-prev" data-coach="prev" aria-label="이전 설명 보기">${icon('back')}</button>`:''}${last?'':'<button class="cm-skip" data-coach="skip">건너뛰기</button>'}<button class="cm-next" data-coach="next">${last?'시작하기':'다음'}</button></div>
+      <div class="cm-btns"><button class="cm-prev" data-coach="prev" ${coachStep===0?'disabled':''}>이전</button><button class="cm-next" data-coach="next">${last?'시작하기':'다음'}</button></div>
     </div>`;
   requestAnimationFrame(placeCoach);
   window.addEventListener('resize', placeCoach);

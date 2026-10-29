@@ -161,7 +161,7 @@ function onboardScreen() {
   // 첫 화면: 로고만 심플하게 (화면을 누르면 바로 다음 단계)
   if (s === 0) return `<button class="ob-splash" data-ob="next" aria-label="핀맵 시작"><img src="${PM_IMG.splash}" alt="Pinmap"></button>`;
   if (s === 1) return `
-    <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를<br><em>발견</em>했다면?</h1>
+    <h1 class="ob-title" tabindex="-1">마음에 드는 콘텐츠를 <em>발견</em>했다면?</h1>
     <ol class="ob-flow">
       <li class="ob-flowcard"><div class="ob-flowtext"><h3><span class="ob-num">1</span>콘텐츠 발견</h3><p>SNS에서 마음에 드는 콘텐츠를 찾아요.</p></div>
         <div class="ob-mock ob-post" aria-hidden="true"><div class="ob-postimg">${art('park')}</div><div class="ob-postbar">${icon('heart')}${icon('comment')}<span class="ob-hl"><img class="ob-sendico" src="${PM_IMG.send}" alt=""></span><span class="ob-gap"></span>${icon('more')}</div></div></li>
@@ -174,12 +174,12 @@ function onboardScreen() {
     </ol>
     <div class="ob-actions"><button class="filled ob-next" data-ob="next">다음</button></div>`;
   if (s === 2) return `
-    <h1 class="ob-title" tabindex="-1">저장한 콘텐츠를<br><em>주로 언제 다시 찾아보나요?</em></h1>
-    <p class="ob-desc">(복수 선택 가능)</p>
+    <h1 class="ob-title" tabindex="-1">저장한 콘텐츠를<br><em>언제 다시 찾아보나요?</em></h1>
+    <p class="ob-desc">복수 선택이 가능해요!</p>
     <div class="ob-options" role="group" aria-label="관심사 · 활용 목적">
       ${interestOptions.filter(o => !o.extra).map(o => { const on = onboardDraft.includes(o.id); return `<button class="ob-option ${on?'on':''}" role="checkbox" aria-checked="${on}" data-ob-interest="${o.id}"><span class="ob-emoji" aria-hidden="true">${o.emoji}</span><span class="ob-label">${o.label}</span></button>`; }).join('')}
     </div>
-    <div class="ob-actions"><button class="filled ob-next" data-ob="next">시작하기</button></div>`;
+    <div class="ob-actions"><button class="ob-action-back" data-ob="back">이전</button><button class="filled ob-next" data-ob="next">시작하기</button></div>`;
   // 마지막 화면: 문구 없이, 저장 카드에서 핀맵으로 점이 하나씩 채워지며 이어지는 애니메이션
   return '';
 }
@@ -190,7 +190,7 @@ function drawOnboarding() {
   const bare = onboardStep === 0; // 첫 화면은 위쪽 단계 표시 없이
   el.innerHTML = `<div class="ob-screen step${onboardStep+1}${bare ? ' bare' : ''}">
     <div class="ob-top">
-      <div class="ob-topleft">${onboardStep===2?`<button class="ob-back" data-ob="back" aria-label="이전">${icon('back')}</button>`:''}<span class="ob-count" aria-label="${onboardStep}단계, 전체 2단계"><b>${onboardStep}</b> / 2</span></div>
+      <div class="ob-topleft"><span class="ob-count" aria-label="${onboardStep}단계, 전체 2단계"><b>${onboardStep}</b> / 2</span></div>
       ${'<button class="ob-skip" data-ob="skip">건너뛰기</button>'}
     </div>
     ${onboardScreen()}

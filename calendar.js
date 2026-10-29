@@ -81,7 +81,7 @@ pages.calendar = function(){
   return `<div class="calfhead">${back}<h1>캘린더</h1></div>` + `
     <section class="calbox">${bg}
       <div class="calhead">
-        <button class="caltitle" data-calpick aria-expanded="${calPick}" aria-label="다른 달로 이동"><small>${y}</small><span>${m + 1}월${icon('chevron')}</span></button>
+        <button class="caltitle" data-calpick aria-expanded="${calPick}" aria-label="다른 달로 이동"><span>${y}년 ${m + 1}월${icon('chevron')}</span></button>
         ${`<div class="calnav" ${calPick ? 'style="visibility:hidden"' : ''}><button data-calnav="-1" aria-label="이전 달">${icon('chevleft')}</button><button data-calnav="1" aria-label="다음 달">${icon('chevright')}</button></div>`}
       </div>
       ${calPick ? `<div class="calmonths" role="group" aria-label="월 선택">${months}</div>` : `
