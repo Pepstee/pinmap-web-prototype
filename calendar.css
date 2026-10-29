@@ -75,7 +75,7 @@
 .caltext b{font-size:15.5px;font-weight:700;letter-spacing:-.4px}
 .caltext small{font-size:12.5px;color:var(--t-sub)}
 .calbadge{padding:6px 11px;background:var(--t-soft);color:var(--t-ink);font-size:12.5px}
-.calbadge.soon{background:var(--t-ink);color:#fff}
+.calbadge.soon{background:#EF4D4D;color:#fff}
 .calempty{padding:18px;border-radius:20px;background:rgba(255,255,255,.6);font-size:14px;color:var(--t-sub);text-align:center}
 
 /* ---------- v3: 제목 줄 (← + 제목) · 유리 캘린더 · 월 선택 ---------- */
@@ -148,4 +148,4 @@
 .caltext b{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.25)}
 .caltext small{color:rgba(255,255,255,.82)}
 .calbadge{background:rgba(255,255,255,.22);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.calbadge.soon{background:#fff;color:var(--t-ink)}
+.calbadge.soon{background:#EF4D4D;color:#fff}
