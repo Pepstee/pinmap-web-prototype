@@ -16,7 +16,12 @@ const paths = {
   share:'M12 15V3 M7 8l5-5 5 5 M5 13v7h14v-7', story:'M12 3a9 9 0 1 0 9 9 M12 8v4l3 2',
   more:'M5 12h.01 M12 12h.01 M19 12h.01', image:'M4 5h16v14H4z M4 16l5-5 4 4 3-3 4 4 M15 9h.01',
   mail:'M3 6h18v12H3z M3 6l9 7 9-7', user:'M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M4 21a8 8 0 0 1 16 0',
-  bell:'M6 16V11a6 6 0 0 1 12 0v5l2 2H4z M10 21h4', note:'M5 3h14v18H5z M9 8h6 M9 12h6 M9 16h4', copy:'M8 8h12v12H8z M4 16V4h12'
+  bell:'M6 16V11a6 6 0 0 1 12 0v5l2 2H4z M10 21h4', note:'M5 3h14v18H5z M9 8h6 M9 12h6 M9 16h4', copy:'M8 8h12v12H8z M4 16V4h12',
+  eat:'M7 3v18 M4 3v5a3 3 0 0 0 6 0V3 M17 21v-9h3V3c-4 0-5 6-3 9',
+  event:'M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4z M16 5v3 M16 11v2 M16 16v3',
+  walk:'M12 22v-7 M12 3a5 5 0 0 0-5 5 4 4 0 0 0 1 7h8a4 4 0 0 0 1-7 5 5 0 0 0-5-5z',
+  shop:'M5 8h14l-1 13H6z M9 8V6a3 3 0 0 1 6 0v2',
+  route:'M7 5h8a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h8 M7 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0 M21 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0'
 };
 const icon = n => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[n]||paths.bookmark}"/></svg>`;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

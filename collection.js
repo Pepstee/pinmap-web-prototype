@@ -5,10 +5,10 @@
 
 /* ---------- 폴더 정의 ---------- */
 Object.assign(paths, {
-  fork:'M7 3v8 M4.5 3v5a2.5 2.5 0 0 0 5 0V3 M7 11v10 M17 3c-2.5 2-2.5 8 0 9v9',
-  ticket:'M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z M14 7v10',
+  fork:paths.eat,
+  ticket:paths.event,
   plane:'M3 13.5 21 6l-4 14-5-5-3 4v-6z M12 15l9-9',
-  bag:'M5 8h14l-1 13H6z M9 8V6a3 3 0 0 1 6 0v2',
+  bag:paths.shop,
   folderplus:'M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2h8.5A1.5 1.5 0 0 1 21 8.5v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z M12 10.5v6 M9 13.5h6',
   chef:'M7 14a4 4 0 0 1-.7-7.9 5 5 0 0 1 11.4 0A4 4 0 0 1 17 14 M7 14v6h10v-6 M7 17h10'
 });

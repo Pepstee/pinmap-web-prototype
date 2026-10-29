@@ -1,7 +1,7 @@
-// 홈과 지도 상단 '내 동네' (최대 3개)
+// 홈과 지도 상단 '내 동네' (최대 2개)
 // 메인 동네는 검정 큰 글씨, 서브 동네는 회색 작은 글씨. 서브를 누르면 서로 자리가 바뀌어요.
 // 메인 동네를 누르면 '내 동네 설정' 시트가 올라와 추가 · 삭제 · 수정할 수 있어요.
-const MAX_PLACES = 3;
+const MAX_PLACES = 2;
 // 검색용 동네 목록 (예시)
 const DONGS = (PM_ENV.development ? [] : [
   ['성수동','서울 성동구'],['성수1가1동','서울 성동구'],['성수2가3동','서울 성동구'],['행당동','서울 성동구'],['왕십리동','서울 성동구'],['금호동','서울 성동구'],['옥수동','서울 성동구'],
@@ -13,7 +13,16 @@ const DONGS = (PM_ENV.development ? [] : [
 ]).map(([name, gu]) => ({name, full:`${gu} ${name}`}));
 const dongOf = name => DONGS.find(d => d.name === name) || {name, full:name};
 
-const myPlaces = () => { if(PM_ENV.development)return Array.isArray(settings.places)?settings.places:[]; if (!Array.isArray(settings.places) || !settings.places.length) settings.places = ['성수동']; return settings.places; };
+const myPlaces = () => {
+  if (!Array.isArray(settings.places)) settings.places = PM_ENV.development ? [] : ['성수동'];
+  if (!PM_ENV.development && !settings.places.length) settings.places = ['성수동'];
+  if (settings.places.length > MAX_PLACES) {
+    settings.archivedPlaces = [...new Set([...(settings.archivedPlaces || []), ...settings.places.slice(MAX_PLACES)])];
+    settings.places.length = MAX_PLACES;
+    afterChange();
+  }
+  return settings.places;
+};
 const mainPlace = () => myPlaces()[0] || '';
 // 저장 장소가 메인 동네에 있는지 (동 이름의 숫자·'가'를 빼고 주소와 비교)
 const inMainPlace = x => !!mainPlace() && (x.address||'').includes(mainPlace().replace(/\d+가?\d*동$|동$/, ''));

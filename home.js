@@ -134,7 +134,7 @@ pages.home = function(){
   const main = picks.length || PM_ENV.development
     ? `<div class="mainwrap"><div class="mainpick" ${picks.length?'aria-label="추천 저장 콘텐츠"':'data-placeholder="true" aria-hidden="true"'}>${picks.length?picks.map((p, i) => pickCard(p, i, picks.length)).join(''):emptyPickCards()}</div></div>`
     : `<div class="empty small"><p class="muted">선택한 관심사에 맞는 저장 콘텐츠가 아직 없어요.</p><button class="tonal" data-action="save">새로 저장하기</button></div>`;
-  const brand = `<div class="homebrand" aria-label="핀맵 로고"><img src="${PM_IMG.logo}" alt=""><span aria-hidden="true">PINMAP</span></div>`;
+  const brand = '<div class="homebrand"><img src="img/pinmap-logo-splash.svg" alt="Pinmap 로고"></div>';
   return stripBar() + brand + main + calWidget() + chips + subWidgets();
 };
 

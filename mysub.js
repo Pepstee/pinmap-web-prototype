@@ -153,7 +153,7 @@ const accSyncBtn = a => { const on = syncing || syncingAcc === a.id;
 paths.sync = 'M20 11a8 8 0 0 0-14.3-4.9L4 8 M4 4v4h4 M4 13a8 8 0 0 0 14.3 4.9L20 16 M20 20v-4h-4';
 
 /* 하위 페이지와 캘린더에서도 하단 메뉴의 해당 탭이 켜져 있게 */
-const PARENT_TAB = {profile:'my', accounts:'my', calendar:'home', topic:'home'};
+const PARENT_TAB = {profile:'my', accounts:'my', courses:'my', course:'my', calendar:'home', topic:'home'};
 const navBase = nav;
 nav = function(){ const real = page; if (PARENT_TAB[page]) page = PARENT_TAB[page]; const h = navBase(); page = real; return h; };
 

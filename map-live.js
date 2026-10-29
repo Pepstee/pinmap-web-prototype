@@ -21,11 +21,11 @@
   // Use the same line style as the app navigation on every platform.
   const categoryPaths = {
     all: paths.spark,
-    eat: 'M7 3v18 M4 3v5a3 3 0 0 0 6 0V3 M17 21v-9h3V3c-4 0-5 6-3 9',
+    eat: paths.eat,
     cafe: paths.coffee,
-    event: 'M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4z M16 5v3 M16 11v2 M16 16v3',
-    walk: 'M12 22v-7 M12 3a5 5 0 0 0-5 5 4 4 0 0 0 1 7h8a4 4 0 0 0 1-7 5 5 0 0 0-5-5z',
-    shop: 'M5 8h14l-1 13H6z M9 8V6a3 3 0 0 1 6 0v2'
+    event: paths.event,
+    walk: paths.walk,
+    shop: paths.shop
   };
   const categorySolidPaths = {
     all: paths.spark,
@@ -40,7 +40,6 @@
   const categoryLabel = tag => ({station:'역',stop:'정류장',park:'공원',restaurant:'식당',cafe:'카페',museum:'박물관',gallery:'갤러리',shop:'상점',water:'호수',residential:'주거 지역'})[tag] || tag;
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
   const round = (name, symbol) => `<button class="lm-round" data-lm="locate" aria-label="${name}" title="${name}">${icon(symbol)}</button>`;
-  const routeIcon = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 5h8a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h8"/></svg>';
   const safe = value => esc(value || '');
   const savedPlaces = () => {
     const pinned = savedCoords.map(position => {
@@ -61,7 +60,7 @@
       </header>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
-      <button type="button" class="lm-directions-preview" aria-label="길찾기 · 준비 중" aria-disabled="true" title="길찾기 · 준비 중"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="m21 3-7 18-4-7-7-4 18-7Z M10 14 21 3"/></svg></button><div class="lm-floating-actions">${round('현재 위치로 이동','target')}<button type="button" class="lm-course-create" data-course-new aria-label="코스 짜기" title="코스 짜기">${routeIcon}</button></div>
+      <button type="button" class="lm-directions-preview" aria-label="길찾기 · 준비 중" aria-disabled="true" title="길찾기 · 준비 중"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="m21 3-7 18-4-7-7-4 18-7Z M10 14 21 3"/></svg></button><div class="lm-floating-actions">${round('현재 위치로 이동','target')}</div>
       <section class="lm-selected-host" id="lm-selected-place" aria-label="장소 둘러보기"></section>
       <nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></section>`;
   }
@@ -102,7 +101,7 @@
     clearTimeout(carouselTimer);
     const host=$('#lm-selected-place');if(!host)return;
     if(!list.length){host.innerHTML='<div class="lm-empty-banner" role="status">표시할 장소가 없어요.<br><small>다른 카테고리나 검색어를 선택해 주세요.</small></div>';return;}
-    host.innerHTML=`<div class="lm-carousel" role="region" aria-roledescription="캐러셀" aria-label="장소 정보, 좌우로 넘기기" tabindex="0">${list.map((place,index)=>`<article class="lm-place-banner" data-place-key="${safe(placeKey(place))}" role="group" aria-roledescription="슬라이드" aria-label="${index+1} / ${list.length}"><button class="lm-banner-main" data-lm="open-place" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} ${place.saved?'상세 보기':'외부 지도에서 보기'}"><img src="${safe(place.image||localPhoto(place.kind))}" alt=""><span class="lm-banner-copy"><strong>${safe(place.title)}</strong><span>${safe(place.category)} · ${place.saved?'저장한 장소':'검색한 장소'}</span><span class="lm-banner-address">${safe(place.address||'주소 정보 없음')}</span><b>${place.saved?'상세 보기':'지도에서 보기'} ${icon('arrow')}</b></span></button></article>`).join('')}</div><div class="lm-carousel-controls"><button data-lm="previous-place" aria-label="이전 장소">‹</button><span class="lm-carousel-position" aria-live="polite"></span><button data-lm="next-place" aria-label="다음 장소">›</button></div>`;
+    host.innerHTML=`<div class="lm-carousel" role="region" aria-roledescription="캐러셀" aria-label="장소 정보, 좌우로 넘기기" tabindex="0">${list.map((place,index)=>`<article class="lm-place-banner" data-place-key="${safe(placeKey(place))}" role="group" aria-roledescription="슬라이드" aria-label="${index+1} / ${list.length}"><button class="lm-banner-main" data-lm="open-place" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} ${place.saved?'상세 보기':'외부 지도에서 보기'}"><img src="${safe(place.image||localPhoto(place.kind))}" alt=""><span class="lm-banner-copy"><strong>${safe(place.title)}</strong><span>${safe(place.category)} · ${place.saved?'저장한 장소':'검색한 장소'}</span><span class="lm-banner-address">${safe(place.address||'주소 정보 없음')}</span><b>${place.saved?'상세 보기':'지도에서 보기'} ${icon('arrow')}</b></span></button></article>`).join('')}</div>`;
     const track=host.querySelector('.lm-carousel');
     track.addEventListener('scroll',()=>{clearTimeout(carouselTimer);carouselTimer=setTimeout(()=>settleCarousel(track),140);},{passive:true});
     track.addEventListener('pointerdown',event=>{if(event.pointerType==='mouse'&&event.button===0)carouselDrag={track,id:event.pointerId,x:event.clientX,left:track.scrollLeft,moved:false};});
@@ -129,8 +128,6 @@
     const host=$('#lm-selected-place'),track=host?.querySelector('.lm-carousel');
     const list=visiblePlaces(),index=list.findIndex(item=>placeKey(item)===key);
     host?.querySelectorAll('.lm-place-banner').forEach(card=>card.setAttribute('aria-current',String(card.dataset.placeKey===key)));
-    const counter=host?.querySelector('.lm-carousel-position');if(counter)counter.textContent=`${index+1} / ${list.length}`;
-    const previous=host?.querySelector('[data-lm="previous-place"]'),next=host?.querySelector('[data-lm="next-place"]');if(previous)previous.disabled=index<=0;if(next)next.disabled=index>=list.length-1;
     if(scroll&&track){const card=[...track.children].find(card=>card.dataset.placeKey===key);if(card)track.scrollTo({left:card.offsetLeft-(track.clientWidth-card.offsetWidth)/2,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}
     const resultsPanel=$('#lm-search-results');if(resultsPanel)resultsPanel.hidden=true;
     if(moveMap)liveMap.setView([place.lat,place.lng],Math.max(liveMap.getZoom(),15),{animate:false});
@@ -261,8 +258,6 @@
     const button=event.target.closest('[data-lm]'); if(!button)return;
     switch(button.dataset.lm){
       case 'locate':locate();break;
-      case 'previous-place':stepPlace(-1);break;
-      case 'next-place':stepPlace(1);break;
       case 'open-place':{if(Date.now()<suppressBannerClickUntil)return;const place=markerEntries.get(button.dataset.placeKey)?.place;if(!place)break;if(place.saved)openDetail(place.id);else window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place.lat+','+place.lng),'_blank','noopener,noreferrer');break;}
       case 'clear-search':searchResults=null;searchQuery='';$('#lm-search input').value='';$('#lm-search [data-lm="clear-search"]').hidden=true;$('#lm-search-results').hidden=true;center=PM_ENV.development?[20,0]:[37.5445,127.043];zoom=PM_ENV.development?2:15;liveMap?.setView(center,zoom);markers();break;
     }

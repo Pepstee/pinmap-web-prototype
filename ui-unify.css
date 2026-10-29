@@ -1,0 +1,37 @@
+/* Shared header rhythm for the map and saved-content pages. */
+.libpage,.live-map{--pm-header-bg:var(--t-bg,#F4F4F5);--pm-header-text:var(--t-ink,#111);--pm-header-muted:var(--t-sub,#8A8A8E);font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif}
+.libpage{color:var(--pm-header-text)}
+.live-map .lm-header{padding:var(--top) var(--gutter) 0;background:var(--pm-header-bg);border-bottom-color:var(--t-line,#E8E8EA)}
+.live-map .lm-header .lm-location-header,.libpage .libhead{height:40px;min-height:40px;margin:0 0 var(--gap-title,20px);padding:0 48px 0 0}
+.live-map .lm-header .lm-location-header .placebar{min-height:40px;margin:0;gap:12px}
+.live-map .lm-header .lm-location-header .placemain,.live-map .lm-header .lm-location-header .placesub,.live-map .lm-header .lm-location-empty,.libpage .libhead h1{font-size:24px;font-weight:600;line-height:1.35;letter-spacing:-.6px}
+.live-map .lm-header .lm-location-header .placemain,.live-map .lm-header .lm-location-empty{color:var(--pm-header-text)}
+.live-map .lm-header .lm-location-header .placesub{max-width:40%;color:var(--pm-header-muted)}
+.live-map .lm-header .lm-search-row .libsearch,.libpage .libsearch{height:52px;margin:0 0 12px;padding:0 6px 0 18px;border:1px solid var(--t-line,#E8E8EA);border-radius:27px;background:var(--t-card,#fff)}
+.live-map .lm-header .lm-search-row .libsearch input,.libpage .libsearch input{font-size:16px;line-height:1.2;color:var(--pm-header-text)}
+.live-map .lm-header .lm-search-row .libgo,.libpage .libsearch .libgo{width:46px;height:46px;min-height:46px;border:0;border-radius:50%;box-shadow:none!important;background:var(--t-soft,#EFEFF1)!important}
+.live-map .lm-header .lm-categories{margin-top:9px}
+.live-map .lm-floating-actions .lm-round,.live-map .lm-directions-preview{width:46px;height:46px;min-height:46px;border-radius:50%;background:#fff!important;border:1px solid var(--t-line,#E8E8EA)!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:none!important}
+.live-map .lm-floating-actions{bottom:calc(var(--lm-footer) + 158px)}
+.live-map .lm-directions-preview{top:231px}
+.my-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0 0 20px;padding:14px 0;border-block:1px solid var(--t-line,#E8E8EA)}
+.my-shortcuts button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:60px;padding:4px 2px;background:transparent;color:var(--t-ink,#111);font:inherit;font-size:11px;white-space:nowrap}
+.my-shortcuts .icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.my-shortcuts button:focus-visible{outline:2px solid currentColor;outline-offset:-2px;border-radius:10px}
+
+/* Simulated keyboard appears only in the desktop-sized prototype preview. */
+#pm-keyboard-preview{position:fixed;inset:auto 0 0;z-index:2000;display:grid;gap:8px;max-width:480px;margin:auto;padding:6px 5px 0;background:#D9DDE4;box-shadow:0 -8px 24px #1112;transform:translateY(105%);opacity:0;visibility:hidden;pointer-events:none;transition:transform .24s ease,opacity .24s ease,visibility .24s}
+.pm-keyboard-open #pm-keyboard-preview{transform:translateY(0);opacity:1;visibility:visible;pointer-events:auto}
+.pm-keyboard-open .bottomnav{visibility:hidden!important}
+.pm-keyboard-tools{display:flex;justify-content:space-between;align-items:center;height:31px;padding:0 18px;color:#4C5058;font-size:13px}
+.pm-keyboard-tools span:first-child,.pm-keyboard-tools span:last-child{font-size:20px}
+.pm-keyboard-row{display:flex;justify-content:center;gap:5px;width:100%;height:44px}
+.pm-keyboard-row button{flex:1;min-width:0;padding:0;border:0;border-radius:5px;background:#fff;box-shadow:0 1px 0 #AEB2BA;color:#202127;font:500 18px -apple-system,BlinkMacSystemFont,sans-serif}
+.pm-keyboard-third button:first-child,.pm-keyboard-third button:last-child,.pm-keyboard-bottom button:first-child{background:#ABB2BE}
+.pm-keyboard-bottom{height:45px;margin:1px 0 0}
+.pm-keyboard-bottom button{font-size:14px}
+.pm-keyboard-bottom button:nth-child(2){flex:5;font-size:13px}
+.pm-keyboard-bottom button:last-child{flex:1.5;background:#477ED5;color:#fff}
+.pm-keyboard-home{width:108px;height:4px;margin:8px auto 6px;border-radius:4px;background:#26282D}
+@media (hover:none) and (pointer:coarse){#pm-keyboard-preview{display:none!important}}
+@media (prefers-reduced-motion:reduce){#pm-keyboard-preview{transition:none}}

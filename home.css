@@ -263,8 +263,7 @@ body.notipanel-open .bottomnav{display:none!important}
 
 /* 홈 상단: 현위치 대신 핀맵 로고 */
 .homebrand{display:flex;align-items:center;gap:8px;min-height:40px;margin:0 0 16px;padding-right:100px;color:var(--t-ink,#111)}
-.homebrand img{display:block;width:30px;height:32px;object-fit:contain}
-.homebrand span{font-size:23px;font-weight:750;letter-spacing:-.8px;line-height:1}
+.homebrand img{display:block;width:130px;height:40px;object-fit:contain;object-position:left center}
 
 /* Empty content uses the same banner dimensions, stacking and text positions. */
 .mainpick[data-placeholder="true"]{cursor:default}

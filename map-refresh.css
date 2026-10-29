@@ -48,8 +48,6 @@
 /* Controls move above the selected-place banner instead of covering it. */
 .lm-floating-actions{position:absolute;right:20px;bottom:calc(var(--lm-footer) + 198px);display:flex;flex-direction:column;gap:12px;z-index:550;transition:bottom .18s}
 .live-map .lm-floating-actions .lm-round{width:46px;height:46px;border-radius:50%;padding:0;background:#fff!important;color:var(--lm-text);border:1px solid var(--lm-line)!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:none!important}
-.live-map button.lm-course-create{position:static;display:grid;place-items:center;width:54px;height:54px;min-height:54px;margin:0 0 0 -4px;padding:0;border:0!important;border-radius:50%;background:var(--lm-text)!important;color:#fff!important;box-shadow:0 4px 14px #1113!important}
-.live-map .lm-course-create svg{width:26px;height:26px}
 .lm-selected-host{position:absolute;left:0;right:0;bottom:calc(var(--lm-footer) + 10px);z-index:560}
 .lm-place-banner{position:relative;background:#fff;border:1px solid #fff;border-radius:18px;box-shadow:0 7px 28px #1113;overflow:hidden}
 .live-map .lm-place-banner .lm-banner-main{display:flex;align-items:stretch;gap:13px;width:100%;min-height:138px;text-align:left;padding:10px;border:0!important;background:#fff!important;box-shadow:none!important;border-radius:0;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
@@ -72,10 +70,6 @@
 .lm-carousel .lm-place-banner{flex:0 0 calc(100% - 0px);min-width:0;scroll-snap-align:center;scroll-snap-stop:always;box-shadow:0 5px 14px #1112}
 .lm-carousel.is-dragging{scroll-snap-type:none;cursor:grabbing;user-select:none}
 .lm-carousel img{-webkit-user-drag:none;user-select:none}
-.lm-carousel-controls{display:flex;align-items:center;justify-content:center;gap:12px;height:24px;margin-top:-6px;pointer-events:none}
-.live-map .lm-carousel-controls button{display:grid;place-items:center;width:28px;height:24px;padding:0;border:0!important;border-radius:12px;background:#ffffffed!important;box-shadow:0 2px 6px #1111!important;font-size:20px;line-height:1;pointer-events:auto;backdrop-filter:none!important}
-.lm-carousel-controls button:disabled{opacity:.35;cursor:default}
-.lm-carousel-position{font-size:10px;line-height:20px;padding:0 8px;border-radius:12px;background:#ffffffed;color:var(--lm-muted)}
 .lm-empty-banner{margin:4px 28px 18px;padding:24px 12px;text-align:center;border-radius:18px;background:#fff;box-shadow:0 5px 14px #1112;font-size:14px;line-height:1.7}
 .lm-empty-banner small{font-size:11px;color:var(--lm-muted)}
 .live-map .lm-directions-preview{position:absolute;top:184px;right:20px;z-index:550;width:46px;height:46px;display:grid;place-items:center;border:1px solid #fff!important;border-radius:50%;background:#ffffffdf!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:blur(15px)!important;cursor:default;color:var(--lm-text)}

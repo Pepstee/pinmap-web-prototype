@@ -48,6 +48,12 @@ pages.my = function(){
     ${avatarHtml()}
     <span class="mpinfo"><b>${esc(settings.nickname)}</b><small>프로필 편집</small></span>${icon('chevron')}
   </button>
+  <nav class="my-shortcuts" aria-label="마이 바로가기">
+    <button data-page="courses">${icon('route')}<span>코스</span></button>
+    <button data-page="library">${icon('folder')}<span>컬렉션</span></button>
+    <button data-page="placeset">${icon('pin')}<span>위치</span></button>
+    <button data-page="guide">${icon('note')}<span>가이드</span></button>
+  </nav>
   <button class="sharepromo" data-action="snsdemo"><span aria-hidden="true">📲</span><div><b>SNS에서 바로 저장해보기</b><small>게시물에서 공유 → 핀맵, 저장 과정을 체험해요</small></div>${icon('arrow')}</button>
 
   <section class="mgroup"><h2>나의 핀맵</h2>
