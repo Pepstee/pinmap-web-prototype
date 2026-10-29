@@ -46,7 +46,7 @@
   pageName.courses='저장한 코스';
   pages.courses=function(){
     return `<section class="coursepage course-list-page">
-      <header class="course-header"><div class="course-toolbar"><button class="course-close" data-page="map" aria-label="지도로 돌아가기">${icon('back')}</button></div><h1>저장한 코스</h1><p>나만의 동선을 모아두고 다시 꺼내보세요.</p></header>
+      <header class="course-header"><div class="course-toolbar"><button class="course-close" data-page="my" aria-label="마이페이지로 돌아가기">${icon('back')}</button></div><h1>저장한 코스</h1><p>나만의 동선을 모아두고 다시 꺼내보세요.</p></header>
       <div class="course-list-body">
         <button class="course-new" data-course-new>${icon('plus')} 새 코스 만들기</button>
         <div class="course-list-heading">코스 ${courses.length}개</div>

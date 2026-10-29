@@ -2,7 +2,7 @@
 (() => {
   const originalRender = render;
   let liveMap, pinLayer, locationMarker, searchController, placeController;
-  let expandedKey=null, preferredKey=null, carouselTimer=null, carouselDrag=null, suppressBannerClickUntil=0;
+  let expandedKey=null, sheetStage='peek', sheetDrag=null, suppressSheetClickUntil=0;
   const markerEntries=new Map();
   let userPosition = null;
   let userHeading = null, locationWatch = null, orientationActive = false;
@@ -21,11 +21,11 @@
   // Use the same line style as the app navigation on every platform.
   const categoryPaths = {
     all: paths.spark,
-    eat: 'M7 3v18 M4 3v5a3 3 0 0 0 6 0V3 M17 21v-9h3V3c-4 0-5 6-3 9',
+    eat: paths.eat,
     cafe: paths.coffee,
-    event: 'M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4z M16 5v3 M16 11v2 M16 16v3',
-    walk: 'M12 22v-7 M12 3a5 5 0 0 0-5 5 4 4 0 0 0 1 7h8a4 4 0 0 0 1-7 5 5 0 0 0-5-5z',
-    shop: 'M5 8h14l-1 13H6z M9 8V6a3 3 0 0 1 6 0v2'
+    event: paths.event,
+    walk: paths.walk,
+    shop: paths.shop
   };
   const categorySolidPaths = {
     all: paths.spark,
@@ -40,7 +40,6 @@
   const categoryLabel = tag => ({station:'역',stop:'정류장',park:'공원',restaurant:'식당',cafe:'카페',museum:'박물관',gallery:'갤러리',shop:'상점',water:'호수',residential:'주거 지역'})[tag] || tag;
   const kindOf = tag => /restaurant|food|fast_food|bar|pub/.test(tag) ? 'eat' : /cafe|coffee|bakery/.test(tag) ? 'cafe' : /museum|gallery|theatre|artwork/.test(tag) ? 'event' : /park|garden|forest|wood/.test(tag) ? 'walk' : /shop|mall|market/.test(tag) ? 'shop' : 'walk';
   const round = (name, symbol) => `<button class="lm-round" data-lm="locate" aria-label="${name}" title="${name}">${icon(symbol)}</button>`;
-  const routeIcon = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 5h8a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h8"/></svg>';
   const safe = value => esc(value || '');
   const savedPlaces = () => {
     const pinned = savedCoords.map(position => {
@@ -61,8 +60,8 @@
       </header>
       <div class="lm-status" role="status" hidden></div>
       <div class="lm-search-results" id="lm-search-results" hidden></div>
-      <button type="button" class="lm-directions-preview" aria-label="길찾기 · 준비 중" aria-disabled="true" title="길찾기 · 준비 중"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="m21 3-7 18-4-7-7-4 18-7Z M10 14 21 3"/></svg></button><div class="lm-floating-actions">${round('현재 위치로 이동','target')}<button type="button" class="lm-course-create" data-course-new aria-label="코스 짜기" title="코스 짜기">${routeIcon}</button></div>
-      <section class="lm-selected-host" id="lm-selected-place" aria-label="장소 둘러보기"></section>
+      <div class="lm-floating-actions"><button type="button" class="lm-directions-preview" aria-label="길찾기 · 준비 중" aria-disabled="true" title="길찾기 · 준비 중"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="m21 3-7 18-4-7-7-4 18-7Z M10 14 21 3"/></svg></button>${round('현재 위치로 이동','target')}</div>
+      <section class="lm-selected-host" id="lm-selected-place" aria-label="이 근방 저장된 장소"></section>
       <nav class="bottomnav lm-shared-nav" aria-label="하단 메뉴">${nav()}</nav></section>`;
   }
   function status(message) { const el = $('#app .lm-status'); if (el) { el.textContent = message; el.hidden = !/못|실패|입력|확인하고|검색하고/.test(message); } }
@@ -84,7 +83,7 @@
   function markerIcon(place,expanded=false) {
     return L.divIcon({className:`lm-photo-marker${expanded?' is-selected':''}`,
       html:`<span class="lm-place-badge"><span class="lm-badge-image"><img src="${safe(place.image||localPhoto(place.kind))}" alt=""></span><span class="lm-badge-category">${categoryIcon(place.kind)}</span></span>`,
-      iconSize:[60,60],iconAnchor:[30,30]});
+      iconSize:expanded?[86,92]:[60,60],iconAnchor:expanded?[43,86]:[30,30]});
   }
   function updateMarker(entry,expanded) {
     entry.marker.setIcon(markerIcon(entry.place,expanded));
@@ -97,55 +96,88 @@
   function clearSelection() {
     if(expandedKey&&markerEntries.has(expandedKey))updateMarker(markerEntries.get(expandedKey),false);
     expandedKey=null;
+    $('#app .live-map')?.classList.remove('has-selected-place');
   }
-  function buildCarousel(list) {
-    clearTimeout(carouselTimer);
+  function nearbyPlaces() {
+    const bounds=liveMap?.getBounds().pad(1);
+    return savedPlaces().filter(place=>(category==='all'||place.kind===category)&&(!bounds||bounds.contains([place.lat,place.lng])));
+  }
+  function setSheetStage(stage) {
+    sheetStage=stage;
+    const sheet=$('#lm-selected-place .lm-sheet');if(!sheet)return;
+    sheet.style.removeProperty('--lm-sheet-height');sheet.classList.remove('is-dragging','is-peek','is-half','is-full');sheet.classList.add('is-'+stage);
+    const handle=sheet.querySelector('.lm-sheet-handle');
+    handle?.setAttribute('aria-expanded',String(stage!=='peek'));
+  }
+  function bindSheetHandle(sheet) {
+    const handle=sheet.querySelector('.lm-sheet-handle');
+    handle.addEventListener('pointerdown',event=>{
+      if(event.pointerType==='mouse'&&event.button!==0)return;
+      sheetDrag={id:event.pointerId,y:event.clientY,height:sheet.getBoundingClientRect().height,moved:false};
+      handle.setPointerCapture(event.pointerId);
+    });
+    handle.addEventListener('pointermove',event=>{
+      if(!sheetDrag||event.pointerId!==sheetDrag.id)return;
+      const delta=sheetDrag.y-event.clientY;
+      if(Math.abs(delta)>6)sheetDrag.moved=true;
+      if(!sheetDrag.moved)return;
+      event.preventDefault();sheet.classList.add('is-dragging');
+      const min=expandedKey?sheet.parentElement.clientHeight*.5:162;
+      sheet.style.setProperty('--lm-sheet-height',Math.max(min,Math.min(sheet.parentElement.clientHeight,sheetDrag.height+delta))+'px');
+    });
+    const finish=event=>{
+      if(!sheetDrag||event.pointerId!==sheetDrag.id)return;
+      const drag=sheetDrag;sheetDrag=null;
+      if(!drag.moved)return;
+      suppressSheetClickUntil=Date.now()+350;
+      const delta=drag.y-event.clientY;
+      const stages=expandedKey?['half','full']:['peek','half','full'];
+      const index=stages.indexOf(sheetStage);
+      setSheetStage(stages[Math.max(0,Math.min(stages.length-1,index+(delta>35?1:delta< -35?-1:0)))]);
+    };
+    handle.addEventListener('pointerup',finish);handle.addEventListener('pointercancel',finish);
+    handle.addEventListener('click',()=>{
+      if(Date.now()<suppressSheetClickUntil)return;
+      const stages=expandedKey?['half','full']:['peek','half','full'];
+      setSheetStage(stages[(stages.indexOf(sheetStage)+1)%stages.length]);
+    });
+    handle.addEventListener('keydown',event=>{
+      if(!['ArrowUp','ArrowDown'].includes(event.key))return;
+      event.preventDefault();const stages=expandedKey?['half','full']:['peek','half','full'];
+      setSheetStage(stages[Math.max(0,Math.min(stages.length-1,stages.indexOf(sheetStage)+(event.key==='ArrowUp'?1:-1)))]);
+    });
+  }
+  function renderSheet() {
     const host=$('#lm-selected-place');if(!host)return;
-    if(!list.length){host.innerHTML='<div class="lm-empty-banner" role="status">표시할 장소가 없어요.<br><small>다른 카테고리나 검색어를 선택해 주세요.</small></div>';return;}
-    host.innerHTML=`<div class="lm-carousel" role="region" aria-roledescription="캐러셀" aria-label="장소 정보, 좌우로 넘기기" tabindex="0">${list.map((place,index)=>`<article class="lm-place-banner" data-place-key="${safe(placeKey(place))}" role="group" aria-roledescription="슬라이드" aria-label="${index+1} / ${list.length}"><button class="lm-banner-main" data-lm="open-place" data-place-key="${safe(placeKey(place))}" aria-label="${safe(place.title)} ${place.saved?'상세 보기':'외부 지도에서 보기'}"><img src="${safe(place.image||localPhoto(place.kind))}" alt=""><span class="lm-banner-copy"><strong>${safe(place.title)}</strong><span>${safe(place.category)} · ${place.saved?'저장한 장소':'검색한 장소'}</span><span class="lm-banner-address">${safe(place.address||'주소 정보 없음')}</span><b>${place.saved?'상세 보기':'지도에서 보기'} ${icon('arrow')}</b></span></button></article>`).join('')}</div><div class="lm-carousel-controls"><button data-lm="previous-place" aria-label="이전 장소">‹</button><span class="lm-carousel-position" aria-live="polite"></span><button data-lm="next-place" aria-label="다음 장소">›</button></div>`;
-    const track=host.querySelector('.lm-carousel');
-    track.addEventListener('scroll',()=>{clearTimeout(carouselTimer);carouselTimer=setTimeout(()=>settleCarousel(track),140);},{passive:true});
-    track.addEventListener('pointerdown',event=>{if(event.pointerType==='mouse'&&event.button===0)carouselDrag={track,id:event.pointerId,x:event.clientX,left:track.scrollLeft,moved:false};});
-    track.addEventListener('pointermove',event=>{const drag=carouselDrag;if(!drag||drag.id!==event.pointerId)return;if(Math.abs(event.clientX-drag.x)>8&&!drag.moved){drag.moved=true;track.setPointerCapture(event.pointerId);track.classList.add('is-dragging');}if(drag.moved){event.preventDefault();track.scrollLeft=drag.left-(event.clientX-drag.x);}});
-    track.addEventListener('pointerleave',()=>{if(carouselDrag?.track===track&&!carouselDrag.moved)carouselDrag=null;});
-    const finish=()=>{const drag=carouselDrag;if(!drag)return;carouselDrag=null;track.classList.remove('is-dragging');if(drag.moved){suppressBannerClickUntil=Date.now()+350;settleCarousel(track);}};
-    track.addEventListener('pointerup',finish);track.addEventListener('pointercancel',finish);
+    const place=expandedKey?markerEntries.get(expandedKey)?.place:null;
+    const nearby=place?[]:nearbyPlaces();
+    host.setAttribute('aria-label',place?`${place.title} 상세정보`:'이 근방 저장된 장소');
+    host.innerHTML=`<div class="lm-sheet is-${sheetStage}" role="region" aria-label="${place?safe(place.title)+' 상세정보':'이 근방 저장된 장소'}">
+      <div class="lm-sheet-handle" role="button" tabindex="0" aria-label="${place?'장소 상세 패널':'주변 장소 패널'} 높이 조절" aria-expanded="${sheetStage!=='peek'}"><span></span></div>
+      <div class="lm-sheet-head"><div><small>${place?safe(place.category):'내 주변'}</small><h2>${place?safe(place.title):`저장한 장소 ${nearby.length}곳`}</h2></div>${place?'<button type="button" class="lm-sheet-close" data-lm="close-place" aria-label="장소 정보 닫기">✕</button>':''}</div>
+      <div class="lm-sheet-scroll">${place?
+        `<img class="lm-detail-photo" src="${safe(place.image||localPhoto(place.kind))}" alt=""><p class="lm-detail-address">${safe(place.address||'주소 정보 없음')}</p>${place.description?`<p class="lm-detail-description">${safe(place.description)}</p>`:''}<p class="lm-detail-source">${safe(place.source||place.category)}</p><button type="button" class="lm-detail-link" data-lm="open-place" data-place-key="${safe(placeKey(place))}">${place.saved?'상세 보기':'지도에서 보기'} ${icon('arrow')}</button>`:
+        nearby.length?`<ul class="lm-nearby-list">${nearby.map(item=>`<li><button type="button" data-lm="select-place" data-place-key="${safe(placeKey(item))}"><img src="${safe(item.image||localPhoto(item.kind))}" alt=""><span><strong>${safe(item.title)}</strong><small>${safe(item.category)} · ${safe(item.address||'주소 정보 없음')}</small></span>${icon('arrow')}</button></li>`).join('')}</ul>`:'<p class="lm-nearby-empty">이 근방에 저장한 장소가 없어요.</p>'}</div>
+    </div>`;
+    bindSheetHandle(host.querySelector('.lm-sheet'));
   }
-  function settleCarousel(track) {
-    if(!liveMap||!track.isConnected||carouselDrag)return;
-    const middle=track.scrollLeft+track.clientWidth/2;
-    const cards=[...track.querySelectorAll('.lm-place-banner')];
-    const card=cards.reduce((best,current)=>Math.abs(current.offsetLeft+current.offsetWidth/2-middle)<Math.abs(best.offsetLeft+best.offsetWidth/2-middle)?current:best,cards[0]);
-    const entry=card&&markerEntries.get(card.dataset.placeKey);
-    if(entry&&expandedKey!==card.dataset.placeKey)expandPlace(entry.place,false);
-  }
-  function stepPlace(direction) {
-    const list=visiblePlaces(),index=list.findIndex(place=>placeKey(place)===expandedKey);
-    const place=list[Math.max(0,Math.min(list.length-1,index+direction))];if(place)expandPlace(place);
-  }
-  function expandPlace(place,scroll=true,moveMap=true) {
+  function expandPlace(place,moveMap=true) {
     const key=placeKey(place),entry=markerEntries.get(key);if(!entry)return;
-    clearSelection();expandedKey=key;preferredKey=key;updateMarker(entry,true);
-    const host=$('#lm-selected-place'),track=host?.querySelector('.lm-carousel');
-    const list=visiblePlaces(),index=list.findIndex(item=>placeKey(item)===key);
-    host?.querySelectorAll('.lm-place-banner').forEach(card=>card.setAttribute('aria-current',String(card.dataset.placeKey===key)));
-    const counter=host?.querySelector('.lm-carousel-position');if(counter)counter.textContent=`${index+1} / ${list.length}`;
-    const previous=host?.querySelector('[data-lm="previous-place"]'),next=host?.querySelector('[data-lm="next-place"]');if(previous)previous.disabled=index<=0;if(next)next.disabled=index>=list.length-1;
-    if(scroll&&track){const card=[...track.children].find(card=>card.dataset.placeKey===key);if(card)track.scrollTo({left:card.offsetLeft-(track.clientWidth-card.offsetWidth)/2,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}
+    clearSelection();expandedKey=key;updateMarker(entry,true);sheetStage='half';
+    $('#app .live-map')?.classList.add('has-selected-place');renderSheet();
     const resultsPanel=$('#lm-search-results');if(resultsPanel)resultsPanel.hidden=true;
-    if(moveMap)liveMap.setView([place.lat,place.lng],Math.max(liveMap.getZoom(),15),{animate:false});
+    if(moveMap){liveMap.setView([place.lat,place.lng],Math.max(liveMap.getZoom(),15),{animate:false});liveMap.panBy([0,120],{animate:false});}
   }
-  function markers(moveMap=false) {
+  function markers() {
     if (!liveMap) return;
     clearSelection();markerEntries.clear();pinLayer.clearLayers();
     const list = visiblePlaces();
-    buildCarousel(list);
     list.forEach(place => {
       const marker=L.marker([place.lat,place.lng],{title:place.title,icon:markerIcon(place),bubblingMouseEvents:false}).addTo(pinLayer);
       const entry={place,marker};markerEntries.set(placeKey(place),entry);updateMarker(entry,false);
       marker.on('click',()=>expandPlace(place));
     });
-    if(list.length)expandPlace(list.find(place=>placeKey(place)===preferredKey)||list[0],true,moveMap);
+    sheetStage='peek';renderSheet();
     status(searchResults ? `${list.length}개 실제 장소 검색 결과` : `${list.length}개 저장 장소`);
   }
   function mount() {
@@ -154,12 +186,12 @@
     window.attachPinmapBasemap(liveMap);
     pinLayer = L.layerGroup().addTo(liveMap); markers(); drawLocation();
     if(!PM_ENV.development&&typeof window.DeviceOrientationEvent?.requestPermission!=='function')startOrientation();
-    liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); });
+    liveMap.on('moveend', () => { center=[liveMap.getCenter().lat,liveMap.getCenter().lng]; zoom=liveMap.getZoom(); if(!expandedKey)renderSheet(); });
     requestAnimationFrame(() => liveMap?.invalidateSize());
   }
   render = function() {
     searchController?.abort();
-    clearTimeout(carouselTimer);carouselDrag=null;expandedKey=null;markerEntries.clear();
+    sheetDrag=null;expandedKey=null;sheetStage='peek';markerEntries.clear();
     window.unmountCourseMap?.();
     window.unmountCourseThumbnails?.();
     stopLocation();
@@ -257,19 +289,18 @@
     const result=event.target.closest('[data-result]');
     if(result){const found=visiblePlaces()[Number(result.dataset.result)];if(found) expandPlace(found);return;}
     const cat=event.target.closest('[data-lm-cat]');
-    if(cat){selectCategory(cat.dataset.lmCat);markers(true);showResults();return;}
+    if(cat){selectCategory(cat.dataset.lmCat);markers();showResults();return;}
     const button=event.target.closest('[data-lm]'); if(!button)return;
     switch(button.dataset.lm){
       case 'locate':locate();break;
-      case 'previous-place':stepPlace(-1);break;
-      case 'next-place':stepPlace(1);break;
-      case 'open-place':{if(Date.now()<suppressBannerClickUntil)return;const place=markerEntries.get(button.dataset.placeKey)?.place;if(!place)break;if(place.saved)openDetail(place.id);else window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place.lat+','+place.lng),'_blank','noopener,noreferrer');break;}
+      case 'select-place':{const place=markerEntries.get(button.dataset.placeKey)?.place;if(place)expandPlace(place);break;}
+      case 'close-place':clearSelection();sheetStage='peek';renderSheet();break;
+      case 'open-place':{const place=markerEntries.get(button.dataset.placeKey)?.place;if(!place)break;if(place.saved)openDetail(place.id);else window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(place.lat+','+place.lng),'_blank','noopener,noreferrer');break;}
       case 'clear-search':searchResults=null;searchQuery='';$('#lm-search input').value='';$('#lm-search [data-lm="clear-search"]').hidden=true;$('#lm-search-results').hidden=true;center=PM_ENV.development?[20,0]:[37.5445,127.043];zoom=PM_ENV.development?2:15;liveMap?.setView(center,zoom);markers();break;
     }
   });
-  document.addEventListener('click',event=>{if(event.target.closest('.lm-carousel')&&Date.now()<suppressBannerClickUntil){event.preventDefault();event.stopImmediatePropagation();}},true);
   document.addEventListener('error',event=>{if(event.target.matches?.('.lm-badge-image img'))event.target.hidden=true;},true);
-  document.addEventListener('keydown',event=>{if(page!=='map')return;if(event.target.closest('.lm-carousel')&&['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();stepPlace(event.key==='ArrowRight'?1:-1);return;}if(event.key===' '&&event.target.closest('.lm-photo-marker')){event.preventDefault();event.target.closest('.lm-photo-marker').click();}});
+  document.addEventListener('keydown',event=>{if(page==='map'&&event.key===' '&&event.target.closest('.lm-photo-marker')){event.preventDefault();event.target.closest('.lm-photo-marker').click();}});
   document.addEventListener('input',event=>{if(event.target.matches('#lm-search input'))$('#lm-search [data-lm="clear-search"]').hidden=!event.target.value;});
   document.addEventListener('submit',event => { if(event.target.id==='lm-search'){event.preventDefault();searchPlaces(new FormData(event.target).get('q').trim());} });
   window.addEventListener('pinmap:place-changed',async event=>{
