@@ -232,7 +232,8 @@ function finishOnboarding() {
   closeOnboarding();
   go('home');
   // 온보딩이 끝나면 홈 화면 사용법을 코치마크로 간단히 안내해요 (coach.js)
-  if (onboardFull) setTimeout(startCoach, 350);
+  // 코치마크 1단계는 홈 카드를 가리켜요: 350ms 뒤에도 홈 화면이 열려 있을 때만 시작해요.
+  if (onboardFull) setTimeout(() => { if (page === 'home' && !detailId) startCoach(); }, 350);
   else if (preferences.length) toast('관심사 기본값을 바꿨어요.');
 }
 intro = function() { openOnboarding(0); };
