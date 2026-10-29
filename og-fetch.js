@@ -16,6 +16,7 @@ if(PM_ENV.development) {
     ogHint(form).textContent = '링크 정보를 확인하는 중…';
     try {
       const res = await fetch('/api/og?url=' + encodeURIComponent(url), {signal: ogController.signal});
+      if(res.status === 404){ ogHint(form).textContent = '링크 정보 API가 이 환경에는 없어요. Vercel 미리보기에서는 동작해요.'; return; }
       const data = await res.json();
       if(!data.ok){ogHint(form).textContent = '제목을 자동으로 가져오지 못했어요. 직접 입력해 주세요.';return;}
       const title = form.elements.namedItem('title');
