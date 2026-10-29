@@ -46,7 +46,7 @@
 .lm-location-demo{position:absolute;top:66px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#fff;border:1px solid var(--lm-line);border-radius:10px;padding:1px 5px;font-size:9px;line-height:1.5;color:var(--lm-muted);box-shadow:0 1px 4px #1111}
 
 /* Controls move above the selected-place banner instead of covering it. */
-.lm-floating-actions{position:absolute;right:20px;bottom:calc(var(--lm-footer) + 198px);display:flex;flex-direction:column;gap:12px;z-index:550;transition:bottom .18s}
+.lm-floating-actions{position:absolute;right:20px;bottom:calc(var(--lm-footer) + 182px);display:flex;flex-direction:column;gap:12px;z-index:550;transition:bottom .18s}
 .live-map .lm-floating-actions .lm-round{width:46px;height:46px;border-radius:50%;padding:0;background:#fff!important;color:var(--lm-text);border:1px solid var(--lm-line)!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:none!important}
 .lm-selected-host{position:absolute;left:0;right:0;bottom:calc(var(--lm-footer) + 10px);z-index:560}
 .lm-place-banner{position:relative;background:#fff;border:1px solid #fff;border-radius:18px;box-shadow:0 7px 28px #1113;overflow:hidden}
@@ -72,7 +72,7 @@
 .lm-carousel img{-webkit-user-drag:none;user-select:none}
 .lm-empty-banner{margin:4px 28px 18px;padding:24px 12px;text-align:center;border-radius:18px;background:#fff;box-shadow:0 5px 14px #1112;font-size:14px;line-height:1.7}
 .lm-empty-banner small{font-size:11px;color:var(--lm-muted)}
-.live-map .lm-directions-preview{position:absolute;top:184px;right:20px;z-index:550;width:46px;height:46px;display:grid;place-items:center;border:1px solid #fff!important;border-radius:50%;background:#ffffffdf!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:blur(15px)!important;cursor:default;color:var(--lm-text)}
+.live-map .lm-directions-preview{position:static;flex:none;width:46px;height:46px;display:grid;place-items:center;border:1px solid #fff!important;border-radius:50%;background:#ffffffdf!important;box-shadow:0 3px 12px #1112!important;backdrop-filter:blur(15px)!important;cursor:default;color:var(--lm-text)}
 .live-map .lm-directions-preview svg{width:23px;height:23px}
 
 /* Teammate's neighborhood control, adapted to the photo-map header. */
@@ -94,7 +94,6 @@
 .live-map .lm-header .lm-search-row .iconbtn{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .live-map .lm-header .lm-search-row .iconbtn[hidden]{display:none!important}
 .live-map .lm-header .lm-search-row .libgo{width:28px;height:28px;min-height:28px;padding:0;border-radius:50%;background:rgba(255,255,255,.62)!important;box-shadow:0 8px 28px rgba(32,32,32,.133),inset 0 1px 0 rgba(255,255,255,.9)!important}
-.live-map .lm-directions-preview{top:231px}
 .live-map .lm-search-results,.live-map .lm-status{top:220px}
 .live-map .leaflet-top{top:227px}
 @media(max-width:360px){.live-map .lm-header .lm-location-header .placemain{font-size:21px}.live-map .lm-header .lm-location-header .placesub{font-size:12px}}
