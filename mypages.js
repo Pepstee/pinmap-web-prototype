@@ -2,7 +2,7 @@
 // 마이에서 누르는 기능은 아래에서 올라오는 시트 대신 새 페이지로 열리고, 왼쪽 위 ← 로 마이로 돌아가요.
 // 현재 위치 · 관심 키워드 · 알림 · 저장 · 위치/지도 · 저장하는 방법 · 앱 정보 · 핀맵 계정 설정
 
-const MY_PAGES = {placeset:'현재 위치', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', mapset:'위치 · 지도', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', account:'핀맵 계정 설정'};
+const MY_PAGES = {placeset:'위치 설정', interestset:'관심 키워드 설정', notiset:'알림 설정', saveset:'저장 설정', mapset:'위치 · 지도', guide:'이용 가이드', howtopage:'저장하는 방법', appinfo:'앱 정보', account:'핀맵 계정 설정'};
 Object.entries(MY_PAGES).forEach(([k, v]) => { PARENT_TAB[k] = 'my'; pageName[k] = v; });
 const myPage = (title, body, cls = '', back = 'my') => `<div class="mypage ${cls}">${subHead(title, back)}${body}</div>`;
 
@@ -31,7 +31,7 @@ function placeBody(){
     ${p.length < MAX_PLACES ? `<button class="padd" data-action="placeadd">${icon('plus')} 위치 추가</button>` : `<p class="hint pfull">위치를 바꾸려면 ✎ 수정을 누르거나, 하나를 삭제한 뒤 추가하세요.</p>`}
     ${p.length===1 ? '<p class="hint pfull">위치는 최소 1개가 필요해서 삭제할 수 없어요.</p>' : ''}`;
 }
-pages.placeset = () => myPage('현재 위치', placeBody(), 'placepage');
+pages.placeset = () => myPage('위치 설정', placeBody(), 'placepage');
 // 이 페이지에 있을 때는 시트 대신 페이지를 다시 그려요 (홈 상단에서 열 때는 지금처럼 시트)
 placeSheet = function(){ if (page === 'placeset' && !detailId) { if ($('#sheet').open) $('#sheet').close(); render(); } else placeSheetBase(); };
 const placeSheetAction = actions.placesheet;
@@ -41,7 +41,7 @@ actions.placesheet = () => { if (page === 'placeset') placeSheet(); else placeSh
 pages.interestset = function(){
   const opts = interestOptions.filter(o => o.id !== 'later');
   return myPage('관심 키워드 설정', `
-    <p class="muted mpdesc">고른 키워드에 맞는 저장 콘텐츠를 홈에서 먼저 보여드려요. (복수 선택 가능)</p>
+    <p class="muted mpdesc">고른 키워드에 맞는 저장 콘텐츠를 홈에서 먼저 보여드려요. 복수 선택이 가능해요!</p>
     <div class="kwgrid" role="group" aria-label="관심 키워드">${opts.map(o => { const on = preferences.includes(o.id);
       return `<button class="kwopt ${on ? 'on' : ''}" data-kw="${o.id}" role="checkbox" aria-checked="${on}"><span class="kwico" aria-hidden="true">${o.emoji}</span><span>${o.short}</span></button>`; }).join('')}</div>
     <p class="hint mpnote">${preferences.length ? `${preferences.length}개 선택됨 · 바로 저장돼요` : '아무것도 고르지 않으면 홈에서 랜덤으로 추천해요'}</p>`);

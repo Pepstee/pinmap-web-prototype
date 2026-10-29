@@ -198,6 +198,9 @@ body.onboarding-open{overflow:hidden}
 #onboarding .ob-screen.step3::before,#onboarding .ob-screen.step3::after{display:none!important;content:none!important}
 #onboarding .ob-screen.step2,#onboarding .ob-screen.step3{background:#F4F4F5!important}
 #onboarding .ob-actions{background:none!important}
+.step3 .ob-actions{display:flex;flex-direction:column;gap:8px}
+.ob-action-back{width:100%;min-height:48px;border-radius:24px;font-size:15px;font-weight:600;color:var(--ob-ink)}
+.ob-action-back:hover{background:rgba(0,0,0,.04);filter:none}
 .step2 .ob-flowcard{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid #ECECEE!important;box-shadow:none!important}
 .step2 .ob-mock{background:#F6F6F7!important;border:0!important}
 .step3 .ob-option{background:#fff!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid #ECECEE!important;box-shadow:none!important}

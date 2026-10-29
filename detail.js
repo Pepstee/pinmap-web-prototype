@@ -61,8 +61,6 @@ detail = function(){
       <div class="dttop"><button class="dtbtn" data-action="back" aria-label="돌아가기">${icon('chevleft')}</button>
         <div class="dttopr">
           <button class="dtbtn" data-action="dtshare" aria-label="공유">${icon('share')}</button>
-          <button class="dtbtn" data-action="edit" aria-label="수정">${icon('pen')}</button>
-          <button class="dtbtn" data-unsave="${x.id}" aria-label="삭제">${icon('trash')}</button>
         </div></div>
       <div class="dtsrc dthtitle">
         <span class="dthpill">${esc(x.category || shortType(x.type))}</span>
@@ -77,9 +75,10 @@ detail = function(){
         </div>
       </div>
       ${x.desc ? `<section class="dtsum"><h2>${icon('spark')}요약</h2><p>${esc(x.desc)}</p></section>` : ''}
-      <section class="dtsec"><h2>저장한 메모</h2><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨보세요.')}</span>${icon('chevron')}</button></section>
+      <section class="dtsec"><div class="dtsechead"><h2>저장한 메모</h2><button type="button" class="dtmemoedit" data-action="edit" aria-label="저장한 메모 수정">${icon('pen')}수정</button></div><button type="button" class="dtmemobox" data-action="edit" aria-label="메모 수정"><span>${esc(x.memo || '아직 메모가 없어요. 눌러서 남겨보세요.')}</span>${icon('chevron')}</button></section>
       ${info}
       <p class="dthint dtfoot">원본 콘텐츠는 저장한 SNS에서 확인해요. 핀맵은 썸네일과 요약만 보여줘요. (예시 콘텐츠)</p>
+      <button type="button" class="dtdelete" data-unsave="${x.id}">${icon('trash')}컬렉션에서 삭제</button>
     </div>
     <div class="dtbar ${bottom.length === 1 ? 'one' : ''}">${bottom.join('')}</div>
   </article>`;
@@ -124,7 +123,7 @@ function editSheet(){
         <span class="esinput withicon">${icon('pin')}<input name="address" id="es-address" value="${esc(x.address||'')}" maxlength="200" placeholder="원본에서 확인한 주소"></span>
       </label>
       <label class="esfield">${label('note','메모')}
-        <span class="esinput area"><textarea name="memo" id="es-memo" rows="3" maxlength="200" placeholder="어떤 순간에 다시 보고 싶나요?">${esc(x.memo||'')}</textarea><small class="escount" data-for="es-memo"></small></span>
+        <span class="esinput area"><textarea name="memo" id="es-memo" rows="3" maxlength="200" placeholder="어떤 순간에 다시 보고 싶나요?">${esc(x.memo||'')}</textarea></span><small class="escount" data-for="es-memo"></small>
       </label>
       <div class="esfield">${label('folder','모음')}
         <input type="hidden" name="collection" id="es-col" value="${esc(x.collection||'')}">
@@ -193,7 +192,7 @@ function saveSheet(){
         <input class="esnewcol" id="es-newcol" maxlength="30" placeholder="새 모음 이름 (예: 10월 데이트)" hidden>
       </div>
       <label class="esfield">${label('note','저장한 이유', '<small class="esopt">선택</small>')}
-        <span class="esinput area"><textarea name="memo" id="es-memo" rows="2" maxlength="200" placeholder="어떤 순간에 다시 보고 싶나요?"></textarea><small class="escount" data-for="es-memo"></small></span>
+        <span class="esinput area"><textarea name="memo" id="es-memo" rows="2" maxlength="200" placeholder="어떤 순간에 다시 보고 싶나요?"></textarea></span><small class="escount" data-for="es-memo"></small>
       </label>
       <p class="eshint">이 브라우저에 저장돼요. AI 분류는 프로토타입용 간단한 규칙이에요.</p>
       <p class="eserror" id="saveerror" role="alert"></p>
